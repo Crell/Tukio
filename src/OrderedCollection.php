@@ -22,6 +22,11 @@ class OrderedCollection implements \IteratorAggregate
     protected $itemLookup;
 
     /**
+     * @var bool
+     */
+    protected $sorted = false;
+
+    /**
      * Adds an item to the collection with a given priority.  (Higher numbers come first.)
      *
      * @param $item
@@ -39,6 +44,8 @@ class OrderedCollection implements \IteratorAggregate
 
         $this->items[$priority][] = $item;
         $this->itemLookup[$id] = $item;
+
+        $this->sorted = false;
 
         return $id;
     }
@@ -95,7 +102,10 @@ class OrderedCollection implements \IteratorAggregate
      */
     public function getIterator()
     {
-        krsort($this->items);
+        if (!$this->sorted) {
+            krsort($this->items);
+            $this->sorted = true;
+        }
 
         foreach ($this->items as $itemList) {
             $list = array_map(function(Item $item) {
