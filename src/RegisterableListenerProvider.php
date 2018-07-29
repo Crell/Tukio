@@ -184,6 +184,10 @@ class RegisterableListenerProvider implements ListenerProviderInterface
             throw new ContainerMissingException();
         }
 
+        // We cannot verify the service name as existing at this time, as the container may be populated in any
+        // order.  Thus the referenced service may not be registered now but could be registered by the time the
+        // listener is called.
+
         // Fun fact: We cannot auto-detect the listener target type from a container without instantiating it, which
         // defeats the purpose of a service registration. Therefore this method requires an explicit event type. Also,
         // the wrapping listener must listen to just EventInterface.  The explicit $type means it will still get only
