@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Crell\EventDispatcher;
+namespace Crell\Tukio;
 
 
 trait ParameterDeriverTrait
