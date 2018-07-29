@@ -8,8 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class OrderedCollectionTest extends TestCase
 {
-
-
     public function test_can_add_items_with_same_priority() : void
     {
         $c = new OrderedCollection();
@@ -17,7 +15,9 @@ class OrderedCollectionTest extends TestCase
         $c->addItem('B', 1);
         $c->addItem('C', 1);
 
-        $results = iterator_to_array($c);
+        // Because the collection uses a generator in the getIterator() method, we have to explicitly ignore the
+        // keys in iterator_to_array() or later values will overwrite earlier ones.
+        $results = iterator_to_array($c, false);
 
         $this->assertEquals('ABC', implode($results));
     }
@@ -30,7 +30,7 @@ class OrderedCollectionTest extends TestCase
         $c->addItem('B', 2);
         $c->addItem('A', 3);
 
-        $results = iterator_to_array($c);
+        $results = iterator_to_array($c, false);
 
         $this->assertEquals('ABC', implode($results));
     }
@@ -46,7 +46,7 @@ class OrderedCollectionTest extends TestCase
         $c->addItem('E', 1);
         $c->addItem('F', 1);
 
-        $results = iterator_to_array($c);
+        $results = iterator_to_array($c, false);
 
         $this->assertEquals('ABCDEF', implode($results));
     }
@@ -61,7 +61,7 @@ class OrderedCollectionTest extends TestCase
 
         $c->addItemBefore($cid, 'B');
 
-        $results = implode(iterator_to_array($c));
+        $results = implode(iterator_to_array($c, false));
 
         $this->assertTrue(strpos($results, 'B') < strpos($results, 'C'));
     }
@@ -76,7 +76,7 @@ class OrderedCollectionTest extends TestCase
 
         $c->addItemAfter($aid, 'B');
 
-        $results = implode(iterator_to_array($c));
+        $results = implode(iterator_to_array($c, false));
 
         $this->assertTrue(strpos($results, 'B') > strpos($results, 'A'));
     }

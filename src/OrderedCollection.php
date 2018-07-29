@@ -3,7 +3,14 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
+/**
+ * Defines an orderable collection of arbitrary values.
+ *
+ * Values may be added to the collection at any priority, or relative to an existing value.  When iterated they will
+ * be returned in priority order with higher priority values being returned first.  The order in which values with the
+ * same priority are returned is explicitly undefined and you should not rely on it.  (Although in practice is should be
+ * FIFO, that is not guaranteed.)
+ */
 class OrderedCollection implements \IteratorAggregate
 {
 
@@ -99,6 +106,10 @@ class OrderedCollection implements \IteratorAggregate
     /**
      * {@inheritdoc}
      * @return \ArrayIterator|\Traversable
+     *
+     * Note: Because of how iterator_to_array() works, you MUST pass `false` as the second paramter to that function
+     * if calling it on the return from this object.  If not, only the last list's worth of values will be included in
+     * the resulting array.
      */
     public function getIterator()
     {
@@ -107,25 +118,13 @@ class OrderedCollection implements \IteratorAggregate
             $this->sorted = true;
         }
 
-        foreach ($this->items as $itemList) {
-            $list = array_map(function(Item $item) {
-                return $item->item;
-            }, $itemList);
-            foreach ($list as $i) {
-                $return[] = $i;
+        return (function () {
+            foreach ($this->items as $itemList) {
+                yield from array_map(function(Item $item) {
+                    return $item->item;
+                }, $itemList);
             }
-        }
-
-        return new \ArrayIterator($return);
-
-        /* This is the version that ought to work, but seems to not. Maybe a PHP bug?
-        foreach ($this->items as $itemList) {
-            $list = array_map(function(Item $item) {
-                return $item->item;
-            }, $itemList);
-            yield from $list;
-        }
-        */
+        })();
     }
 }
 
