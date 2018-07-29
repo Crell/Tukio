@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-use Crell\Tukio\BasicEvent;
-
 class CollectingEvent extends BasicEvent
 {
     protected $out = [];

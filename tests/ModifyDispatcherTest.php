@@ -7,6 +7,7 @@ use Crell\Tukio\BasicModifyDispatcher;
 use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
+use Psr\Event\Dispatcher\StoppableEventInterface;
 
 class ModifyDispatcherTest extends TestCase
 {
@@ -30,5 +31,25 @@ class ModifyDispatcherTest extends TestCase
         $d->modify($e);
 
         $this->assertEquals('CRELL', implode($e->result()));
+    }
+
+    public function test_stoppable_events_stop() : void {
+        $provider = new class implements ListenerProviderInterface {
+            public function getListenersForEvent(EventInterface $event): iterable
+            {
+                yield function (StoppableCollectingEvent $event) { $event->add('C'); };
+                yield function (StoppableCollectingEvent $event) { $event->add('R'); };
+                yield function (StoppableCollectingEvent $event) { $event->add('E'); $event->stopPropagation(); };
+                yield function (StoppableCollectingEvent $event) { $event->add('L'); };
+                yield function (StoppableCollectingEvent $event) { $event->add('L'); };
+            }
+        };
+
+        $d = new BasicModifyDispatcher($provider);
+
+        $e = new StoppableCollectingEvent();
+        $d->modify($e);
+
+        $this->assertEquals('CRE', implode($e->result()));
     }
 }
