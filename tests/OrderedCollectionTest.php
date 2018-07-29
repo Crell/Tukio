@@ -80,4 +80,26 @@ class OrderedCollectionTest extends TestCase
 
         $this->assertTrue(strpos($results, 'B') > strpos($results, 'A'));
     }
+
+    public function test_adding_before_non_existent_item_fails() : void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot add item before undefined ID: a');
+
+        $c = new OrderedCollection();
+
+        // The values returned by `uniqid()` are always multiple characters long.
+        $c->addItemBefore('a', 'B');
+    }
+
+    public function test_adding_after_non_existent_item_fails() : void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot add item after undefined ID: a');
+
+        $c = new OrderedCollection();
+
+        // The values returned by `uniqid()` are always multiple characters long.
+        $c->addItemAfter('a', 'B');
+    }
 }
