@@ -67,6 +67,29 @@ class OrderedCollection implements \IteratorAggregate
     }
 
     /**
+     * Adds an item to the collection after another existing item.
+     *
+     * Note: The new item is only guaranteed to get returned after the existing item. No guarantee is made
+     * regarding when it will be returned relative to any other item.
+     *
+     * @param string $pivotId
+     *   The existing ID of an item in the collection.
+     * @param $item
+     *   The new item to add.
+     * @return string
+     *   An opaque ID string uniquely identifying the new item for future reference.
+     */
+    public function addItemAfter(string $pivotId, $item) : string
+    {
+        if (!isset($this->itemLookup[$pivotId])) {
+            throw new \InvalidArgumentException(sprintf('Cannot add item after undefined ID: %s', $pivotId));
+        }
+
+        // Because high numbers come first, we have to SUBTRACT one to get the new item to be returned first.
+        return $this->addItem($item, $this->itemLookup[$pivotId]->priority - 1);
+    }
+
+    /**
      * {@inheritdoc}
      * @return \ArrayIterator|\Traversable
      */
