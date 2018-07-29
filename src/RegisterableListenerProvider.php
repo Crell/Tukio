@@ -105,7 +105,36 @@ class RegisterableListenerProvider implements ListenerProviderInterface
         return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type));
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): void
+    /**
+     * Adds a method on a service as a listener.
+     *
+     * @param string $serviceName
+     *   The name of a service on which this listener lives.
+     * @param string $methodName
+     *   The method name of the service that is the listener being registered.
+     * @param string|null $type
+     *   The class or interface type of events for which this listener will be registered.
+     * @param int $priority
+     *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
+     * @return string
+     *   The opaque ID of the listener.  This can be used for future reference.
+     */
+    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): string
+    {
+        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $type);
+    }
+
+    /**
+     * Creates a callable that will proxy to the provided service and method.
+     *
+     * @param string $serviceName
+     *   The name of a service.
+     * @param string $methodName
+     *   A method on the service.
+     * @return callable
+     *   A callable that proxies to the the provided method and service.
+     */
+    protected function makeListenerForService(string $serviceName, string $methodName) : callable
     {
         if (!$this->container) {
             throw new ContainerMissingException();
@@ -119,10 +148,8 @@ class RegisterableListenerProvider implements ListenerProviderInterface
         $listener = function(EventInterface $event) use ($serviceName, $methodName, $container) : void {
             $container->get($serviceName)->$methodName($event);
         };
-
-        $this->addListener($listener, $priority, $type);
+        return $listener;
     }
-
 }
 
 
