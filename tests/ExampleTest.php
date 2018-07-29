@@ -1,6 +1,6 @@
 <?php
 
-namespace League\Skeleton;
+namespace Crell\Tukio;
 
 class ExampleTest extends \PHPUnit\Framework\TestCase
 {

@@ -1,18 +1,18 @@
 {
-    "name": ":vendor/:package_name",
+    "name": "Crell/Tukio",
     "type": "library",
-    "description": ":package_description",
+    "description": "A robust, stand-alone PSR-14 event dispatcher implementation.",
     "keywords": [
-        ":vendor",
-        ":package_name"
+        "Crell",
+        "Tukio"
     ],
-    "homepage": "https://github.com/:vendor/:package_name",
+    "homepage": "https://github.com/Crell/Tukio",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": ":author_website",
+            "name": "Larry Garfield",
+            "email": "larry@garfieldtech.com",
+            "homepage": "http://www.garfieldtech.com/",
             "role": "Developer"
         }
     ],
@@ -25,12 +25,12 @@
     },
     "autoload": {
         "psr-4": {
-            ":vendor\\:package_name\\": "src"
+            "Crell\\Tukio\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            ":vendor\\:package_name\\": "tests"
+            "Crell\\Tukio\\": "tests"
         }
     },
     "scripts": {
