@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\Tukio\BasicModifyDispatcher;
 use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
-use Psr\Event\Dispatcher\StoppableEventInterface;
 
 class ModifyDispatcherTest extends TestCase
 {
