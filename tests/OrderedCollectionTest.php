@@ -50,4 +50,19 @@ class OrderedCollectionTest extends TestCase
 
         $this->assertEquals('ABCDEF', implode($results));
     }
+
+    public function test_can_add_items_before_other_items() : void
+    {
+        $c = new OrderedCollection();
+        // High priority number comes first.
+        $cid = $c->addItem('C', 2);
+        $c->addItem('D', 1);
+        $c->addItem('A', 3);
+
+        $c->addItemBefore($cid, 'B');
+
+        $results = iterator_to_array($c);
+
+        $this->assertEquals('ABCD', implode($results));
+    }
 }
