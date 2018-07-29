@@ -125,6 +125,50 @@ class RegisterableListenerProvider implements ListenerProviderInterface
     }
 
     /**
+     * Adds a service listener to trigger before another existing listener.
+     *
+     * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
+     * regarding when it comes relative to any other listener.
+     *
+     * @param string $pivotId
+     *   The ID of an existing listener.
+     * @param string $serviceName
+     *   The name of a service on which this listener lives.
+     * @param string $methodName
+     *   The method name of the service that is the listener being registered.
+     * @param string $type
+     *   The class or interface type of events for which this listener will be registered.
+     * @return string
+     *   The opaque ID of the listener.  This can be used for future reference.
+     */
+    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type) : string
+    {
+        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $type);
+    }
+
+    /**
+     * Adds a service listener to trigger before another existing listener.
+     *
+     * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
+     * regarding when it comes relative to any other listener.
+     *
+     * @param string $pivotId
+     *   The ID of an existing listener.
+     * @param string $serviceName
+     *   The name of a service on which this listener lives.
+     * @param string $methodName
+     *   The method name of the service that is the listener being registered.
+     * @param string $type
+     *   The class or interface type of events for which this listener will be registered.
+     * @return string
+     *   The opaque ID of the listener.  This can be used for future reference.
+     */
+    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type) : string
+    {
+        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $type);
+    }
+
+    /**
      * Creates a callable that will proxy to the provided service and method.
      *
      * @param string $serviceName
