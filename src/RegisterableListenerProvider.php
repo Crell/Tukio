@@ -198,6 +198,39 @@ class RegisterableListenerProvider implements ListenerProviderInterface
         };
         return $listener;
     }
+
+    /**
+     * Registers all listener methods on a service as listeners.
+     *
+     * A method on the specified class is a listener if:
+     * - It is public.
+     * - It's name is in the form on*.  onUpdate(), onUserLogin(), onHammerTime() will all be registered.
+     *
+     * The event type the listener is for will be derived from the type hint in the method signature.
+     *
+     * @param string $class
+     *   The class name to be registered as a subscriber.
+     * @param string $serviceName
+     *   The name of a service in the container.
+     */
+    public function addSubscriber(string $class, string $serviceName) : void
+    {
+        try {
+            $rClass = new \ReflectionClass($class);
+            $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+            /** @var \ReflectionMethod $rMethod */
+            foreach ($methods as $rMethod) {
+                if (strpos($rMethod->getName(), 'on') !== false) {
+                    $params = $rMethod->getParameters();
+                    $type = $params[0]->getType()->getName();
+                    $this->addListenerService($serviceName, $rMethod->getName(), $type);
+                }
+            }
+        }
+        catch (\ReflectionException $e) {
+            throw new \RuntimeException('Type error registering subscriber.', 0, $e);
+        }
+    }
 }
 
 
