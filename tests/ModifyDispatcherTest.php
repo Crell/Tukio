@@ -23,7 +23,7 @@ class ModifyDispatcherTest extends TestCase
             }
         };
 
-        $d = new BasicModifyDispatcher($provider);
+        $d = new ModifyDispatcher($provider);
 
         $e = new CollectingEvent();
         $d->modify($e);
@@ -43,7 +43,7 @@ class ModifyDispatcherTest extends TestCase
             }
         };
 
-        $d = new BasicModifyDispatcher($provider);
+        $d = new ModifyDispatcher($provider);
 
         $e = new StoppableCollectingEvent();
         $d->modify($e);

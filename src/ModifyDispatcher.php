@@ -9,7 +9,7 @@ use Psr\Event\Dispatcher\ModifyDispatcherInterface;
 use Psr\Event\Dispatcher\StoppableEventInterface;
 
 
-class BasicModifyDispatcher implements ModifyDispatcherInterface
+class ModifyDispatcher implements ModifyDispatcherInterface
 {
     /**
      * @var ListenerProviderInterface
