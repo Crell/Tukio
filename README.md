@@ -7,23 +7,11 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-**Note:** Replace ```Larry Garfield``` ```Crell``` ```http://www.garfieldtech.com/``` ```larry@garfieldtech.com``` ```Crell``` ```Tukio``` ```A robust, stand-alone PSR-14 event dispatcher implementation.``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE.md](LICENSE.md) and [composer.json](composer.json) files, then delete this line. You can run `$ php prefill.php` in the command line to make all replacements at once. Delete the file prefill.php as well.
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+Tukio is a complete and robust implementation of the PSR-14 Event Dispatcher specification.
 
-## Structure
-
-If any of the following are applicable to your project, then the directory structure should follow industry best practices by being named the following.
-
-```
-bin/        
-config/
-src/
-tests/
-vendor/
-```
-
+PSR-14 is still in draft.  This library will be updated accordingly as PSR-14 evolves.  A stable release will be made
+once PSR-14 is complete.
 
 ## Install
 
@@ -35,10 +23,7 @@ $ composer require Crell/Tukio
 
 ## Usage
 
-``` php
-$skeleton = new Crell\Tukio();
-echo $skeleton->echoPhrase('Hello, League!');
-```
+Coming Soon!
 
 ## Change log
 
@@ -65,7 +50,7 @@ If you discover any security related issues, please email larry@garfieldtech.com
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/Crell/Tukio.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
