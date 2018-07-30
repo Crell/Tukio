@@ -3,12 +3,8 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\EventDispatcher\BasicDispatcher;
-use Crell\EventDispatcher\CompiledListenerCollector;
-use Crell\EventDispatcher\ListenerCompiler;
 use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
-use Psr\Event\Dispatcher\ListenerSetInterface;
 
 function listenerA(CollectingEvent $event) : void
 {
@@ -48,7 +44,7 @@ class CompiledEventDispatcherTest extends TestCase
 {
     function testFunctionCompile()
     {
-        $class = 'CompiledSet';
+        $class = 'CompiledProvider';
         $namespace = 'Test\\Space';
 
         $builder = new ProviderBuilder();

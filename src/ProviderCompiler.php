@@ -16,7 +16,7 @@ class ProviderCompiler
      * @param string $namespace
      *   the namespace for the compiled class.
      */
-    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerSet', string $namespace = '\\Crell\\Tukio\\Compiled') : void
+    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled') : void
     {
         fwrite($stream, $this->createPreamble($class, $namespace));
 
