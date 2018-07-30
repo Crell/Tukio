@@ -22,7 +22,7 @@ class OrderedCollection implements \IteratorAggregate
     protected $items;
 
     /**
-     * @var Item[]
+     * @var OrderedItem[]
      *
      * A list of the items in the collection indexed by ID. Order is undefined.
      */
@@ -47,7 +47,7 @@ class OrderedCollection implements \IteratorAggregate
     {
         $id = uniqid('', true);
 
-        $item = new Item($item, $priority, $id);
+        $item = new OrderedItem($item, $priority, $id);
 
         $this->items[$priority][] = $item;
         $this->itemLookup[$id] = $item;
@@ -120,26 +120,10 @@ class OrderedCollection implements \IteratorAggregate
 
         return (function () {
             foreach ($this->items as $itemList) {
-                yield from array_map(function(Item $item) {
+                yield from array_map(function(OrderedItem $item) {
                     return $item->item;
                 }, $itemList);
             }
         })();
     }
-}
-
-class Item
-{
-    public function __construct($item, int $priority, string $id)
-    {
-        $this->item = $item;
-        $this->priority = $priority;
-        $this->id = $id;
-    }
-
-    public $item;
-
-    public $priority;
-
-    public $id;
 }
