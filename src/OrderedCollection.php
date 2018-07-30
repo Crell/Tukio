@@ -107,7 +107,7 @@ class OrderedCollection implements \IteratorAggregate
      * {@inheritdoc}
      * @return \ArrayIterator|\Traversable
      *
-     * Note: Because of how iterator_to_array() works, you MUST pass `false` as the second paramter to that function
+     * Note: Because of how iterator_to_array() works, you MUST pass `false` as the second parameter to that function
      * if calling it on the return from this object.  If not, only the last list's worth of values will be included in
      * the resulting array.
      */
