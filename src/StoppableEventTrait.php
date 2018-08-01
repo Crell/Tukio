@@ -9,7 +9,7 @@ trait StoppableEventTrait
 {
     protected $stop = false;
 
-    public function stopPropagation($stop = true) : StoppableEventInterface
+    public function stopPropagation(bool $stop = true) : StoppableEventInterface
     {
         $this->stop = $stop;
         return $this;
