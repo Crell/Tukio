@@ -102,4 +102,33 @@ class OrderedCollectionTest extends TestCase
         // The values returned by `uniqid()` are always multiple characters long.
         $c->addItemAfter('a', 'B');
     }
+
+    public function test_explicit_id_works() : void
+    {
+        $c = new OrderedCollection();
+        $a = $c->addItem('A', 1, 'item_a');
+        $c->addItemAfter('item_a', 'B');
+
+        // Because the collection uses a generator in the getIterator() method, we have to explicitly ignore the
+        // keys in iterator_to_array() or later values will overwrite earlier ones.
+        $results = iterator_to_array($c, false);
+
+        $this->assertEquals('AB', implode($results));
+    }
+
+    public function test_explicit_id_that_already_exists_works() : void
+    {
+        $c = new OrderedCollection();
+        $a = $c->addItem('A', 1, 'an_item');
+        $b = $c->addItem('B', 1, 'an_item');
+        $c->addItemAfter($b, 'C');
+
+        $this->assertNotEquals($a, $b);
+
+        // Because the collection uses a generator in the getIterator() method, we have to explicitly ignore the
+        // keys in iterator_to_array() or later values will overwrite earlier ones.
+        $results = iterator_to_array($c, false);
+
+        $this->assertEquals('ABC', implode($results));
+    }
 }

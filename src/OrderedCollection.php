@@ -40,12 +40,14 @@ class OrderedCollection implements \IteratorAggregate
      *   The item to add. May be any data type.
      * @param int $priority
      *   The priority order of the item. Higher numbers will come first.
+     * @param string $id
+     *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
      * @return string
      *   An opaque ID string uniquely identifying the item for future reference.
      */
-    public function addItem($item, int $priority = 0) : string
+    public function addItem($item, int $priority = 0, string $id = null) : string
     {
-        $id = uniqid('', true);
+        $id = $this->enforceUniqueId($id);
 
         $item = new OrderedItem($item, $priority, $id);
 
@@ -55,6 +57,27 @@ class OrderedCollection implements \IteratorAggregate
         $this->sorted = false;
 
         return $id;
+    }
+
+
+    /**
+     * Ensures a unique ID for all items in the collection.
+     *
+     * @param null|string $id
+     *   The proposed ID of an item, or null to generate a random string.
+     * @return string
+     *   A confirmed unique ID string.
+     */
+    protected function enforceUniqueId(?string $id) : string
+    {
+        $candidateId = $id ?? uniqid('', true);
+
+        $counter = 1;
+        while (isset($this->itemLookup[$candidateId])) {
+            $candidateId = $id . '-' . $counter++;
+        }
+
+        return $candidateId;
     }
 
     /**
@@ -67,10 +90,12 @@ class OrderedCollection implements \IteratorAggregate
      *   The existing ID of an item in the collection.
      * @param $item
      *   The new item to add.
+     * @param string $id
+     *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
      * @return string
      *   An opaque ID string uniquely identifying the new item for future reference.
      */
-    public function addItemBefore(string $pivotId, $item) : string
+    public function addItemBefore(string $pivotId, $item, string $id = null) : string
     {
         if (!isset($this->itemLookup[$pivotId])) {
             throw new \InvalidArgumentException(sprintf('Cannot add item before undefined ID: %s', $pivotId));
@@ -90,10 +115,12 @@ class OrderedCollection implements \IteratorAggregate
      *   The existing ID of an item in the collection.
      * @param $item
      *   The new item to add.
+     * @param string $id
+     *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
      * @return string
      *   An opaque ID string uniquely identifying the new item for future reference.
      */
-    public function addItemAfter(string $pivotId, $item) : string
+    public function addItemAfter(string $pivotId, $item, string $id = null) : string
     {
         if (!isset($this->itemLookup[$pivotId])) {
             throw new \InvalidArgumentException(sprintf('Cannot add item after undefined ID: %s', $pivotId));
