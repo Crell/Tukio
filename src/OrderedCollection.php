@@ -8,7 +8,7 @@ namespace Crell\Tukio;
  *
  * Values may be added to the collection at any priority, or relative to an existing value.  When iterated they will
  * be returned in priority order with higher priority values being returned first.  The order in which values with the
- * same priority are returned is explicitly undefined and you should not rely on it.  (Although in practice is should be
+ * same priority are returned is explicitly undefined and you should not rely on it.  (Although in practice it should be
  * FIFO, that is not guaranteed.)
  */
 class OrderedCollection implements \IteratorAggregate
