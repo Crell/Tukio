@@ -12,8 +12,6 @@ class EventTwo extends CollectingTask {}
 
 class RegisterableListenerProviderTest extends TestCase
 {
-
-
     public function test_only_type_correct_listeners_are_returned(): void
     {
         $p = new RegisterableListenerProvider();

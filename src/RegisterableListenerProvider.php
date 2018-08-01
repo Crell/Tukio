@@ -44,7 +44,9 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
     {
         $type = $type ?? $this->getParameterType($listener);
 
-        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority);
+        $id = $this->getListenerId($listener);
+
+        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
     }
 
     public function addListenerBefore(string $pivotId, callable $listener, string $type = null) : string
@@ -133,5 +135,33 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
         }
+    }
+
+    /**
+     * Derives a predictable ID from the listener if possible.
+     *
+     * @todo If we add support for annotations or similar for identifying listeners that logic would go here.
+     *
+     * @param callable $listener
+     *   The listener for which to derive an ID.
+     * @return null|string
+     *   The derived ID if possible or null if no reasonable ID could be derived.
+     */
+    protected function getListenerId(callable $listener) : ?string
+    {
+        // There's no name to base an ID on for a closure, so don't try.
+        if ($listener instanceof \Closure) {
+            return null;
+        }
+        // String means it's a function name, so use that directly.
+        if (is_string($listener)) {
+            return $listener;
+        }
+        // This is how we recognize a static method call.  Generate an ID like $class::$method.
+        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+            return $listener[0] . '::' . $listener[1];
+        }
+        // Anything else we can't derive an ID for logically.
+        return null;
     }
 }
