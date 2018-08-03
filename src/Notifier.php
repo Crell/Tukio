@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
-use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
-use Psr\Event\Dispatcher\NotifyDispatcherInterface;
+use Psr\Event\Dispatcher\MessageInterface;
+use Psr\Event\Dispatcher\MessageNotifierInterface;
 
-class NotifyDispatcher implements NotifyDispatcherInterface
+class Notifier implements MessageNotifierInterface
 {
     /**
      * @var ListenerProviderInterface
@@ -20,10 +19,10 @@ class NotifyDispatcher implements NotifyDispatcherInterface
         $this->listeners = $listeners;
     }
 
-    public function notify(EventInterface $event): void
+    public function notify(MessageInterface $message): void
     {
-        foreach ($this->listeners->getListenersForEvent($event) as $listener) {
-            $listener(clone $event);
+        foreach ($this->listeners->getListenersForEvent($message) as $listener) {
+            $listener(clone $message);
         }
     }
 }

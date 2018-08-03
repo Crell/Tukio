@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\Event\Dispatcher\EventInterface;
+use Psr\Event\Dispatcher\TaskInterface;
 
-class BasicEvent implements EventInterface
+class BasicTask implements TaskInterface
 {
 }

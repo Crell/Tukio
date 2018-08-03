@@ -15,16 +15,16 @@ class CompoundProviderTest extends TestCase
         $provider1 = new class implements ListenerProviderInterface {
             public function getListenersForEvent(EventInterface $event): iterable
             {
-                yield function (CollectingEvent $event) { $event->add('C'); };
-                yield function (CollectingEvent $event) { $event->add('R'); };
+                yield function (CollectingTask $event) { $event->add('C'); };
+                yield function (CollectingTask $event) { $event->add('R'); };
             }
         };
         $provider2 = new class implements ListenerProviderInterface {
             public function getListenersForEvent(EventInterface $event): iterable
             {
-                yield function (CollectingEvent $event) { $event->add('E'); };
-                yield function (CollectingEvent $event) { $event->add('L'); };
-                yield function (CollectingEvent $event) { $event->add('L'); };
+                yield function (CollectingTask $event) { $event->add('E'); };
+                yield function (CollectingTask $event) { $event->add('L'); };
+                yield function (CollectingTask $event) { $event->add('L'); };
             }
         };
 
@@ -34,7 +34,7 @@ class CompoundProviderTest extends TestCase
         $p->addProvider($provider1)
           ->addProvider($provider2);
 
-        $event = new CollectingEvent();
+        $event = new CollectingTask();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);

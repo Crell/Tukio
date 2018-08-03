@@ -6,12 +6,12 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
 
-function listenerA(CollectingEvent $event) : void
+function listenerA(CollectingTask $event) : void
 {
     $event->add('A');
 }
 
-function listenerB(CollectingEvent $event) : void
+function listenerB(CollectingTask $event) : void
 {
     $event->add('B');
 }
@@ -26,7 +26,7 @@ function noListen(EventOne $event) : void
 
 class Listen
 {
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingTask $event)
     {
         $event->add('C');
     }
@@ -34,7 +34,7 @@ class Listen
 
 class ListenService
 {
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingTask $event)
     {
         $event->add('D');
     }
@@ -57,7 +57,7 @@ class CompiledEventDispatcherTest extends TestCase
         $builder->addListener('\\Crell\\Tukio\\listenerB');
         $builder->addListener('\\Crell\\Tukio\\noListen');
         $builder->addListener([Listen::class, 'listen']);
-        $builder->addListenerService('D', 'listen', CollectingEvent::class);
+        $builder->addListenerService('D', 'listen', CollectingTask::class);
 
         try {
             // Write the generated compiler out to a temp file.
@@ -77,7 +77,7 @@ class CompiledEventDispatcherTest extends TestCase
             unlink($filename);
         }
 
-        $event = new CollectingEvent();
+        $event = new CollectingTask();
         foreach ($provider->getListenersForEvent($event) as $listener) {
             $listener($event);
         }

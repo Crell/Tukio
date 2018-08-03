@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-class BasicStoppableEvent extends BasicEvent
+class BasicStoppableTask extends BasicTask
 {
     use StoppableEventTrait;
 }

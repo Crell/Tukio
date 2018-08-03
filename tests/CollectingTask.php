@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-class CollectingEvent extends BasicEvent
+class CollectingTask extends BasicTask
 {
     protected $out = [];
 

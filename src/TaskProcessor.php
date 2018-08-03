@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
-use Psr\Event\Dispatcher\ModifyDispatcherInterface;
-use Psr\Event\Dispatcher\StoppableEventInterface;
+use Psr\Event\Dispatcher\TaskInterface;
+use Psr\Event\Dispatcher\TaskProcessorInterface;
+use Psr\Event\Dispatcher\StoppableTaskInterface;
 
 
-class ModifyDispatcher implements ModifyDispatcherInterface
+class TaskProcessor implements TaskProcessorInterface
 {
     /**
      * @var ListenerProviderInterface
@@ -21,14 +21,14 @@ class ModifyDispatcher implements ModifyDispatcherInterface
         $this->listeners = $listeners;
     }
 
-    public function modify(EventInterface $event): EventInterface
+    public function process(TaskInterface $task): TaskInterface
     {
-        foreach ($this->listeners->getListenersForEvent($event) as $listener) {
-            $listener($event);
-            if ($event instanceof StoppableEventInterface && $event->isStopped()) {
+        foreach ($this->listeners->getListenersForEvent($task) as $listener) {
+            $listener($task);
+            if ($task instanceof StoppableTaskInterface && $task->isStopped()) {
                 break;
             }
         }
-        return $event;
+        return $task;
     }
 }

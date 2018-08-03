@@ -8,7 +8,7 @@ use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
 
 
-class NotifyDispatcherTest extends TestCase
+class NotifierTest extends TestCase
 {
     protected $counter;
 
@@ -49,22 +49,22 @@ class NotifyDispatcherTest extends TestCase
 
     }
 
-    public function test_dispatcher_calls_all_listeners() : void
+    public function test_notifier_calls_all_listeners() : void
     {
         $counter = $this->counter;
 
-        $this->provider->addListener(function (BasicEvent $e) use ($counter) {
+        $this->provider->addListener(function (BasicMessage $e) use ($counter) {
             $counter->inc('A');
         });
 
         // This should fire once.
-        $this->provider->addListener(function (BasicEvent $e) use ($counter) {
+        $this->provider->addListener(function (BasicMessage $e) use ($counter) {
             $counter->inc('B');
         });
 
-        $d = new NotifyDispatcher($this->provider);
+        $d = new Notifier($this->provider);
 
-        $d->notify(new BasicEvent());
+        $d->notify(new BasicMessage());
 
         $this->assertEquals(1, $this->counter->countOf('A'));
         $this->assertEquals(1, $this->counter->countOf('B'));

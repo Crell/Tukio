@@ -7,10 +7,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
 
-class ModifyDispatcherTest extends TestCase
+class ProcessorTest extends TestCase
 {
 
-    public function test_dispatcher_calls_all_listeners() : void
+    public function test_processor_calls_all_listeners() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(EventInterface $event): iterable
@@ -26,7 +26,7 @@ class ModifyDispatcherTest extends TestCase
         $d = new TaskProcessor($provider);
 
         $e = new CollectingTask();
-        $d->modify($e);
+        $d->process($e);
 
         $this->assertEquals('CRELL', implode($e->result()));
     }

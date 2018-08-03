@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Psr\Event\Dispatcher\StoppableTaskInterface;
 
-use Psr\Event\Dispatcher\StoppableEventInterface;
-
-class StoppableCollectingEvent extends CollectingTask implements StoppableEventInterface
+class StoppableCollectingTask extends CollectingTask implements StoppableTaskInterface
 {
-    use StoppableEventTrait;
+    use StoppableTaskTrait;
 }
