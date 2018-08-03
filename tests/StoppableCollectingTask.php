@@ -6,7 +6,7 @@ namespace Crell\Tukio;
 
 use Psr\Event\Dispatcher\StoppableEventInterface;
 
-class StoppableCollectingEvent extends CollectingEvent implements StoppableEventInterface
+class StoppableCollectingEvent extends CollectingTask implements StoppableEventInterface
 {
     use StoppableEventTrait;
 }

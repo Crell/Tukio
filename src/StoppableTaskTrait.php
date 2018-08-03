@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\Event\Dispatcher\StoppableEventInterface;
+use Psr\Event\Dispatcher\StoppableTaskInterface;
 
-trait StoppableEventTrait
+trait StoppableTaskTrait
 {
     protected $stop = false;
 
-    public function stopPropagation(bool $stop = true) : StoppableEventInterface
+    public function stopPropagation() : StoppableTaskInterface
     {
-        $this->stop = $stop;
+        $this->stop = true;
         return $this;
     }
 
