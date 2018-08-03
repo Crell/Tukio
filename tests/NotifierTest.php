@@ -6,7 +6,9 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 use Psr\Event\Dispatcher\EventInterface;
 use Psr\Event\Dispatcher\ListenerProviderInterface;
-
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class NotifierTest extends TestCase
 {
@@ -14,6 +16,9 @@ class NotifierTest extends TestCase
 
     /** @var ListenerProviderInterface */
     protected $provider;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     public function setUp()
     {
@@ -47,6 +52,20 @@ class NotifierTest extends TestCase
             }
         };
 
+        $this->logger = new class extends AbstractLogger {
+
+            public $messages = [];
+
+            public function log($level, $message, array $context = [])
+            {
+                $this->messages[$level][] = [
+                    'message' => $message,
+                    'context' => $context,
+                ];
+            }
+        };
+
+
     }
 
     public function test_notifier_calls_all_listeners() : void
@@ -57,7 +76,6 @@ class NotifierTest extends TestCase
             $counter->inc('A');
         });
 
-        // This should fire once.
         $this->provider->addListener(function (BasicMessage $e) use ($counter) {
             $counter->inc('B');
         });
@@ -68,5 +86,38 @@ class NotifierTest extends TestCase
 
         $this->assertEquals(1, $this->counter->countOf('A'));
         $this->assertEquals(1, $this->counter->countOf('B'));
+    }
+
+    public function test_listener_exception_logs_not_dies() : void
+    {
+        $counter = $this->counter;
+
+        $this->provider->addListener(function (BasicMessage $e) use ($counter) {
+            $counter->inc('A');
+        });
+
+        $this->provider->addListener(function (BasicMessage $e) use ($counter) {
+            throw new \Exception('Stop the world,  want to get off.');
+        });
+
+        $this->provider->addListener(function (BasicMessage $e) use ($counter) {
+            $counter->inc('C');
+        });
+
+        $logger = $this->logger;
+
+        $d = new Notifier($this->provider, $logger);
+
+        $basicMessage = new BasicMessage();
+        $d->notify(new BasicMessage());
+
+        $this->assertEquals(1, $this->counter->countOf('A'));
+        $this->assertEquals(1, $this->counter->countOf('C'));
+
+        $this->assertArrayHasKey(LogLevel::WARNING, $logger->messages);
+        $this->assertCount(1, $logger->messages[LogLevel::WARNING]);
+        $entry = $logger->messages[LogLevel::WARNING][0];
+        $this->assertEquals('Unhandled exception thrown from listener while processing message.', $entry['message']);
+        $this->assertEquals($basicMessage, $entry['context']['message']);
     }
 }
