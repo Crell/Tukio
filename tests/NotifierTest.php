@@ -53,8 +53,7 @@ class NotifierTest extends TestCase
         };
 
         $this->logger = new class extends AbstractLogger {
-
-            public $messages = [];
+                public $messages = [];
 
             public function log($level, $message, array $context = [])
             {
@@ -64,8 +63,6 @@ class NotifierTest extends TestCase
                 ];
             }
         };
-
-
     }
 
     public function test_notifier_calls_all_listeners() : void
