@@ -27,7 +27,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     public function getListenersForEvent(EventInterface $event): iterable
     {
         /** @var array $listener */
-        foreach ($this->listeners as $listener) {
+        foreach (static::LISTENERS as $listener) {
             if ($event instanceof $listener['type']) {
                 switch ($listener['entryType']) {
                     case ListenerFunctionEntry::class:

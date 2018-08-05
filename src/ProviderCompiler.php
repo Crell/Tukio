@@ -47,7 +47,7 @@ use Psr\Event\Dispatcher\EventInterface;
 
 class $class extends CompiledListenerProviderBase
 {
-  protected \$listeners = [
+  protected const LISTENERS = [
 
 END;
 
