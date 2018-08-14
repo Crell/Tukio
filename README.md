@@ -53,7 +53,7 @@ If you discover any security related issues, please email larry@garfieldtech.com
 The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for more information.
 
 [ico-version]: https://img.shields.io/packagist/v/Crell/Tukio.svg?style=flat-square
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/License-LGPLv3-green.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/Crell/Tukio/master.svg?style=flat-square
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/Crell/Tukio.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/Crell/Tukio.svg?style=flat-square
