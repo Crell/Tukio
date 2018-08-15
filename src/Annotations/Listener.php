@@ -15,17 +15,19 @@ use Doctrine\Common\Annotations\Annotation\Target;
 class Listener
 {
     /** @var string */
-    protected $id;
+    public $id;
 
     /** @var string */
-    protected $before;
+    public $before;
 
     /** @var string */
-    protected $after;
+    public $after;
 
     /** @var int */
-    protected $priority;
+    public $priority;
 
+    /** @var string */
+    public $type;
 
     public function __construct(array $values)
     {
@@ -40,10 +42,25 @@ class Listener
             throw new \InvalidArgumentException("You may not specify both a listener priority and a before/after directive.");
         }
 
-        foreach (['id', 'before', 'after', 'priority'] as $key) {
+        foreach (['id', 'before', 'after', 'priority', 'type'] as $key) {
             if (!empty($values[$key])) {
                 $this->$key = $values[$key];
             }
         }
     }
+
+    public function getRuleType() : string
+    {
+        if ($this->before) {
+            return 'before';
+        }
+        elseif ($this->after) {
+            return 'after';
+        }
+        elseif (!is_null($this->priority)) {
+            return 'priority';
+        }
+        return 'none';
+    }
+
 }
