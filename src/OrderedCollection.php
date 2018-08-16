@@ -19,19 +19,22 @@ class OrderedCollection implements \IteratorAggregate
      *
      * An indexed array of arrays of Item entries. The key is the priority, the value is an array of Items.
      */
-    protected $items;
+    protected $items = [];
 
     /**
      * @var OrderedItem[]
      *
      * A list of the items in the collection indexed by ID. Order is undefined.
      */
-    protected $itemLookup;
+    protected $itemLookup = [];
 
     /**
      * @var bool
      */
     protected $sorted = false;
+
+    /** @var array */
+    protected $toPrioritize = [];
 
     /**
      * Adds an item to the collection with a given priority.  (Higher numbers come first.)
@@ -49,7 +52,7 @@ class OrderedCollection implements \IteratorAggregate
     {
         $id = $this->enforceUniqueId($id);
 
-        $item = new OrderedItem($item, $priority, $id);
+        $item = OrderedItem::createWithPriority($item, $priority, $id);
 
         $this->items[$priority][] = $item;
         $this->itemLookup[$id] = $item;
@@ -58,7 +61,6 @@ class OrderedCollection implements \IteratorAggregate
 
         return $id;
     }
-
 
     /**
      * Ensures a unique ID for all items in the collection.
@@ -97,12 +99,23 @@ class OrderedCollection implements \IteratorAggregate
      */
     public function addItemBefore(string $pivotId, $item, string $id = null) : string
     {
-        if (!isset($this->itemLookup[$pivotId])) {
-            throw new \InvalidArgumentException(sprintf('Cannot add item before undefined ID: %s', $pivotId));
+        $id = $this->enforceUniqueId($id);
+
+        // If the item this new item is pivoting off of is already defined, add it normally.
+        if (isset($this->itemLookup[$pivotId])) {
+            // Because high numbers come first, we have to ADD one to get the new item to be returned first.
+            return $this->addItem($item, $this->itemLookup[$pivotId]->priority + 1);
         }
 
-        // Because high numbers come first, we have to ADD one to get the new item to be returned first.
-        return $this->addItem($item, $this->itemLookup[$pivotId]->priority + 1);
+        // Otherwise, we still add it but flag it as one to revisit later to determine the priority.
+        $item = OrderedItem::createBefore($item, $pivotId, $id);
+
+        $this->toPrioritize[] = $item;
+        $this->itemLookup[$id] = $item;
+
+        $this->sorted = false;
+
+        return $id;
     }
 
     /**
@@ -122,12 +135,23 @@ class OrderedCollection implements \IteratorAggregate
      */
     public function addItemAfter(string $pivotId, $item, string $id = null) : string
     {
-        if (!isset($this->itemLookup[$pivotId])) {
-            throw new \InvalidArgumentException(sprintf('Cannot add item after undefined ID: %s', $pivotId));
+        $id = $this->enforceUniqueId($id);
+
+        // If the item this new item is pivoting off of is already defined, add it normally.
+        if (isset($this->itemLookup[$pivotId])) {
+            // Because high numbers come first, we have to SUBTRACT one to get the new item to be returned first.
+            return $this->addItem($item, $this->itemLookup[$pivotId]->priority - 1);
         }
 
-        // Because high numbers come first, we have to SUBTRACT one to get the new item to be returned first.
-        return $this->addItem($item, $this->itemLookup[$pivotId]->priority - 1);
+        // Otherwise, we still add it but flag it as one to revisit later to determine the priority.
+        $item = OrderedItem::createAfter($item, $pivotId, $id);
+
+        $this->toPrioritize[] = $item;
+        $this->itemLookup[$id] = $item;
+
+        $this->sorted = false;
+
+        return $id;
     }
 
     /**
@@ -141,6 +165,7 @@ class OrderedCollection implements \IteratorAggregate
     public function getIterator()
     {
         if (!$this->sorted) {
+            $this->prioritizePendingItems();
             krsort($this->items);
             $this->sorted = true;
         }
@@ -152,5 +177,32 @@ class OrderedCollection implements \IteratorAggregate
                 }, $itemList);
             }
         })();
+    }
+
+    protected function prioritizePendingItems() : void
+    {
+        /** @var OrderedItem $item */
+        foreach ($this->toPrioritize as $item) {
+            if ($item->before) {
+                if (!isset($this->itemLookup[$item->before])) {
+                    throw new MissingItemException(sprintf('Cannot add item %s before non-existent item %s', $item->id, $item->before));
+                }
+                $priority = $this->itemLookup[$item->before]->priority + 1;
+                $this->items[$priority][] = $item;
+            }
+            elseif ($item->after) {
+                if (!isset($this->itemLookup[$item->after])) {
+                    throw new MissingItemException(sprintf('Cannot add item %s after non-existent item %s', $item->id, $item->after));
+                }
+                $priority = $this->itemLookup[$item->after]->priority - 1;
+                $this->items[$priority][] = $item;
+            }
+            else {
+                throw new \Error('No, seriously, how did you get here?');
+            }
+        }
+
+        // We never need to reprioritize these again.
+        $this->toPrioritize = [];
     }
 }

@@ -81,28 +81,6 @@ class OrderedCollectionTest extends TestCase
         $this->assertTrue(strpos($results, 'B') > strpos($results, 'A'));
     }
 
-    public function test_adding_before_non_existent_item_fails() : void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot add item before undefined ID: a');
-
-        $c = new OrderedCollection();
-
-        // The values returned by `uniqid()` are always multiple characters long.
-        $c->addItemBefore('a', 'B');
-    }
-
-    public function test_adding_after_non_existent_item_fails() : void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot add item after undefined ID: a');
-
-        $c = new OrderedCollection();
-
-        // The values returned by `uniqid()` are always multiple characters long.
-        $c->addItemAfter('a', 'B');
-    }
-
     public function test_explicit_id_works() : void
     {
         $c = new OrderedCollection();
@@ -130,5 +108,36 @@ class OrderedCollectionTest extends TestCase
         $results = iterator_to_array($c, false);
 
         $this->assertEquals('ABC', implode($results));
+    }
+
+    public function test_adding_out_of_order_works() : void
+    {
+        $c = new OrderedCollection();
+
+        // Add C to come after B, but B isn't defined yet.
+        $c->addItemAfter('b', 'C', 'c');
+
+        // Add A to come before B, but B isn't defined yet.
+        $c->addItemBefore('b', 'A', 'a');
+
+        // Now define B.
+        $c->addItem('B', 3, 'b');
+
+        $results = iterator_to_array($c, false);
+
+        $this->assertEquals('ABC', implode($results));
+    }
+
+    public function test_adding_relative_to_non_existing_item_fails() : void
+    {
+        $this->expectException(MissingItemException::class);
+
+        $c = new OrderedCollection();
+
+        // Add A to come before B, but B isn't defined.
+        $c->addItemBefore('b', 'A', 'a');
+
+        // This should thorw an exception since B doesn't exist.
+        iterator_to_array($c, false);
     }
 }
