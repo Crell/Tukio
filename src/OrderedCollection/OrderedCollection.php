@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\OrderedCollection;
 
 /**
  * Defines an orderable collection of arbitrary values.
