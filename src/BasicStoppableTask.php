@@ -6,5 +6,5 @@ namespace Crell\Tukio;
 
 class BasicStoppableTask extends BasicTask
 {
-    use StoppableEventTrait;
+    use StoppableTaskTrait;
 }
