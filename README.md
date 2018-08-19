@@ -10,8 +10,7 @@
 
 Tukio is a complete and robust implementation of the PSR-14 Event Dispatcher specification.
 
-PSR-14 is still in draft.  This library will be updated accordingly as PSR-14 evolves.  A stable release will be made
-once PSR-14 is complete.
+PSR-14 is still in draft.  This library will be updated accordingly as PSR-14 evolves.  A stable release will be made once PSR-14 is complete.
 
 ## Install
 
