@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\Event\Dispatcher\ListenerProviderInterface;
-use Psr\Event\Dispatcher\MessageInterface;
-use Psr\Event\Dispatcher\MessageNotifierInterface;
-use Psr\Event\Dispatcher\TaskInterface;
-use Psr\Event\Dispatcher\TaskProcessorInterface;
-use Psr\Event\Dispatcher\StoppableTaskInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\MessageInterface;
+use Psr\EventDispatcher\MessageNotifierInterface;
+use Psr\EventDispatcher\TaskInterface;
+use Psr\EventDispatcher\TaskProcessorInterface;
+use Psr\EventDispatcher\StoppableTaskInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

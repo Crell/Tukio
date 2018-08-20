@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-use Psr\Event\Dispatcher\MessageInterface;
-use Psr\Event\Dispatcher\MessageNotifierInterface;
+use Psr\EventDispatcher\MessageInterface;
+use Psr\EventDispatcher\MessageNotifierInterface;
 use Psr\Log\LoggerInterface;
 
 class DebugNotifier implements MessageNotifierInterface

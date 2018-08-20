@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use Psr\Container\ContainerInterface;
-use Psr\Event\Dispatcher\EventInterface;
-use Psr\Event\Dispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\EventInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 
 class CompiledListenerProviderBase implements ListenerProviderInterface
 {

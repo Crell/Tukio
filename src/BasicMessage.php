@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-use Psr\Event\Dispatcher\MessageInterface;
+use Psr\EventDispatcher\MessageInterface;
 
 class BasicMessage implements MessageInterface
 {

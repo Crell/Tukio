@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Event\Dispatcher\EventInterface;
-use Psr\Event\Dispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\EventInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

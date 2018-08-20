@@ -5,8 +5,8 @@ namespace Crell\Tukio;
 
 
 use PHPUnit\Framework\TestCase;
-use Psr\Event\Dispatcher\TaskInterface;
-use Psr\Event\Dispatcher\TaskProcessorInterface;
+use Psr\EventDispatcher\TaskInterface;
+use Psr\EventDispatcher\TaskProcessorInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

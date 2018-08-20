@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-use Psr\Event\Dispatcher\EventInterface;
-use Psr\Event\Dispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\EventInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
  * A compound provider encapsulates multiple other providers and concatenates their responses.

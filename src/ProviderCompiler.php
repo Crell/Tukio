@@ -43,7 +43,7 @@ declare(strict_types=1);
 namespace $namespace;
 
 use Crell\Tukio\CompiledListenerProviderBase;
-use Psr\Event\Dispatcher\EventInterface;
+use Psr\EventDispatcher\EventInterface;
 
 class $class extends CompiledListenerProviderBase
 {

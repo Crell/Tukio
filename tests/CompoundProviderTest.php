@@ -5,8 +5,8 @@ namespace Crell\Tukio;
 
 
 use PHPUnit\Framework\TestCase;
-use Psr\Event\Dispatcher\EventInterface;
-use Psr\Event\Dispatcher\ListenerProviderInterface;
+use Psr\EventDispatcher\EventInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 
 class CompoundProviderTest extends TestCase
 {

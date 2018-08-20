@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\Event\Dispatcher\EventErrorInterface;
-use Psr\Event\Dispatcher\EventInterface;
-use Psr\Event\Dispatcher\MessageInterface;
+use Psr\EventDispatcher\EventErrorInterface;
+use Psr\EventDispatcher\EventInterface;
+use Psr\EventDispatcher\MessageInterface;
 
 class ErrorEvent implements EventErrorInterface, MessageInterface
 {

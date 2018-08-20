@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-use Psr\Event\Dispatcher\TaskInterface;
-use Psr\Event\Dispatcher\TaskProcessorInterface;
+use Psr\EventDispatcher\TaskInterface;
+use Psr\EventDispatcher\TaskProcessorInterface;
 use Psr\Log\LoggerInterface;
 
 class DebugTaskProcessor implements TaskProcessorInterface
