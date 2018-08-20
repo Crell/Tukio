@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-class CollectingTask extends BasicTask
+use Psr\EventDispatcher\TaskInterface;
+
+class CollectingTask implements TaskInterface
 {
     protected $out = [];
 
