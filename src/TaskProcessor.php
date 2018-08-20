@@ -6,9 +6,9 @@ namespace Crell\Tukio;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\EventDispatcher\MessageInterface;
 use Psr\EventDispatcher\MessageNotifierInterface;
+use Psr\EventDispatcher\StoppableTaskInterface;
 use Psr\EventDispatcher\TaskInterface;
 use Psr\EventDispatcher\TaskProcessorInterface;
-use Psr\EventDispatcher\StoppableTaskInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
