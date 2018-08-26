@@ -30,12 +30,13 @@
     "require": {
         "php": "~7.1",
         "doctrine/annotations": "^1.6",
+        "fig/event-dispatcher-util": "^0.4.0",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "0.4.0",
-        "psr/log": "^1.0",
-        "fig/event-dispatcher-util": "^0.4.0"
+        "psr/log": "^1.0"
     },
     "require-dev": {
+        "phpbench/phpbench": "^0.14.0",
         "phpunit/phpunit" : ">=7.0",
         "squizlabs/php_codesniffer": "^2.3"
     },

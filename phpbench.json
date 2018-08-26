@@ -1,0 +1,12 @@
+{
+    "bootstrap": "vendor/autoload.php",
+    "path": "benchmarks",
+    "retry_threshold": 5,
+    "reports": {
+        "consumation_of_time": {
+            "title": "The Consumation of Time",
+            "extends": "aggregate",
+            "cols": ["subject", "mode", "mean", "stdev"]
+        }
+    }
+}
