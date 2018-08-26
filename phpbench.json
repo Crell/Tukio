@@ -3,10 +3,11 @@
     "path": "benchmarks",
     "retry_threshold": 5,
     "reports": {
-        "consumation_of_time": {
-            "title": "The Consumation of Time",
+        "short": {
+            "title": "Short summary",
             "extends": "aggregate",
-            "cols": ["subject", "mode", "mean", "stdev"]
+            "cols": ["subject", "mode", "mean", "stdev", "rstdev"],
+            "break": ["revs"]
         }
     }
 }

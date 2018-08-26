@@ -5,20 +5,34 @@ namespace Crell\Tukio;
 
 
 use Crell\Tukio\OrderedCollection\OrderedCollection;
+use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
+use PhpBench\Benchmark\Metadata\Annotations\ParamProviders;
 
+/**
+ * @Revs(1000)
+ * @Iterations(3)
+ * @Groups({"Collection"})
+ */
 class OrderedCollectionBench
 {
 
+    public function provideItems() : iterable
+    {
+        foreach ([1, 20, 50, 100, 500] as $count) {
+            yield array_fill(1, $count, 'a');
+        }
+    }
+
     /**
-     * @Revs(1000)
-     * @Iterations(10)
+     * @ParamProviders({"provideItems"})
      */
-    public function benchThing(): void
+    public function bench_populate_ordered_collection(array $items): void
     {
         $collection = new OrderedCollection();
 
-        $collection->addItem('a');
+        foreach ($items as $item) {
+            $collection->addItem($item);
+        }
     }
-
 }
