@@ -47,7 +47,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Crell\\Tukio\\": "tests"
+            "Crell\\Tukio\\": "tests",
+            "Crell\\Tukio\\Benchmarks\\": "benchmarks"
         }
     },
     "scripts": {

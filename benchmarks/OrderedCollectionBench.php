@@ -1,20 +1,17 @@
 <?php
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\Benchmarks;
 
 
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
-use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\ParamProviders;
 
 /**
- * @Revs(1000)
- * @Iterations(3)
  * @Groups({"Collection"})
  */
-class OrderedCollectionBench
+class OrderedCollectionBench extends TukioBenchmarks
 {
 
     public function provideItems() : iterable
