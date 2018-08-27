@@ -11,7 +11,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
  * @Groups({"Providers"})
- * @Revs(10000)
+ * @Revs(1000)
  * @Iterations(5)
  */
 abstract class ProviderBenchBase extends TukioBenchmarks
@@ -21,7 +21,15 @@ abstract class ProviderBenchBase extends TukioBenchmarks
      */
     protected $provider;
 
-    protected $numListeners = 1000;
+    /** @var int */
+    protected static $numListeners = 5000;
+
+    /**
+     * @var array
+     *
+     * Deliberately in an unsorted order to force it to need to be sorted.
+     */
+    protected static $listenerPriorities = [1, 2, -2, 3, 0, -1, -3];
 
     public function setUp()
     {

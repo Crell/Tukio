@@ -7,6 +7,7 @@ namespace Crell\Tukio\Benchmarks;
 use PhpBench\Benchmark\Metadata\Annotations\AfterMethods;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
+use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
 use PhpBench\Benchmark\Metadata\Annotations\Revs;
 use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 
@@ -16,6 +17,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  * @Warmup(2)
  * @BeforeMethods({"setUp"})
  * @AfterMethods({"tearDown"})
+ * @OutputTimeUnit("milliseconds", precision=3)
  */
 class TukioBenchmarks
 {

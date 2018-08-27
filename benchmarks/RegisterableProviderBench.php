@@ -22,8 +22,12 @@ class RegisterableProviderBench extends ProviderBenchBase
     {
         $this->provider = new RegisterableListenerProvider();
 
-        foreach(range(1, $this->numListeners) as $counter) {
-            $this->provider->addListener(function(CollectingTask $task) {});
+        $priority = new \InfiniteIterator(new \ArrayIterator(static::$listenerPriorities));
+        $priority->next();
+
+        foreach(range(1, static::$numListeners) as $counter) {
+            $this->provider->addListener(function(CollectingTask $task) {}, $priority->current());
+            $priority->next();
         }
     }
 }
