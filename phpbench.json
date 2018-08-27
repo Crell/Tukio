@@ -6,7 +6,7 @@
         "short": {
             "title": "Short summary",
             "extends": "aggregate",
-            "cols": ["benchmark", "subject", "mode", "mean", "stdev", "rstdev", "mem_real"],
+            "cols": ["benchmark", "subject", "mode", "mean", "stdev", "rstdev", "mem_peak"],
             "break": ["revs"]
         }
     }
