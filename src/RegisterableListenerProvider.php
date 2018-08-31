@@ -109,12 +109,21 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
 
     public function addSubscriber(string $class, string $serviceName) : void
     {
+        $proxy = new ListenerProxy($this, $serviceName, $class);
+
+        // Explicit registration is opt-in.
+        if (in_array(SubscriberInterface::class, class_implements($class))) {
+            /** @var SubscriberInterface */
+            $class::registerListeners($proxy);
+        }
+
         try {
             $rClass = new \ReflectionClass($class);
             $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
-                if (strpos($rMethod->getName(), 'on') !== false) {
+                $methodName = $rMethod->getName();
+                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') !== false) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType()->getName();
                     $this->addListenerService($serviceName, $rMethod->getName(), $type);

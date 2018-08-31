@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-class MockSubscriber
+class MockSubscriber implements SubscriberInterface
 {
     public function onA(CollectingTask $event) : void
     {
@@ -27,23 +27,25 @@ class MockSubscriber
         $event->add('E');
     }
 
-    public function onF(NoEvent $event) : void
+    public function notNormalName(CollectingTask $task) : void
     {
-        $event->add('F');
+        $task->add('F');
     }
 
-    /*
-    public static function getSubscribers(): iterable
+    public function onG(NoEvent $event) : void
     {
-        return [
-            ['method' => 'a', 'type' => CollectingEvent::class, 'priority' => 10],  // Specify everything.
-            ['method' => 'b', 'priority' => 9], // Both type and prioirty can be omitted.
-            'd',  // Just list the method, the rest is default/autodetected. The most common case.
-            ['method' => 'c', 'type' => CollectingEvent::class], // Both type and prioirty can be omitted.
-            ['e' => -5], // You can short-case the method/priority, but not the type. Use the full version for that.
-            'f', // This one shouldn't fire.
-        ];
+        $event->add('G');
     }
-    */
+
+    public static function registerListeners(ListenerProxy $proxy): void
+    {
+        $a = $proxy->addListener('onA');
+        $b = $proxy->addListener('onB', 5);
+        $c = $proxy->addListenerBefore($a, 'onC');
+        $d = $proxy->addListenerAfter($a, 'onD');
+        // Don't register E.  It should self-register by reflection.
+        $f = $proxy->addListener('notNormalName', -5);
+        $g = $proxy->addListener('onG');
+    }
 }
 

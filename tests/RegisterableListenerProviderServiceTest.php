@@ -147,7 +147,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('ABCDE', implode($event->result()));
+        $this->assertEquals('BCAEDF', implode($event->result()));
     }
 
 }
