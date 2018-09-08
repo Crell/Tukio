@@ -16,6 +16,16 @@ function event_listener_two(CollectingTask $task) : void
     $task->add('B');
 }
 
+function event_listener_three(CollectingTask $task) : void
+{
+    $task->add('C');
+}
+
+function event_listener_four(CollectingTask $task) : void
+{
+    $task->add('D');
+}
+
 
 class TestListeners
 {
@@ -46,8 +56,13 @@ class RegisterableListenerProviderIdTest extends TestCase
     {
         $p = new RegisterableListenerProvider();
 
-        $p->addListener('\\Crell\\Tukio\\event_listener_one', -4);
-        $p->addListenerBefore('\\Crell\\Tukio\\event_listener_one', '\\Crell\\Tukio\\event_listener_two');
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $p->addListener("{$ns}event_listener_one", -4);
+        $p->addListenerBefore("{$ns}event_listener_one", "{$ns}event_listener_two");
+        $p->addListenerAfter("{$ns}event_listener_two", "{$ns}event_listener_three");
+        $p->addListenerAfter("{$ns}event_listener_three", "{$ns}event_listener_four");
 
         $task = new CollectingTask();
 
@@ -55,7 +70,7 @@ class RegisterableListenerProviderIdTest extends TestCase
             $listener($task);
         }
 
-        $this->assertEquals('BA', implode($task->result()));
+        $this->assertEquals('BACD', implode($task->result()));
     }
 
     public function test_explict_id_for_static_method() : void
