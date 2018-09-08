@@ -37,6 +37,11 @@ class MockSubscriber implements SubscriberInterface
         $event->add('G');
     }
 
+    public function ignoredMethodThatDoesNothing() : void
+    {
+        throw new \Exception('What are you doing here?');
+    }
+
     public static function registerListeners(ListenerProxy $proxy): void
     {
         $a = $proxy->addListener('onA');
