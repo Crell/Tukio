@@ -63,26 +63,6 @@ class OrderedCollection implements \IteratorAggregate
     }
 
     /**
-     * Ensures a unique ID for all items in the collection.
-     *
-     * @param null|string $id
-     *   The proposed ID of an item, or null to generate a random string.
-     * @return string
-     *   A confirmed unique ID string.
-     */
-    protected function enforceUniqueId(?string $id) : string
-    {
-        $candidateId = $id ?? uniqid('', true);
-
-        $counter = 1;
-        while (isset($this->itemLookup[$candidateId])) {
-            $candidateId = $id . '-' . $counter++;
-        }
-
-        return $candidateId;
-    }
-
-    /**
      * Adds an item to the collection before another existing item.
      *
      * Note: The new item is only guaranteed to get returned before the existing item. No guarantee is made
@@ -200,5 +180,25 @@ class OrderedCollection implements \IteratorAggregate
 
         // We never need to reprioritize these again.
         $this->toPrioritize = [];
+    }
+
+    /**
+     * Ensures a unique ID for all items in the collection.
+     *
+     * @param null|string $id
+     *   The proposed ID of an item, or null to generate a random string.
+     * @return string
+     *   A confirmed unique ID string.
+     */
+    protected function enforceUniqueId(?string $id) : string
+    {
+        $candidateId = $id ?? uniqid('', true);
+
+        $counter = 1;
+        while (isset($this->itemLookup[$candidateId])) {
+            $candidateId = $id . '-' . $counter++;
+        }
+
+        return $candidateId;
     }
 }
