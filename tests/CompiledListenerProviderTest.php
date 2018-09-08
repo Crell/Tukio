@@ -102,7 +102,7 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertEquals('BCAEDF', implode($event->result()));
     }
 
-    public function test_explict_id_on_compiled_provider() : void
+    public function test_natural_id_on_compiled_provider() : void
     {
         $class = 'ExplicitIdProvider';
         $namespace = 'Test\\Space';

@@ -52,7 +52,7 @@ class TestListeners
 class RegisterableListenerProviderIdTest extends TestCase
 {
 
-    public function test_explict_id_for_function() : void
+    public function test_natural_id_for_function() : void
     {
         $p = new RegisterableListenerProvider();
 
@@ -73,7 +73,7 @@ class RegisterableListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($task->result()));
     }
 
-    public function test_explict_id_for_static_method() : void
+    public function test_natural_id_for_static_method() : void
     {
         $p = new RegisterableListenerProvider();
 
@@ -89,7 +89,7 @@ class RegisterableListenerProviderIdTest extends TestCase
         $this->assertEquals('BA', implode($task->result()));
     }
 
-    public function test_explict_id_for_object_method() : void
+    public function test_natural_id_for_object_method() : void
     {
         $p = new RegisterableListenerProvider();
 
