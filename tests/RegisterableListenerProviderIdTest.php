@@ -26,6 +26,16 @@ class TestListeners
     {
         $event->add('B');
     }
+
+    public function listenerC(CollectingTask $task) : void
+    {
+        $task->add('C');
+    }
+
+    public function listenerD(CollectingTask $task) : void
+    {
+        $task->add('D');
+    }
 }
 
 class RegisterableListenerProviderIdTest extends TestCase
@@ -61,6 +71,24 @@ class RegisterableListenerProviderIdTest extends TestCase
         }
 
         $this->assertEquals('BA', implode($event->result()));
+    }
+
+    public function test_explict_id_for_object_method() : void
+    {
+        $p = new RegisterableListenerProvider();
+
+        $l = new TestListeners();
+
+        $p->addListener([$l, 'listenerC'], -4);
+        $p->addListenerBefore(TestListeners::class . '::listenerC', [$l, 'listenerD']);
+
+        $event = new CollectingTask();
+
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('DC', implode($event->result()));
     }
 
 }

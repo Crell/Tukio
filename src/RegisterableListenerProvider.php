@@ -153,18 +153,18 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
      */
     protected function getListenerId(callable $listener) : ?string
     {
-        // There's no name to base an ID on for a closure, so don't try.
-        if ($listener instanceof \Closure) {
-            return null;
+
+        if ($this->isFunctionCallable($listener)) {
+            // Function callables are strings, so use that directly.
+            return (string)$listener;
         }
-        // String means it's a function name, so use that directly.
-        if (is_string($listener)) {
-            return $listener;
-        }
-        // This is how we recognize a static method call.  Generate an ID like $class::$method.
-        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+        if ($this->isClassCallable($listener)) {
             return $listener[0] . '::' . $listener[1];
         }
+        if ($this->isObjectCallable($listener)) {
+            return get_class($listener[0]) . '::' . $listener[1];
+        }
+
         // Anything else we can't derive an ID for logically.
         return null;
     }
