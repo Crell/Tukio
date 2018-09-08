@@ -41,43 +41,43 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         }
     }
 
-    public function addListener(callable $listener, $priority = 0, string $type = null): string
+    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
     {
         $type = $type ?? $this->getParameterType($listener);
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $type = null) : string
+    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null) : string
     {
         $type = $type ?? $this->getParameterType($listener);
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemBefore($pivotId, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $type = null) : string
+    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null) : string
     {
         $type = $type ?? $this->getParameterType($listener);
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): string
+    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
     {
-        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $type);
+        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
     }
 
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type) : string
+    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
     {
-        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $type);
+        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
     }
 
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type) : string
+    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
     {
-        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $type);
+        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
     }
 
     /**

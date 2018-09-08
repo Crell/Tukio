@@ -107,4 +107,25 @@ class RegisterableListenerProviderIdTest extends TestCase
         $this->assertEquals('DC', implode($task->result()));
     }
 
+    public function test_explicit_id_for_function(): void
+    {
+        $p = new RegisterableListenerProvider();
+
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $p->addListener("{$ns}event_listener_one", -4, 'id-1');
+        $p->addListenerBefore('id-1', "{$ns}event_listener_two", 'id-2');
+        $p->addListenerAfter('id-2', "{$ns}event_listener_three", 'id-3');
+        $p->addListenerAfter('id-3', "{$ns}event_listener_four");
+
+        $task = new CollectingTask();
+
+        foreach ($p->getListenersForEvent($task) as $listener) {
+            $listener($task);
+        }
+
+        $this->assertEquals('BACD', implode($task->result()));
+    }
+
 }

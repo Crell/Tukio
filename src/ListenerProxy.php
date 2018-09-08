@@ -32,19 +32,21 @@ class ListenerProxy
      *
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
-     * @param string|null $type
-     *   The class or interface type of events for which this listener will be registered.
      * @param int $priority
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
+     * @param string|null $id
+     *   The ID of this listener, so it can be referenced by other listeners.
+     * @param string|null $type
+     *   The class or interface type of events for which this listener will be registered.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(string $methodName, $priority = 0, string $type = null): string
+    public function addListener(string $methodName, $priority = 0, string $id = null, string $type = null): string
     {
         $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
         $this->registeredMethods[] = $methodName;
 
-        return $this->provider->addListenerService($this->serviceName, $methodName, $type, $priority);
+        return $this->provider->addListenerService($this->serviceName, $methodName, $type, $priority, $id);
     }
 
     /**
@@ -57,17 +59,19 @@ class ListenerProxy
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
+     * @param string|null $id
+     *   The ID of this listener, so it can be referenced by other listeners.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, string $methodName, string $type = null): string
+    public function addListenerBefore(string $pivotId, string $methodName, string $id = null, string $type = null): string
     {
         $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
         $this->registeredMethods[] = $methodName;
 
-        return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type);
+        return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
     /**
@@ -80,17 +84,19 @@ class ListenerProxy
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
+     * @param string|null $id
+     *   The ID of this listener, so it can be referenced by other listeners.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, string $methodName, string $type = null) : string
+    public function addListenerAfter(string $pivotId, string $methodName, string $id = null, string $type = null) : string
     {
         $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
         $this->registeredMethods[] = $methodName;
 
-        return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type);
+        return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
     public function getRegisteredMethods() : array

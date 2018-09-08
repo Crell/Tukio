@@ -12,13 +12,15 @@ interface RegisterableProviderInterface
      *   The listener to register.
      * @param int $priority
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(callable $listener, $priority = 0, string $type = null): string;
+    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string;
 
     /**
      * Adds a listener to trigger before another existing listener.
@@ -30,13 +32,15 @@ interface RegisterableProviderInterface
      *   The ID of an existing listener.
      * @param callable $listener
      *   The listener to register.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, callable $listener, string $type = null): string;
+    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string;
 
     /**
      * Adds a listener to trigger after another existing listener.
@@ -48,13 +52,15 @@ interface RegisterableProviderInterface
      *   The ID of an existing listener.
      * @param callable $listener
      *   The listener to register.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, callable $listener, string $type = null): string;
+    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string;
 
     /**
      * Adds a method on a service as a listener.
@@ -67,10 +73,12 @@ interface RegisterableProviderInterface
      *   The class or interface type of events for which this listener will be registered.
      * @param int $priority
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): string;
+    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.
@@ -86,15 +94,12 @@ interface RegisterableProviderInterface
      *   The method name of the service that is the listener being registered.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerServiceBefore(
-        string $pivotId,
-        string $serviceName,
-        string $methodName,
-        string $type
-    ): string;
+    public function addListenerServiceBefore(string $pivotId,string $serviceName, string $methodName, string $type, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.
@@ -110,10 +115,12 @@ interface RegisterableProviderInterface
      *   The method name of the service that is the listener being registered.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
+     * @param string $id
+     *   The identifier by which this listener should be known. If not specified one will be generated.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type) : string;
+    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string;
 
     /**
      * Registers all listener methods on a service as listeners.

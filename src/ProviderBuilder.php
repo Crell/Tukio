@@ -21,49 +21,49 @@ class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggrega
         $this->listeners = new OrderedCollection();
     }
 
-    public function addListener(callable $listener, $priority = 0, string $type = null): string
+    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $type = null): string
+    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemBefore($pivotId, $entry, $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $type = null): string
+    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $this->getListenerId($listener);
+        $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemAfter($pivotId, $entry, $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): string
+    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
     {
         $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
 
-        return $this->listeners->addItem($entry, $priority);
+        return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type): string
+    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
     {
         $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
 
-        return $this->listeners->addItemBefore($pivotId, $entry);
+        return $this->listeners->addItemBefore($pivotId, $entry, $id);
     }
 
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type): string
+    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
     {
         $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
 
-        return $this->listeners->addItemAfter($pivotId, $entry);
+        return $this->listeners->addItemAfter($pivotId, $entry, $id);
     }
 
     public function addSubscriber(string $class, string $serviceName): void
