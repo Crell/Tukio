@@ -42,7 +42,7 @@ class ListenService
 
 class CompiledEventDispatcherTest extends TestCase
 {
-    function testFunctionCompile()
+    function test_compiled_provider_triggers_in_order()
     {
         $class = 'CompiledProvider';
         $namespace = 'Test\\Space';
@@ -89,5 +89,52 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertContains('D', $result);
 
         $this->assertTrue(true);
+    }
+
+    public function test_add_subscriber()
+    {
+        // This test is parallel to and uses the same mock subscriber as
+        // RegisterableListenerProviderServiceTest::test_add_subscriber().
+        // Thus if both work, it means the same subscriber works the same
+        // transparently in both compiled and non-compiled versions.
+
+        $class = 'SubscriberProvider';
+        $namespace = 'Test\\Space';
+
+        $builder = new ProviderBuilder();
+        $compiler = new ProviderCompiler();
+
+        $container = new MockContainer();
+
+        $subscriber = new MockSubscriber();
+
+        $container->addService('subscriber', $subscriber);
+
+        $builder->addSubscriber(MockSubscriber::class, 'subscriber');
+
+        try {
+            // Write the generated compiler out to a temp file.
+            $filename = tempnam(sys_get_temp_dir(), 'compiled');
+            $out = fopen($filename, 'w');
+            $compiler->compile($builder, $out, $class, $namespace);
+            fclose($out);
+
+            // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
+            include($filename);
+
+            /** @var ListenerProviderInterface $provider */
+            $compiledClassName = "$namespace\\$class";
+            $provider = new $compiledClassName($container);
+        }
+        finally {
+            unlink($filename);
+        }
+
+        $event = new CollectingTask();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('BCAEDF', implode($event->result()));
     }
 }

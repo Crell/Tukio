@@ -130,7 +130,8 @@ class RegisterableListenerProviderServiceTest extends TestCase
     }
 
 
-    public function test_add_unordered_subscriber() : void {
+    public function test_add_subscriber() : void
+    {
         $container = new MockContainer();
 
         $subscriber = new MockSubscriber();
