@@ -57,7 +57,7 @@ class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggrega
     {
         $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
 
-        return $this->listeners->addItemBefore($pivotId, $entry);
+        return $this->listeners->addItemAfter($pivotId, $entry);
     }
 
     public function addSubscriber(string $class, string $serviceName): void
