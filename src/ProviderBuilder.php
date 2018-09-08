@@ -8,7 +8,7 @@ use Crell\Tukio\OrderedCollection\OrderedCollection;
 
 class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggregate
 {
-    use ParameterDeriverTrait;
+    use ProviderUtilitiesTrait;
 
     /** @var OrderedCollection */
     protected $listeners;
@@ -21,22 +21,25 @@ class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggrega
     public function addListener(callable $listener, $priority = 0, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
+        $id = $this->getListenerId($listener);
 
-        return $this->listeners->addItem($entry, $priority);
+        return $this->listeners->addItem($entry, $priority, $id);
     }
 
     public function addListenerBefore(string $pivotId, callable $listener, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
+        $id = $this->getListenerId($listener);
 
-        return $this->listeners->addItemBefore($pivotId, $entry);
+        return $this->listeners->addItemBefore($pivotId, $entry, $id);
     }
 
     public function addListenerAfter(string $pivotId, callable $listener, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
+        $id = $this->getListenerId($listener);
 
-        return $this->listeners->addItemAfter($pivotId, $entry);
+        return $this->listeners->addItemAfter($pivotId, $entry, $id);
     }
 
     public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0): string

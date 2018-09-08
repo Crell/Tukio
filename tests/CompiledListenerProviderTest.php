@@ -49,7 +49,6 @@ class CompiledEventDispatcherTest extends TestCase
         $namespace = 'Test\\Space';
 
         $builder = new ProviderBuilder();
-        $compiler = new ProviderCompiler();
 
         $container = new MockContainer();
         $container->addService('D', new ListenService());
@@ -102,6 +101,33 @@ class CompiledEventDispatcherTest extends TestCase
 
         $this->assertEquals('BCAEDF', implode($event->result()));
     }
+
+    public function test_explict_id_on_compiled_provider() : void
+    {
+        $class = 'ExplicitIdProvider';
+        $namespace = 'Test\\Space';
+
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $builder->addListener("{$ns}event_listener_one", -4);
+        $builder->addListenerBefore("{$ns}event_listener_one", "{$ns}event_listener_two");
+        $builder->addListenerAfter("{$ns}event_listener_two", "{$ns}event_listener_three");
+        $builder->addListenerAfter("{$ns}event_listener_three", "{$ns}event_listener_four");
+
+        $provider = $this->makeProvider($builder, $container, $class, $namespace);
+
+        $task = new CollectingTask();
+        foreach ($provider->getListenersForEvent($task) as $listener) {
+            $listener($task);
+        }
+
+        $this->assertEquals('BACD', implode($task->result()));
+    }
+
 
     /**
      * Converts a builder into a compiled container.
