@@ -142,6 +142,10 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
      *
      * @todo If we add support for annotations or similar for identifying listeners that logic would go here.
      *
+     * It's OK for this method to return null, as OrderedCollection will generate a random
+     * ID if necessary.  It will also handle duplicates for us.  This method is just a
+     * suggestion.
+     *
      * @param callable $listener
      *   The listener for which to derive an ID.
      * @return null|string
