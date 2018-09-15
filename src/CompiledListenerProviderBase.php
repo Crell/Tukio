@@ -44,6 +44,8 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
                             $this->container->get($listener['serviceName'])->{$listener['method']}($event);
                         };
                         break;
+                    default:
+                        throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
                 }
             }
         }
