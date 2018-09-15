@@ -9,4 +9,10 @@ use Psr\EventDispatcher\StoppableTaskInterface;
 class StoppableCollectingTask extends CollectingTask implements StoppableTaskInterface
 {
     use StoppableTaskTrait;
+
+    public function stopPropagation() : self
+    {
+        $this->stopPropagation = true;
+        return $this;
+    }
 }

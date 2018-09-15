@@ -89,8 +89,9 @@ class ProcessorTest extends TestCase
             }
         };
 
+        /*
         $errorHandlingNotifier = new class implements MessageNotifierInterface {
-            /** @var array  */
+            /** @var array
             public $messages = [];
 
             public function notify(MessageInterface $message): void
@@ -98,11 +99,18 @@ class ProcessorTest extends TestCase
                 $this->messages[] = $message;
             }
         };
+    */
 
-        $p = new TaskProcessor($provider, $this->logger, $errorHandlingNotifier);
+        $p = new TaskProcessor($provider, $this->logger);
 
         $task = new CollectingTask();
-        $p->process($task);
+        try {
+            $p->process($task);
+            $this->fail('No exception was bubbled up.');
+        }
+        catch (\Exception $e) {
+            $this->assertEquals('Fail!', $e->getMessage());
+        }
 
         $this->assertEquals('CR', implode($task->result()));
 
@@ -112,7 +120,7 @@ class ProcessorTest extends TestCase
         $this->assertEquals('Unhandled exception thrown from listener while processing task.', $entry['message']);
         $this->assertEquals($task, $entry['context']['task']);
 
-        $this->assertCount(1, $errorHandlingNotifier->messages);
-        $this->assertInstanceOf(ErrorEvent::class, $errorHandlingNotifier->messages[0]);
+//        $this->assertCount(1, $errorHandlingNotifier->messages);
+//        $this->assertInstanceOf(ErrorEvent::class, $errorHandlingNotifier->messages[0]);
     }
 }
