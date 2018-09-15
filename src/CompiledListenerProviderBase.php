@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Entry\ListenerFunctionEntry;
+use Crell\Tukio\Entry\ListenerServiceEntry;
+use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;

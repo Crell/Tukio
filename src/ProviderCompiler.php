@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Entry\CompileableListenerEntryInterface;
+
 class ProviderCompiler
 {
     /**
