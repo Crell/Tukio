@@ -22,11 +22,28 @@ class ProviderCompiler
     {
         fwrite($stream, $this->createPreamble($class, $namespace));
 
+        $compiled = [];
+
         /** @var CompileableListenerEntryInterface $listenerEntry */
         foreach ($listeners as $listenerEntry) {
-            $item = $this->createEntry($listenerEntry);
-            fwrite($stream, $item);
+            $matches = array_merge(class_parents($listenerEntry->type), class_implements($listenerEntry->type));
+
+            if (class_exists($listenerEntry->type)) {
+                $compiled[$listenerEntry->type][] = $listenerEntry->getProperties();
+                // @todo Also need to get all its subclasses, but how do we determine those here?
+            }
+            else if (interface_exists($listenerEntry->type)) {
+                // @todo Whatever we do for interfaces.
+            }
+
+            /*
+            [
+                ClassA::class => [$listenerEntries],
+            ];
+            */
         }
+
+        print_r($compiled);
 
         fwrite($stream, $this->createClosing());
     }
