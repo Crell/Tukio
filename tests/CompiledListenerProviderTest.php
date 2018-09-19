@@ -104,7 +104,7 @@ class CompiledEventDispatcherTest extends TestCase
 
     public function test_natural_id_on_compiled_provider() : void
     {
-        $class = 'ExplicitIdProvider';
+        $class = 'NaturalIdProvider';
         $namespace = 'Test\\Space';
 
         $builder = new ProviderBuilder();
