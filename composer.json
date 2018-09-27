@@ -29,7 +29,6 @@
     ],
     "require": {
         "php": "~7.1",
-        "doctrine/annotations": "^1.6",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "0.6.0",
         "psr/event-dispatcher-task": "0.6.0",
