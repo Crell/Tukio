@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
 use Crell\Tukio\Entry\ListenerEntry;
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 use Psr\Container\ContainerInterface;
@@ -105,7 +104,7 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         // the wrapping listener must listen to just EventInterface.  The explicit $type means it will still get only
         // the right event type, and the real listener can still type itself properly.
         $container = $this->container;
-        $listener = function(EventInterface $event) use ($serviceName, $methodName, $container) : void {
+        $listener = function (EventInterface $event) use ($serviceName, $methodName, $container) : void {
             $container->get($serviceName)->$methodName($event);
         };
         return $listener;
@@ -133,10 +132,8 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
                     $this->addListenerService($serviceName, $rMethod->getName(), $type);
                 }
             }
-        }
-        catch (\ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
         }
     }
-
 }

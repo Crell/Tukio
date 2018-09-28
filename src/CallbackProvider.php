@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
 use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -36,5 +35,4 @@ class CallbackProvider implements ListenerProviderInterface
         $this->callbacks[$type][] = $method;
         return $this;
     }
-
 }

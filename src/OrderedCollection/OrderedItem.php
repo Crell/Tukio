@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\OrderedCollection;
 
-
 /**
  * This is an internal class.  Do not use outside of this library.
  *
@@ -61,5 +60,4 @@ class OrderedItem
 
         return $new;
     }
-
 }

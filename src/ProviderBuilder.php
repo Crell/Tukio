@@ -8,7 +8,6 @@ use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 
-
 class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggregate
 {
     use ProviderUtilitiesTrait;
@@ -90,8 +89,7 @@ class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggrega
                     $this->addListenerService($serviceName, $rMethod->getName(), $type);
                 }
             }
-        }
-        catch (\ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
         }
     }

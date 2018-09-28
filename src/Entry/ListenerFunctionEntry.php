@@ -18,5 +18,4 @@ class ListenerFunctionEntry extends ListenerEntry implements CompileableListener
             'type' => $this->type,
         ];
     }
-
 }

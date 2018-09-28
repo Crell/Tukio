@@ -148,7 +148,7 @@ class OrderedCollection implements \IteratorAggregate
 
         return (function () {
             foreach ($this->items as $itemList) {
-                yield from array_map(function(OrderedItem $item) {
+                yield from array_map(function (OrderedItem $item) {
                     return $item->item;
                 }, $itemList);
             }
@@ -165,15 +165,13 @@ class OrderedCollection implements \IteratorAggregate
                 }
                 $priority = $this->itemLookup[$item->before]->priority + 1;
                 $this->items[$priority][] = $item;
-            }
-            elseif ($item->after) {
+            } elseif ($item->after) {
                 if (!isset($this->itemLookup[$item->after])) {
                     throw new MissingItemException(sprintf('Cannot add item %s after non-existent item %s', $item->id, $item->after));
                 }
                 $priority = $this->itemLookup[$item->after]->priority - 1;
                 $this->items[$priority][] = $item;
-            }
-            else {
+            } else {
                 throw new \Error('No, seriously, how did you get here?');
             }
         }

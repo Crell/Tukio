@@ -99,7 +99,7 @@ interface RegisterableProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerServiceBefore(string $pivotId,string $serviceName, string $methodName, string $type, string $id = null): string;
+    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.

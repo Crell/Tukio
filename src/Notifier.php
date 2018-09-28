@@ -28,8 +28,7 @@ class Notifier implements MessageNotifierInterface
         foreach ($this->listeners->getListenersForEvent($message) as $listener) {
             try {
                 $listener(clone $message);
-            }
-            catch (\Throwable $e) {
+            } catch (\Throwable $e) {
                 $this->logger->warning('Unhandled exception thrown from listener while processing message.', [
                     'message' => $message,
                     'exception' => $e,

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
 use Crell\Tukio\Entry\CompileableListenerEntryInterface;
 
 class ProviderCompiler
@@ -52,7 +51,6 @@ class $class extends CompiledListenerProviderBase
   protected const LISTENERS = [
 
 END;
-
     }
 
     protected function createClosing() : string
