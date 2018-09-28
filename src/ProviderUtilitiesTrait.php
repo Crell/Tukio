@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Fig\EventDispatcher\ParameterDeriverTrait;
+
 trait ProviderUtilitiesTrait
 {
     use ParameterDeriverTrait;
