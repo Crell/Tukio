@@ -8,7 +8,7 @@
         "Events"
     ],
     "homepage": "https://github.com/Crell/Tukio",
-    "license": "LGPLv3+",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Larry Garfield",
