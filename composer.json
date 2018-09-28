@@ -1,21 +1,11 @@
 {
-    "name": "Crell/Tukio",
+    "name": "crell/tukio",
     "type": "library",
     "description": "A robust, stand-alone PSR-14 event dispatcher implementation.",
     "keywords": [
         "Tukio",
         "PSR-14",
         "Events"
-    ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/php-fig/event-dispatcher"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/php-fig/event-dispatcher-util"
-        }
     ],
     "homepage": "https://github.com/Crell/Tukio",
     "license": "LGPLv3+",
