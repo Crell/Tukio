@@ -23,7 +23,7 @@
         "psr/event-dispatcher": "0.6.0",
         "psr/event-dispatcher-task": "0.6.0",
         "psr/event-dispatcher-message": "0.6.0",
-        "fig/event-dispatcher-util": "^0.6.0",
+        "fig/event-dispatcher-util": "^0.6.1",
         "psr/log": "^1.0"
     },
     "require-dev": {
