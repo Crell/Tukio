@@ -20,7 +20,7 @@ function listenerB(CollectingTask $event) : void
 /**
  * @throws \Exception
  */
-function noListen(EventOne $event) : void
+function noListen(TaskOne $event) : void
 {
     throw new \Exception('This should not be called');
 }
@@ -89,10 +89,10 @@ class CompiledEventDispatcherTest extends TestCase
 
         $builder = new ProviderBuilder();
         $container = new MockContainer();
-        $subscriber = new MockSubscriber();
+        $subscriber = new MockTaskSubscriber();
 
         $container->addService('subscriber', $subscriber);
-        $builder->addSubscriber(MockSubscriber::class, 'subscriber');
+        $builder->addSubscriber(MockTaskSubscriber::class, 'subscriber');
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 

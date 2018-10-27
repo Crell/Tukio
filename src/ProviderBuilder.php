@@ -72,8 +72,8 @@ class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggrega
         $proxy = new ListenerProxy($this, $serviceName, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface */
+        if (in_array(TaskSubscriberInterface::class, class_implements($class))) {
+            /** @var TaskSubscriberInterface */
             $class::registerListeners($proxy);
         }
 

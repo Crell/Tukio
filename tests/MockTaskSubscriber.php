@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
-class MockSubscriber implements SubscriberInterface
+class MockTaskSubscriber implements TaskSubscriberInterface
 {
     public function onA(CollectingTask $event) : void
     {

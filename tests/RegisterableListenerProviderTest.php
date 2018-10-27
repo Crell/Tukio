@@ -6,9 +6,9 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-class EventOne extends CollectingTask {}
+class TaskOne extends CollectingTask {}
 
-class EventTwo extends CollectingTask {}
+class TaskTwo extends CollectingTask {}
 
 class RegisterableListenerProviderTest extends TestCase
 {
@@ -16,13 +16,13 @@ class RegisterableListenerProviderTest extends TestCase
     {
         $p = new RegisterableListenerProvider();
 
-        $p->addListener(function (EventOne $event) {
+        $p->addListener(function (TaskOne $event) {
             $event->add('Y');
         });
         $p->addListener(function (CollectingTask $event) {
             $event->add('Y');
         });
-        $p->addListener(function (EventTwo $event) {
+        $p->addListener(function (TaskTwo $event) {
             $event->add('N');
         });
         // This class doesn't exist but should not result in an error.
@@ -30,7 +30,7 @@ class RegisterableListenerProviderTest extends TestCase
             $event->add('F');
         });
 
-        $event = new EventOne();
+        $event = new TaskOne();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);

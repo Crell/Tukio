@@ -9,14 +9,14 @@ use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
-class RegisterableListenerProvider implements ListenerProviderInterface, RegisterableProviderInterface
+class RegisterableNotificationListenerProvider implements ListenerProviderInterface
 {
     use ProviderUtilitiesTrait;
 
     /**
-     * @var OrderedCollection
+     * @var array
      */
-    protected $listeners;
+    protected $listeners = [];
 
     /**
      * @var ContainerInterface
@@ -25,7 +25,6 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
 
     public function __construct(ContainerInterface $container = null)
     {
-        $this->listeners = new OrderedCollection();
         $this->container = $container;
     }
 
@@ -40,43 +39,15 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         }
     }
 
-    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, string $type = null): void
     {
         $type = $type ?? $this->getParameterType($listener);
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
+        $this->listeners[] = new ListenerEntry($listener, $type);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerService(string $serviceName, string $methodName, string $type): void
     {
-        $type = $type ?? $this->getParameterType($listener);
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItemBefore($pivotId, new ListenerEntry($listener, $type), $id);
-    }
-
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null) : string
-    {
-        $type = $type ?? $this->getParameterType($listener);
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
-    }
-
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
-    {
-        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
-    }
-
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
-    {
-        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
-    }
-
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
-    {
-        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
+        $this->addListener($this->makeListenerForService($serviceName, $methodName), $type);
     }
 
     /**
@@ -112,11 +83,11 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
 
     public function addSubscriber(string $class, string $serviceName) : void
     {
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new MessageListenerProxy($this, $serviceName, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(TaskSubscriberInterface::class, class_implements($class))) {
-            /** @var TaskSubscriberInterface */
+        if (in_array(MessageSubscriberInterface::class, class_implements($class))) {
+            /** @var MessageSubscriberInterface */
             $class::registerListeners($proxy);
         }
 

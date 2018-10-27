@@ -134,13 +134,13 @@ class RegisterableListenerProviderServiceTest extends TestCase
     {
         $container = new MockContainer();
 
-        $subscriber = new MockSubscriber();
+        $subscriber = new MockTaskSubscriber();
 
         $container->addService('subscriber', $subscriber);
 
         $p = new RegisterableListenerProvider($container);
 
-        $p->addSubscriber(MockSubscriber::class, 'subscriber');
+        $p->addSubscriber(MockTaskSubscriber::class, 'subscriber');
 
         $event = new CollectingTask();
 
