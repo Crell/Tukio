@@ -15,7 +15,7 @@ trait MakeCompiledProviderTrait
      * Technically this is the core of every test in this class.  However, the build process
      * is identical in all cases so there's little point in repeating the code.
      *
-     * @param ProviderBuilder $builder
+     * @param ProviderBuilderInterface $builder
      *   A builder, ready to compile.
      * @param ContainerInterface $container
      *   A container to provide to the built provider.
@@ -26,7 +26,7 @@ trait MakeCompiledProviderTrait
      * @return ListenerProviderInterface
      *   The compiled provider.
      */
-    protected function makeProvider(ProviderBuilder $builder, ContainerInterface $container, string $class, string $namespace) : ListenerProviderInterface
+    protected function makeProvider(ProviderBuilderInterface $builder, ContainerInterface $container, string $class, string $namespace) : ListenerProviderInterface
     {
         try {
             $compiler = new ProviderCompiler();

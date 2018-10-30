@@ -8,7 +8,7 @@ use Crell\Tukio\Entry\CompileableListenerEntryInterface;
 class ProviderCompiler
 {
     /**
-     * @param ProviderBuilder $listeners
+     * @param ProviderBuilderInterface $listeners
      *   The set of listeners to compile.
      * @param resource $stream
      *   A writeable stream to which to write the compiled class.
@@ -17,7 +17,7 @@ class ProviderCompiler
      * @param string $namespace
      *   the namespace for the compiled class.
      */
-    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled') : void
+    public function compile(ProviderBuilderInterface $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled') : void
     {
         fwrite($stream, $this->createPreamble($class, $namespace));
 

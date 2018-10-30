@@ -9,7 +9,7 @@ use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
-class RegisterableNotificationListenerProvider implements ListenerProviderInterface
+class RegisterableNotificationListenerProvider implements ListenerProviderInterface, RegisterableNotificationListenerProviderInterface
 {
     use ProviderUtilitiesTrait;
 

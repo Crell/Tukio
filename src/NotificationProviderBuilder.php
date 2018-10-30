@@ -8,71 +8,33 @@ use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 
-class ProviderBuilder implements RegisterableProviderInterface, ProviderBuilderInterface
+class NotificationProviderBuilder implements ProviderBuilderInterface, RegisterableNotificationListenerProviderInterface
 {
     use ProviderUtilitiesTrait;
 
-    /** @var OrderedCollection */
-    protected $listeners;
+    /** @var array */
+    protected $listenerEntries = [];
 
-    public function __construct()
-    {
-        $this->listeners = new OrderedCollection();
-    }
-
-    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, string $type = null): void
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItem($entry, $priority, $id);
+        $this->listenerEntries[] = $entry;
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string
+    public function addListenerService(string $serviceName, string $methodName, string $type): void
     {
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
-    }
-
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string
-    {
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
-    }
-
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
-
-        return $this->listeners->addItem($entry, $priority, $id);
-    }
-
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
-
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
-    }
-
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
-
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
+        $this->listenerEntries[] = new ListenerServiceEntry($serviceName, $methodName, $type);
     }
 
     public function addSubscriber(string $class, string $serviceName): void
     {
         // @todo This method is identical to the one in RegisterableListenerProvider. Is it worth merging them?
 
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new MessageListenerProxy($this, $serviceName, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(TaskSubscriberInterface::class, class_implements($class))) {
+        if (in_array(MessageSubscriberInterface::class, class_implements($class))) {
             /** @var TaskSubscriberInterface */
             $class::registerListeners($proxy);
         }
@@ -96,7 +58,7 @@ class ProviderBuilder implements RegisterableProviderInterface, ProviderBuilderI
 
     public function getIterator()
     {
-        yield from $this->listeners;
+        yield from $this->listenerEntries;
     }
 
     protected function getListenerEntry(callable $listener, string $type)

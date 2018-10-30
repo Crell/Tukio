@@ -21,7 +21,7 @@ class MessageListenerProxy
     /** @var array */
     protected $registeredMethods = [];
 
-    public function __construct(RegisterableNotificationListenerProvider $provider, string $serviceName, string $serviceClass)
+    public function __construct(RegisterableNotificationListenerProviderInterface $provider, string $serviceName, string $serviceClass)
     {
         $this->provider = $provider;
         $this->serviceName = $serviceName;
