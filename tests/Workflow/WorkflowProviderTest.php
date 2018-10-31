@@ -30,18 +30,22 @@ class WorkflowProviderTest extends TestCase
     {
         $p = new WorkflowProvider();
 
+        // This has the right workflow name and event type.
         $p->addListener(function (WorkflowStartTask $task) {
             $task->add('A');
         }, 'bob');
 
+        // This has the wrong workflow type.
         $p->addListener(function (WorkflowEndTask $task) {
             $task->add('B');
         }, 'bob');
 
+        // This matches the parent, so would be called for both WorkflowStart and WorkflowEnd.
         $p->addListener(function (WorkflowTask $task) {
             $task->add('C');
         }, 'bob');
 
+        // This is the right type but the wrong workflow name, so it won't be called.
         $p->addListener(function (WorkflowStartTask $task) {
             $task->add('D');
         }, 'anita');
