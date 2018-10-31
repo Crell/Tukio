@@ -8,21 +8,50 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 
 
-Tukio is a complete and robust implementation of the PSR-14 Event Dispatcher specification.
+Tukio is a complete and robust implementation of the [PSR-14](http://www.php-fig.org/psr/psr-14/) Event Dispatcher specification.
 
 PSR-14 is still in draft.  This library will be updated accordingly as PSR-14 evolves.  A stable release will be made once PSR-14 is complete.
+
+"Tukio" is the Swahili word for "Event".
 
 ## Install
 
 Via Composer
 
 ``` bash
-$ composer require Crell/Tukio
+$ composer require crell/tukio
 ```
 
 ## Usage
 
-Coming Soon!
+
+Tukio implements both the Message and Task components of PSR-14.  As with PSR-14 itself it is broken up into a series of collaborating objects.  (These instructions assume you are already familiar with PSR-14.)
+
+### Registering listeners
+
+There are two different ListenerProviders included.  Either one can be used.  The first is the `RegisterableListenerProvider`, which lets you register listeners by calling methods on it:
+
+```php
+$provider = new RegisterableListnerProvider():
+
+$provider->addListener(function (ImportantTask $task) {
+    // ...
+});
+```
+
+That's it!  You can register any legal PHP callable: An anonymous function (as shown above), a function name, an object/method array, or a class/method array for a static method.
+
+There's no need to specify what type of event the listener is for.  That will be derived automatically from the function itself, as long as you type-hint the parameter.  In the example above, the provider will register this callable for any event of type `ImportantTask`, or any subclass of `ImportantTask`.  Any event that is an `instanceof ImportantTask` will get passed to this listener.
+
+That means you can listen on an interface, too!
+
+```php
+$provider->addListener(function (LifecyleEventInterface $task) {
+  // ...
+});
+```
+
+That listener will now be called for any event that implements `LifecycleEventInterface`.
 
 ## Change log
 
