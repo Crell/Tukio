@@ -50,12 +50,17 @@ class WorkflowProviderTest extends TestCase
             $task->add('D');
         }, 'anita');
 
+        // This is the right type and applies to any workflow name.
+        $p->addListener(function (WorkflowStartTask $task) {
+            $task->add('E');
+        });
+
         $event = new WorkflowStartTask('bob');
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
 
-        $this->assertEquals('AC', implode($event->result()));
+        $this->assertEquals('ACE', implode($event->result()));
     }
 }

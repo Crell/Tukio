@@ -14,6 +14,9 @@ class WorkflowProvider implements ListenerProviderInterface
     /** @var array */
     protected $listeners = [];
 
+    /** @var array */
+    protected $all = [];
+
     public function getListenersForEvent(EventInterface $event) : iterable
     {
         if (!$event instanceof WorkflowTaskInterface) {
@@ -30,13 +33,25 @@ class WorkflowProvider implements ListenerProviderInterface
                 }
             }
         }
+        foreach ($this->all as $type => $listeners) {
+            foreach ($listeners as $listener) {
+                if ($event instanceof $type) {
+                    yield $listener;
+                }
+            }
+        }
     }
 
-    public function addListener(callable $listener, string $workflowName, string $type = null) : void
+    public function addListener(callable $listener, string $workflowName = '', string $type = null) : void
     {
         $type = $type ?? $this->getParameterType($listener);
 
-        $this->listeners[$workflowName][$type][] = $listener;
+        if ($workflowName) {
+            $this->listeners[$workflowName][$type][] = $listener;
+        }
+        else {
+            $this->all[$type][] = $listener;
+        }
     }
 
 }
