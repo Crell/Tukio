@@ -7,6 +7,20 @@ namespace Crell\Tukio;
 use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
+/**
+ * A Delegating provider.
+ *
+ * The delegating provider allows for selected types of event to be handled by dedicated
+ * sub-providers, which if used will block the use of a default sub-provider.  That is,
+ * certain high-frequency event types (mainly some Tasks) can be handled by dedicated
+ * providers and then skip the normal lookup process of the default provider.  That can
+ * provide a performance benefit if certain tasks are triggered many dozens of times
+ * or more.
+ *
+ * Note: The presence of a sub-provider that wants to intercept a given type of event
+ * will be sufficient to block the default from firing, even if it has no applicable
+ * listeners.
+ */
 class DelegatingProvider implements ListenerProviderInterface
 {
 
