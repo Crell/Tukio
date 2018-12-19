@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\EventInterface;
 
-interface EventParentInterface extends EventInterface
+interface EventParentInterface
 {
     public function add(string $val) : void;
     public function result() : array;

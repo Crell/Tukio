@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\EventDispatcher\MessageInterface;
-use Psr\EventDispatcher\MessageNotifierInterface;
-use Psr\EventDispatcher\StoppableTaskInterface;
-use Psr\EventDispatcher\TaskInterface;
-use Psr\EventDispatcher\TaskProcessorInterface;
+use Psr\EventDispatcher\StoppableEventInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class TaskProcessor implements TaskProcessorInterface
+class Dispatcher implements EventDispatcherInterface
 {
     /** @var ListenerProviderInterface  */
     protected $listeners;
@@ -26,25 +23,25 @@ class TaskProcessor implements TaskProcessorInterface
         $this->logger = $logger ?? new NullLogger();
     }
 
-    public function process(TaskInterface $task): TaskInterface
+    public function dispatch(object $event)
     {
-        foreach ($this->listeners->getListenersForEvent($task) as $listener) {
+        foreach ($this->listeners->getListenersForEvent($event) as $listener) {
             try {
-                $listener($task);
-                if ($task instanceof StoppableTaskInterface && $task->isPropagationStopped()) {
+                $listener($event);
+                if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
                     break;
                 }
             } // We do not catch Errors here, because Errors indicate the developer screwed up in
             // some way. Let those bubble up because they should just become fatals.
             catch (\Exception $e) {
-                $this->logger->warning('Unhandled exception thrown from listener while processing task.', [
-                    'task' => $task,
+                $this->logger->warning('Unhandled exception thrown from listener while processing event.', [
+                    'event' => $event,
                     'exception' => $e,
                 ]);
 
                 throw $e;
             }
         }
-        return $task;
+        return $event;
     }
 }

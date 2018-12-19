@@ -5,13 +5,12 @@ namespace Crell\Tukio;
 
 
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\TaskInterface;
-use Psr\EventDispatcher\TaskProcessorInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-class DebugTaskProcessorTest extends TestCase
+class DebugEventDispatcherTest extends TestCase
 {
 
     /** @var LoggerInterface */
@@ -36,20 +35,20 @@ class DebugTaskProcessorTest extends TestCase
 
     public function test_event_is_logged() : void
     {
-        $inner = new class implements TaskProcessorInterface {
-            public function process(TaskInterface $task): TaskInterface
+        $inner = new class implements EventDispatcherInterface {
+            public function dispatch(object $event)
             {
-                return $task;
+                return $event;
             }
         };
 
-        $p = new DebugTaskProcessor($inner, $this->logger);
+        $p = new DebugEventDispatcher($inner, $this->logger);
 
-        $task = new CollectingTask();
-        $p->process($task);
+        $event = new CollectingEvent();
+        $p->dispatch($event);
 
         $this->assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
-        $this->assertEquals('Processing task of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
-        $this->assertEquals($task, $this->logger->messages[LogLevel::DEBUG][0]['context']['task']);
+        $this->assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
+        $this->assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
     }
 }

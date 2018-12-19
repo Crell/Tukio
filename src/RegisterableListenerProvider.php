@@ -29,8 +29,7 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         $this->container = $container;
     }
 
-
-    public function getListenersForEvent(EventInterface $event): iterable
+    public function getListenersForEvent(object $event): iterable
     {
         /** @var ListenerEntry $listener */
         foreach ($this->listeners as $listener) {
@@ -104,7 +103,7 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
         // the wrapping listener must listen to just EventInterface.  The explicit $type means it will still get only
         // the right event type, and the real listener can still type itself properly.
         $container = $this->container;
-        $listener = function (EventInterface $event) use ($serviceName, $methodName, $container) : void {
+        $listener = function (object $event) use ($serviceName, $methodName, $container) : void {
             $container->get($serviceName)->$methodName($event);
         };
         return $listener;

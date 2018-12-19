@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
 
-use Crell\Tukio\CollectingTask;
+use Crell\Tukio\CollectingEvent;
 use Crell\Tukio\MockContainer;
 use Crell\Tukio\ProviderBuilder;
 use Crell\Tukio\ProviderCompiler;
@@ -66,7 +66,7 @@ class CompiledProviderBench extends ProviderBenchBase
         $this->provider = new $compiledClassName($container);
     }
 
-    public static function fakeListener(CollectingTask $task) : void
+    public static function fakeListener(CollectingEvent $task) : void
     {
     }
 }

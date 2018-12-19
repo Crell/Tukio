@@ -18,17 +18,15 @@
         }
     ],
     "require": {
-        "php": "~7.1",
+        "php": "~7.2",
         "psr/container": "^1.0",
-        "psr/event-dispatcher": "0.6.0",
-        "psr/event-dispatcher-task": "0.6.0",
-        "psr/event-dispatcher-message": "0.6.0",
-        "fig/event-dispatcher-util": "^0.6.1",
+        "psr/event-dispatcher": "dev-revision",
+        "fig/event-dispatcher-util": "dev-revision",
         "psr/log": "^1.0"
     },
     "require-dev": {
         "phpbench/phpbench": "@dev",
-        "phpunit/phpunit": ">=7.0",
+        "phpunit/phpunit": "~7.0",
         "squizlabs/php_codesniffer": "^2.3"
     },
     "autoload": {

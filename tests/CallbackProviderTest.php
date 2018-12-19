@@ -7,7 +7,7 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 
 
-class LifecycleTask extends CollectingTask implements CallbackTaskInterface
+class LifecycleEvent extends CollectingEvent implements CallbackEventInterface
 {
     protected $entity;
 
@@ -22,31 +22,31 @@ class LifecycleTask extends CollectingTask implements CallbackTaskInterface
     }
 }
 
-class LoadTask extends LifecycleTask {}
+class LoadEvent extends LifecycleEvent {}
 
-class SaveTask extends LifecycleTask {}
+class SaveEvent extends LifecycleEvent {}
 
 class FakeEntity
 {
 
-    public function load(LoadTask $task) : void
+    public function load(LoadEvent $event) : void
     {
-        $task->add('A');
+        $event->add('A');
     }
 
-    public function save(SaveTask $task) : void
+    public function save(SaveEvent $event) : void
     {
-        $task->add('B');
+        $event->add('B');
     }
 
-    public function stuff(StuffTask $task) : void
+    public function stuff(StuffEvent $event) : void
     {
-        $task->add('C');
+        $event->add('C');
     }
 
-    public function all(LifecycleTask $task) : void
+    public function all(LifecycleEvent $event) : void
     {
-        $task->add('D');
+        $event->add('D');
     }
 }
 
@@ -60,33 +60,33 @@ class CallbackProviderTest extends TestCase
 
         $entity = new FakeEntity();
 
-        $p->addCallbackMethod(LoadTask::class, 'load');
-        $p->addCallbackMethod(SaveTask::class, 'save');
-        $p->addCallbackMethod(LifecycleTask::class, 'all');
+        $p->addCallbackMethod(LoadEvent::class, 'load');
+        $p->addCallbackMethod(SaveEvent::class, 'save');
+        $p->addCallbackMethod(LifecycleEvent::class, 'all');
 
-        $task = new LoadTask($entity);
+        $event = new LoadEvent($entity);
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('AD', implode($task->result()));
+        $this->assertEquals('AD', implode($event->result()));
     }
 
-    public function test_non_callback_task_skips_silently() : void
+    public function test_non_callback_event_skips_silently() : void
     {
         $p = new CallbackProvider();
 
-        $p->addCallbackMethod(LoadTask::class, 'load');
-        $p->addCallbackMethod(SaveTask::class, 'save');
-        $p->addCallbackMethod(LifecycleTask::class, 'all');
+        $p->addCallbackMethod(LoadEvent::class, 'load');
+        $p->addCallbackMethod(SaveEvent::class, 'save');
+        $p->addCallbackMethod(LifecycleEvent::class, 'all');
 
-        $task = new CollectingTask();
+        $event = new CollectingEvent();
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('', implode($task->result()));
+        $this->assertEquals('', implode($event->result()));
     }
 }
