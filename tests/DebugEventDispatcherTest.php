@@ -5,13 +5,12 @@ namespace Crell\Tukio;
 
 
 use PHPUnit\Framework\TestCase;
-use Psr\EventDispatcher\MessageInterface;
-use Psr\EventDispatcher\MessageNotifierInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-class DebugNotifierTest extends TestCase
+class DebugEventDispatcherTest extends TestCase
 {
 
     /** @var LoggerInterface */
@@ -36,17 +35,20 @@ class DebugNotifierTest extends TestCase
 
     public function test_event_is_logged() : void
     {
-        $inner = new class implements MessageNotifierInterface {
-            public function notify(MessageInterface $message): void {}
+        $inner = new class implements EventDispatcherInterface {
+            public function dispatch(object $event)
+            {
+                return $event;
+            }
         };
 
-        $p = new DebugNotifier($inner, $this->logger);
+        $p = new DebugEventDispatcher($inner, $this->logger);
 
-        $message = new BasicMessage();
-        $p->notify($message);
+        $event = new CollectingEvent();
+        $p->dispatch($event);
 
         $this->assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
-        $this->assertEquals('Notifying message of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
-        $this->assertEquals($message, $this->logger->messages[LogLevel::DEBUG][0]['context']['message']);
+        $this->assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
+        $this->assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
     }
 }

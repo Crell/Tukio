@@ -7,7 +7,6 @@ use Crell\Tukio\Entry\ListenerFunctionEntry;
 use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 class CompiledListenerProviderBase implements ListenerProviderInterface
@@ -27,7 +26,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
         $this->container = $container;
     }
 
-    public function getListenersForEvent(EventInterface $event): iterable
+    public function getListenersForEvent(object $event): iterable
     {
         /** @var array $listener */
         foreach (static::LISTENERS as $listener) {
@@ -40,7 +39,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
                         yield [$listener['class'], $listener['method']];
                         break;
                     case ListenerServiceEntry::class:
-                        yield function (EventInterface $event) use ($listener) {
+                        yield function (object $event) use ($listener) {
                             $this->container->get($listener['serviceName'])->{$listener['method']}($event);
                         };
                         break;

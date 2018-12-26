@@ -6,30 +6,30 @@ namespace Crell\Tukio;
 
 class MockSubscriber implements SubscriberInterface
 {
-    public function onA(CollectingTask $event) : void
+    public function onA(CollectingEvent $event) : void
     {
         $event->add('A');
     }
-    public function onB(CollectingTask $event) : void
+    public function onB(CollectingEvent $event) : void
     {
         $event->add('B');
     }
-    public function onC(CollectingTask $event) : void
+    public function onC(CollectingEvent $event) : void
     {
         $event->add('C');
     }
-    public function onD(CollectingTask $event) : void
+    public function onD(CollectingEvent $event) : void
     {
         $event->add('D');
     }
-    public function onE(CollectingTask $event) : void
+    public function onE(CollectingEvent $event) : void
     {
         $event->add('E');
     }
 
-    public function notNormalName(CollectingTask $task) : void
+    public function notNormalName(CollectingEvent $event) : void
     {
-        $task->add('F');
+        $event->add('F');
     }
 
     public function onG(NoEvent $event) : void

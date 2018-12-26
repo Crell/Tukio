@@ -6,9 +6,9 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-class EventOne extends CollectingTask {}
+class EventOne extends CollectingEvent {}
 
-class EventTwo extends CollectingTask {}
+class EventTwo extends CollectingEvent {}
 
 class RegisterableListenerProviderTest extends TestCase
 {
@@ -19,7 +19,7 @@ class RegisterableListenerProviderTest extends TestCase
         $p->addListener(function (EventOne $event) {
             $event->add('Y');
         });
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('Y');
         });
         $p->addListener(function (EventTwo $event) {
@@ -43,23 +43,23 @@ class RegisterableListenerProviderTest extends TestCase
     {
         $p = new RegisterableListenerProvider();
 
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('E');
         }, 0);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('R');
         }, 90);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('C');
         }, 100);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -72,23 +72,23 @@ class RegisterableListenerProviderTest extends TestCase
     {
         $p = new RegisterableListenerProvider();
 
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('E');
         }, 0);
-        $rid = $p->addListener(function (CollectingTask $event) {
+        $rid = $p->addListener(function (CollectingEvent $event) {
             $event->add('R');
         }, 90);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
-        $p->addListenerBefore($rid, function (CollectingTask $event) {
+        $p->addListenerBefore($rid, function (CollectingEvent $event) {
             $event->add('C');
         });
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -101,23 +101,23 @@ class RegisterableListenerProviderTest extends TestCase
     {
         $p = new RegisterableListenerProvider();
 
-        $rid = $p->addListener(function (CollectingTask $event) {
+        $rid = $p->addListener(function (CollectingEvent $event) {
             $event->add('R');
         }, 90);
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
-        $p->addListenerBefore($rid, function (CollectingTask $event) {
+        $p->addListenerBefore($rid, function (CollectingEvent $event) {
             $event->add('C');
         });
-        $p->addListener(function (CollectingTask $event) {
+        $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
         }, 0);
-        $p->addListenerAfter($rid, function (CollectingTask $event) {
+        $p->addListenerAfter($rid, function (CollectingEvent $event) {
             $event->add('E');
         });
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);

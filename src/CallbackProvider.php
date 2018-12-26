@@ -11,9 +11,9 @@ class CallbackProvider implements ListenerProviderInterface
     /** @var array */
     protected $callbacks = [];
 
-    public function getListenersForEvent(EventInterface $event): iterable
+    public function getListenersForEvent(object $event): iterable
     {
-        if (!$event instanceof CallbackTaskInterface) {
+        if (!$event instanceof CallbackEventInterface) {
             return [];
         }
 

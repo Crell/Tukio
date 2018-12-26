@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Psr\EventDispatcher\TaskInterface;
-
 /**
- * A Task that carries an object that has its own event callbacks.
+ * An Event that carries an object that has its own event callbacks.
  */
-interface CallbackTaskInterface extends TaskInterface
+interface CallbackEventInterface
 {
 
     /**

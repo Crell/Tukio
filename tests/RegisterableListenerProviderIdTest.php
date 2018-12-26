@@ -6,46 +6,46 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-function event_listener_one(CollectingTask $task) : void
+function event_listener_one(CollectingEvent $event) : void
 {
-    $task->add('A');
+    $event->add('A');
 }
 
-function event_listener_two(CollectingTask $task) : void
+function event_listener_two(CollectingEvent $event) : void
 {
-    $task->add('B');
+    $event->add('B');
 }
 
-function event_listener_three(CollectingTask $task) : void
+function event_listener_three(CollectingEvent $event) : void
 {
-    $task->add('C');
+    $event->add('C');
 }
 
-function event_listener_four(CollectingTask $task) : void
+function event_listener_four(CollectingEvent $event) : void
 {
-    $task->add('D');
+    $event->add('D');
 }
 
 
 class TestListeners
 {
-    public static function listenerA(CollectingTask $task) : void
+    public static function listenerA(CollectingEvent $event) : void
     {
-        $task->add('A');
+        $event->add('A');
     }
-    public static function listenerB(CollectingTask $task) : void
+    public static function listenerB(CollectingEvent $event) : void
     {
-        $task->add('B');
-    }
-
-    public function listenerC(CollectingTask $task) : void
-    {
-        $task->add('C');
+        $event->add('B');
     }
 
-    public function listenerD(CollectingTask $task) : void
+    public function listenerC(CollectingEvent $event) : void
     {
-        $task->add('D');
+        $event->add('C');
+    }
+
+    public function listenerD(CollectingEvent $event) : void
+    {
+        $event->add('D');
     }
 }
 
@@ -64,13 +64,13 @@ class RegisterableListenerProviderIdTest extends TestCase
         $p->addListenerAfter("{$ns}event_listener_two", "{$ns}event_listener_three");
         $p->addListenerAfter("{$ns}event_listener_three", "{$ns}event_listener_four");
 
-        $task = new CollectingTask();
+        $event = new CollectingEvent();
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($task->result()));
+        $this->assertEquals('BACD', implode($event->result()));
     }
 
     public function test_natural_id_for_static_method() : void
@@ -80,13 +80,13 @@ class RegisterableListenerProviderIdTest extends TestCase
         $p->addListener([TestListeners::class, 'listenerA'], -4);
         $p->addListenerBefore(TestListeners::class . '::listenerA', [TestListeners::class, 'listenerB']);
 
-        $task = new CollectingTask();
+        $event = new CollectingEvent();
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('BA', implode($task->result()));
+        $this->assertEquals('BA', implode($event->result()));
     }
 
     public function test_natural_id_for_object_method() : void
@@ -98,13 +98,13 @@ class RegisterableListenerProviderIdTest extends TestCase
         $p->addListener([$l, 'listenerC'], -4);
         $p->addListenerBefore(TestListeners::class . '::listenerC', [$l, 'listenerD']);
 
-        $task = new CollectingTask();
+        $event = new CollectingEvent();
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('DC', implode($task->result()));
+        $this->assertEquals('DC', implode($event->result()));
     }
 
     public function test_explicit_id_for_function(): void
@@ -119,13 +119,13 @@ class RegisterableListenerProviderIdTest extends TestCase
         $p->addListenerAfter('id-2', "{$ns}event_listener_three", 'id-3');
         $p->addListenerAfter('id-3', "{$ns}event_listener_four");
 
-        $task = new CollectingTask();
+        $event = new CollectingEvent();
 
-        foreach ($p->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($task->result()));
+        $this->assertEquals('BACD', implode($event->result()));
     }
 
 }

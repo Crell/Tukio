@@ -2,7 +2,6 @@ dist: trusty
 language: php
 
 php:
-  - 7.1
   - 7.2
 
 # This triggers builds to run on the new TravisCI infrastructure.

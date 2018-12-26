@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
-function listenerA(CollectingTask $event) : void
+function listenerA(CollectingEvent $event) : void
 {
     $event->add('A');
 }
 
-function listenerB(CollectingTask $event) : void
+function listenerB(CollectingEvent $event) : void
 {
     $event->add('B');
 }
@@ -27,7 +27,7 @@ function noListen(EventOne $event) : void
 
 class Listen
 {
-    public static function listen(CollectingTask $event)
+    public static function listen(CollectingEvent $event)
     {
         $event->add('C');
     }
@@ -35,7 +35,7 @@ class Listen
 
 class ListenService
 {
-    public static function listen(CollectingTask $event)
+    public static function listen(CollectingEvent $event)
     {
         $event->add('D');
     }
@@ -59,11 +59,11 @@ class CompiledEventDispatcherTest extends TestCase
         $builder->addListener('\\Crell\\Tukio\\listenerB');
         $builder->addListener('\\Crell\\Tukio\\noListen');
         $builder->addListener([Listen::class, 'listen']);
-        $builder->addListenerService('D', 'listen', CollectingTask::class);
+        $builder->addListenerService('D', 'listen', CollectingEvent::class);
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
         foreach ($provider->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
@@ -96,7 +96,7 @@ class CompiledEventDispatcherTest extends TestCase
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
         foreach ($provider->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
@@ -122,12 +122,12 @@ class CompiledEventDispatcherTest extends TestCase
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
-        $task = new CollectingTask();
-        foreach ($provider->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        $event = new CollectingEvent();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($task->result()));
+        $this->assertEquals('BACD', implode($event->result()));
     }
 
     public function test_explicit_id_on_compiled_provider() : void
@@ -148,12 +148,12 @@ class CompiledEventDispatcherTest extends TestCase
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
-        $task = new CollectingTask();
-        foreach ($provider->getListenersForEvent($task) as $listener) {
-            $listener($task);
+        $event = new CollectingEvent();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($task->result()));
+        $this->assertEquals('BACD', implode($event->result()));
     }
 
 

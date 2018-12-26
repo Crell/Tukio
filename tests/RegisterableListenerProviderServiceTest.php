@@ -19,42 +19,42 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
         $container->addService('A', new class
         {
-            public function listen(CollectingTask $event)
+            public function listen(CollectingEvent $event)
             {
                 $event->add('A');
             }
         });
         $container->addService('B', new class
         {
-            public function listen(CollectingTask $event)
+            public function listen(CollectingEvent $event)
             {
                 $event->add('B');
             }
         });
         $container->addService('C', new class
         {
-            public function listen(CollectingTask $event)
+            public function listen(CollectingEvent $event)
             {
                 $event->add('C');
             }
         });
         $container->addService('R', new class
         {
-            public function listen(CollectingTask $event)
+            public function listen(CollectingEvent $event)
             {
                 $event->add('R');
             }
         });
         $container->addService('E', new class
         {
-            public function listen(CollectingTask $event)
+            public function listen(CollectingEvent $event)
             {
                 $event->add('E');
             }
         });
         $container->addService('L', new class
         {
-            public function hear(CollectingTask $event)
+            public function hear(CollectingEvent $event)
             {
                 $event->add('L');
             }
@@ -67,13 +67,13 @@ class RegisterableListenerProviderServiceTest extends TestCase
     {
         $p = new RegisterableListenerProvider($this->mockContainer);
 
-        $p->addListenerService('L', 'hear', CollectingTask::class, 70);
-        $p->addListenerService('E', 'listen', CollectingTask::class, 80);
-        $p->addListenerService('C', 'listen', CollectingTask::class, 100);
-        $p->addListenerService('L', 'hear', CollectingTask::class); // Defaults to 0
-        $p->addListenerService('R', 'listen', CollectingTask::class, 90);
+        $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
+        $p->addListenerService('E', 'listen', CollectingEvent::class, 80);
+        $p->addListenerService('C', 'listen', CollectingEvent::class, 100);
+        $p->addListenerService('L', 'hear', CollectingEvent::class); // Defaults to 0
+        $p->addListenerService('R', 'listen', CollectingEvent::class, 90);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -86,13 +86,13 @@ class RegisterableListenerProviderServiceTest extends TestCase
     {
         $p = new RegisterableListenerProvider($this->mockContainer);
 
-        $l1 = $p->addListenerService('L', 'hear', CollectingTask::class);
-        $l2 = $p->addListenerServiceBefore($l1, 'L', 'hear', CollectingTask::class);
-        $e = $p->addListenerServiceBefore($l2, 'E', 'listen', CollectingTask::class);
-        $r = $p->addListenerServiceBefore($e, 'R', 'listen', CollectingTask::class);
-        $c = $p->addListenerServiceBefore($r, 'C', 'listen', CollectingTask::class);
+        $l1 = $p->addListenerService('L', 'hear', CollectingEvent::class);
+        $l2 = $p->addListenerServiceBefore($l1, 'L', 'hear', CollectingEvent::class);
+        $e = $p->addListenerServiceBefore($l2, 'E', 'listen', CollectingEvent::class);
+        $r = $p->addListenerServiceBefore($e, 'R', 'listen', CollectingEvent::class);
+        $c = $p->addListenerServiceBefore($r, 'C', 'listen', CollectingEvent::class);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -105,13 +105,13 @@ class RegisterableListenerProviderServiceTest extends TestCase
     {
         $p = new RegisterableListenerProvider($this->mockContainer);
 
-        $c = $p->addListenerService('C', 'listen', CollectingTask::class);
-        $r = $p->addListenerServiceAfter($c, 'R', 'listen', CollectingTask::class);
-        $e = $p->addListenerServiceAfter($r, 'E', 'listen', CollectingTask::class);
-        $l1 = $p->addListenerServiceAfter($e, 'L', 'hear', CollectingTask::class);
-        $l2 = $p->addListenerServiceAfter($l1, 'L', 'hear', CollectingTask::class);
+        $c = $p->addListenerService('C', 'listen', CollectingEvent::class);
+        $r = $p->addListenerServiceAfter($c, 'R', 'listen', CollectingEvent::class);
+        $e = $p->addListenerServiceAfter($r, 'E', 'listen', CollectingEvent::class);
+        $l1 = $p->addListenerServiceAfter($e, 'L', 'hear', CollectingEvent::class);
+        $l2 = $p->addListenerServiceAfter($l1, 'L', 'hear', CollectingEvent::class);
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -126,7 +126,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
         $p = new RegisterableListenerProvider();
 
-        $p->addListenerService('L', 'hear', CollectingTask::class, 70);
+        $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
     }
 
 
@@ -142,7 +142,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
         $p->addSubscriber(MockSubscriber::class, 'subscriber');
 
-        $event = new CollectingTask();
+        $event = new CollectingEvent();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
 
-use Crell\Tukio\CollectingTask;
+use Crell\Tukio\CollectingEvent;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\Revs;
@@ -41,7 +41,7 @@ abstract class ProviderBenchBase extends TukioBenchmarks
      */
     public function bench_match_provider() : void
     {
-        $task = new CollectingTask();
+        $task = new CollectingEvent();
 
         $listeners = $this->provider->getListenersForEvent($task);
 
