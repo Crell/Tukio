@@ -25,7 +25,15 @@ class Dispatcher implements EventDispatcherInterface
 
     public function dispatch(object $event)
     {
+        // If the event is already stopped, this method becomes a no-op.
+        if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
+            return $event;
+        }
+
         foreach ($this->listeners->getListenersForEvent($event) as $listener) {
+            // Technically this has an extraneous stopped-check after the last listener,
+            // but that doesn't violate the spec since it's still technically checking
+            // before each listener is called, given the check above.
             try {
                 $listener($event);
                 if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {

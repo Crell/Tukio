@@ -105,4 +105,23 @@ class DispatcherTest extends TestCase
         $this->assertEquals('Unhandled exception thrown from listener while processing event.', $entry['message']);
         $this->assertEquals($event, $entry['context']['event']);
     }
+
+    public function test_already_stopped_event_calls_no_listeners() : void
+    {
+        $provider = new class implements ListenerProviderInterface {
+            public function getListenersForEvent(object $event): iterable
+            {
+                yield function (CollectingEvent $event) { $event->add('C'); };
+            }
+        };
+
+        $d = new Dispatcher($provider);
+
+        $event = new StoppableCollectingEvent();
+        $event->stopPropagation();
+
+        $d->dispatch($event);
+
+        $this->assertEquals('', implode($event->result()));
+    }
 }
