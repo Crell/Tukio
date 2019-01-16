@@ -3,12 +3,16 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Fig\EventDispatcher\StoppableEventTrait;
 use Psr\EventDispatcher\StoppableEventInterface;
 
 class StoppableCollectingEvent extends CollectingEvent implements StoppableEventInterface
 {
-    use StoppableEventTrait;
+    protected $stopPropagation = false;
+
+    public function isPropagationStopped() : bool
+    {
+        return $this->stopPropagation;
+    }
 
     public function stopPropagation() : self
     {
