@@ -21,7 +21,7 @@
         "php": "~7.2",
         "psr/container": "^1.0",
         "psr/event-dispatcher": "0.7.0",
-        "fig/event-dispatcher-util": "0.7.1",
+        "fig/event-dispatcher-util": "0.7.2",
         "psr/log": "^1.0"
     },
     "require-dev": {
