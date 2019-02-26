@@ -100,7 +100,7 @@ class RegisterableListenerProvider implements ListenerProviderInterface, Registe
 
         // Fun fact: We cannot auto-detect the listener target type from a container without instantiating it, which
         // defeats the purpose of a service registration. Therefore this method requires an explicit event type. Also,
-        // the wrapping listener must listen to just EventInterface.  The explicit $type means it will still get only
+        // the wrapping listener must listen to just object.  The explicit $type means it will still get only
         // the right event type, and the real listener can still type itself properly.
         $container = $this->container;
         $listener = function (object $event) use ($serviceName, $methodName, $container) : void {
