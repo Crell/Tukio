@@ -16,7 +16,7 @@ class LifecycleEvent extends CollectingEvent implements CallbackEventInterface
         $this->entity = $entity;
     }
 
-    public function getSubject()
+    public function getSubject() : object
     {
         return $this->entity;
     }
