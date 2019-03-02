@@ -308,6 +308,59 @@ But what if you want to have most of your listeners pre-registered, but have som
 
 ### `CallbackProvider`
 
+The third option Tukio provides is a `CallbackProvider`, which takes an entirely different approach.  In this case, the Provider works only on events that have a `CallbackEventInterface`.  The use case is for Events that are carrying some other object, which itself has methods on it that should be called at certain times.  Think lifecycle callbacks for a domain object, for example.
+
+To see it in action, we'll use an example straight out of Tukio's test suite:
+
+```php
+use Crell\Tukio\CallbackEventInterface;
+use Crell\Tukio\CallbackProvider;
+
+class LifecycleEvent implements CallbackEventInterface
+{
+    protected $entity;
+
+    public function __construct(FakeEntity $entity)
+    {
+        $this->entity = $entity;
+    }
+
+    public function getSubject() : object
+    {
+        return $this->entity;
+    }
+}
+
+class LoadEvent extends LifecycleEvent {}
+
+class SaveEvent extends LifecycleEvent {}
+
+class FakeEntity
+{
+
+    public function load(LoadEvent $event) : void { ... }
+
+    public function save(SaveEvent $event) : void { ... }
+
+    public function stuff(StuffEvent $event) : void { ... }
+
+    public function all(LifecycleEvent $event) : void { ... }
+}
+
+$provider = new CallbackProvider();
+
+$entity = new FakeEntity();
+
+$provider->addCallbackMethod(LoadEvent::class, 'load');
+$provider->addCallbackMethod(SaveEvent::class, 'save');
+$provider->addCallbackMethod(LifecycleEvent::class, 'all');
+
+$event = new LoadEvent($entity);
+
+$provider->getListenersForEvent($event);
+```
+
+In this example, the provider is configured not with Listeners but with method names that correspond to Events.  Those methods are methods on the "subject" object.  The Provider will now return callables for `[$entity, 'load']` and `[$entity, 'all']` when called with a `LoadEvent`.  That allows a domain object itself to have Listeners on it that will get called at the appropriate time.
 
 ## Change log
 
