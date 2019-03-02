@@ -42,7 +42,7 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(string $methodName, $priority = 0, string $id = null, string $type = null): string
+    public function addListener(string $methodName, int $priority = 0, string $id = null, string $type = null): string
     {
         $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
         $this->registeredMethods[] = $methodName;

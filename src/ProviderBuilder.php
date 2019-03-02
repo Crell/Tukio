@@ -20,7 +20,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $this->listeners = new OrderedCollection();
     }
 
-    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);

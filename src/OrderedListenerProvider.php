@@ -39,7 +39,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
-    public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
     {
         $type = $type ?? $this->getParameterType($listener);
         $id = $id ?? $this->getListenerId($listener);
