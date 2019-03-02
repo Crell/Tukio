@@ -11,7 +11,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 /**
  * @Groups({"Providers"})
  */
-class RegisterableProviderBench extends ProviderBenchBase
+class OrderedProviderBench extends ProviderBenchBase
 {
     /**
      * @var ListenerProviderInterface
