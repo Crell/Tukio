@@ -132,7 +132,7 @@ use Crell\Tukio\OrderedListenerProvider;
 $provider = new OrderedListenerProvider();
 
 // The ID will be "handleStuff", unless there is such an ID already,
-//in which case it would be "handleStuff_1" or similar.
+//in which case it would be "handleStuff-1" or similar.
 $id = $provider->addListener('handleStuff');
 
 // This Listener will get called before handleStuff does. If you want to specify an ID
@@ -189,34 +189,125 @@ $provider->addListenerServiceAfter($id, 'some_other_service', 'methodC', Specifi
 
 In this example, we assume that `$container` has two services defined: `some_service` and `some_other_service`.  (Creative, I know.)  We then register three Listners: Two of them are methods on `some_service`, the other on `some_other_service`.  Both services will be requested from the container as needed, so won't be instantiated until the Listener method is about to be called.
 
-Of note, the `methodB` Listener is referencing the `methodA` listener by an explict ID.  The generated ID is as noted predicatable, so in most cases you don't need to use the return value.  The return value is the more robust and reliable option, though, as if the requested ID is already taken a new one will be generated. 
+Of note, the `methodB` Listener is referencing the `methodA` listener by an explict ID.  The generated ID is as noted predictable, so in most cases you don't need to use the return value.  The return value is the more robust and reliable option, though, as if the requested ID is already taken a new one will be generated.
 
+#### Subscribers
 
-### Registering listeners
+As in the last example, it's quite common to have multiple Listeners in a single service.  In fact, it's common to have a service that is nothing but listeners.  Tukio calls those "Subscribers" (a name openly and unashamedly borrowed from Symfony), and has specific support for them.
 
-There are two different ListenerProviders included.  Either one can be used.  The first is the `RegisterableListenerProvider`, which lets you register listeners by calling methods on it:
-
-```php
-$provider = new RegisterableListnerProvider():
-
-$provider->addListener(function (ImportantTask $task) {
-    // ...
-});
-```
-
-That's it!  You can register any legal PHP callable: An anonymous function (as shown above), a function name, an object/method array, or a class/method array for a static method.
-
-There's no need to specify what type of event the listener is for.  That will be derived automatically from the function itself, as long as you type-hint the parameter.  In the example above, the provider will register this callable for any event of type `ImportantTask`, or any subclass of `ImportantTask`.  Any event that is an `instanceof ImportantTask` will get passed to this listener.
-
-That means you can listen on an interface, too!
+The basic case works like this:
 
 ```php
-$provider->addListener(function (LifecyleEventInterface $task) {
-  // ...
-});
+use Crell\Tukio\OrderedListenerProvider;
+
+class Subscriber
+{
+    public function onThingsHappening(ThingHappened $event) : void { ... }
+
+    public function onSpecialEvent(SpecificThingHappened $event) : void { ... }
+}
+
+$container = new SomePsr11Container();
+// Configure the container so that the service 'listeners' is an instance of Subscriber above.
+
+$provider = new OrderedListenerProvider($container);
+
+
+$provider->addSubscriber('listeners', Subscriber::class);
 ```
 
-That listener will now be called for any event that implements `LifecycleEventInterface`.
+That's it!  Because we don't know what the class of the service is it will need to be specified explicitly, but the rest is automatic.  Any public method whose name begins with "on" will be registered as a listener, and the Event type it is for will be derived from reflection, while the rest of the class is ignored.  There is no limit to how many listeners can be added this way.  The method names can be anything that makes sense in context, so make it descriptive.  And because the service is pulled on-demand from the container it will only be instantiated once, and not before it's needed.  That's the ideal.
+
+Sometimes, though, you want to order the Listeners in the Subscriber, or need to use a different naming convention for the Listener method.  For that case, your Subscriber class can implement an extra interface that allows for manual registration:
+
+```php
+use Crell\Tukio\OrderedListenerProvider;
+use Crell\Tukio\SubscriberInterface;
+
+class Subscriber implements SubscriberInterface
+{
+    public function onThingsHappening(ThingHappened $event) : void { ... }
+
+    public function onSpecialEvent(SpecificThingHappened $event) : void { ... }
+
+    public function somethingElse(ThingHappened $event) : void { ... }
+
+    public static function registerListeners(ListenerProxy $proxy) : void
+    {
+        $id = $proxy->addListener('somethingElse', 10);
+        $proxy->addListenerAfter($id, 'onSpecialEvent');
+    }
+}
+
+$container = new SomePsr11Container();
+// Configure the container so that the service 'listeners' is an instance of Subscriber above.
+
+$provider = new OrderedListenerProvider($container);
+
+$provider->addSubscriber('listeners', Subscriber::class);
+```
+
+As before, `onThingsHappen()` will be registered automatically.  However, `somethingElse()` will also be registered as a Listener with a priority of 10, and `onSpecialEvent()` will be registered to fire after it.
+
+In practice, using Subscribers is the most robust way to register Listeners in a production system and so is the recommended approach.  However, all approaches have their uses and can be used as desired.
+
+### Compiled Provider
+
+All of that registration and ordering logic is powerful, and it's surprisingly fast in practice.  What's even faster, though, is not having to re-register on every request.  For that, Tukio offers a compiled provider option.
+
+The compiled provider comes in three parts: `ProviderBuilder`, `ProviderCompiler`, and a generated provider class.  `ProviderBuilder`, as the name implies, is an object that allows you to build up a set of Listeners that will make up a Provider.  They work exactly the same as on `OrderedListenerProvider`, and in fact it exposes the same `OrderedProviderInterface`.
+
+`ProviderCompiler` then takes a builder object and writes a new PHP class to a provided stream (presumably a file on disk) that matches the definitions in the builder.  That built Provider is fixed; it cannot be modified and no new Listeners can be added to it, but all of the ordering and sorting has already been done, making it notably faster (to say nothing of skipping the registration process itself).
+
+Let's see it in action:
+
+```php
+use Crell\Tukio\ProviderBuilder;
+use Crell\Tukio\ProviderCompiler;
+
+$builder = new ProviderBuilder();
+
+$builder->addListener('listenerA', 100);
+$builder->addListenerAfter('listenerA', 'listenerB');
+$builder->addListener([Listen::class, 'listen']);
+$builder->addListenerService('listeners', 'listen', CollectingEvent::class);
+$builder->addSubscriber('subscriber', Subscriber::class);
+
+$compiler = new ProviderCompiler();
+
+// Write the generated compiler out to a file.
+$filename = 'MyCompiledProvider.php';
+$out = fopen($filename, 'w');
+
+// Here's the magic:
+$compiler->compile($builder, $out, 'MyCompiledProvider', '\\Name\\Space\\Of\\My\\App');
+
+fclose($out);
+```
+
+`$builder` can do anything that `OrderedListenerProvider` can do, except that it only supports statically-defined Listeners.  That means it does not support anonymous functions or methods of an object, but it will still handle functions, static methods, services, and subscribers just fine.  In practice when using a compiled container you will most likely want to use almost entirely service listeners and subscribers, since you'll most likely be using it with a container.
+
+That gives you a file on disk named `MyCompiledProvider.php`, which contains `Name\Space\Of\My\App\MyCompiledProvider`.  (Name it something logical for you.)  At runtime, then, do this:
+
+```php
+// Configure the container such that it has a service "listeners"
+// and another named "subscriber".
+
+$container = new Psr11Container();
+$container->addService('D', new ListenService());
+
+include('MyCompiledProvider.php');
+
+$provider = new Name\Space\Of\My\App\MyCompiledProvider($container);
+```
+
+And boom!  `$provider` is now a fully functional Provider you can pass to a Dispatcher.  It will work just like any other, but faster.
+
+
+But what if you want to have most of your listeners pre-registered, but have some that you add conditionally at runtime?  Have a look at the FIG's [`AggregateProvider`](https://github.com/php-fig/event-dispatcher-util/blob/master/src/AggregateProvider.php), and combine your compiled Provider with an instance of `OrderedListenerProvider`.
+
+### `CallbackProvider`
+
 
 ## Change log
 
