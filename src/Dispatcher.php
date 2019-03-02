@@ -12,14 +12,14 @@ use Psr\Log\NullLogger;
 class Dispatcher implements EventDispatcherInterface
 {
     /** @var ListenerProviderInterface  */
-    protected $listeners;
+    protected $provider;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(ListenerProviderInterface $listeners, LoggerInterface $logger = null)
+    public function __construct(ListenerProviderInterface $provider, LoggerInterface $logger = null)
     {
-        $this->listeners = $listeners;
+        $this->provider = $provider;
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -30,7 +30,7 @@ class Dispatcher implements EventDispatcherInterface
             return $event;
         }
 
-        foreach ($this->listeners->getListenersForEvent($event) as $listener) {
+        foreach ($this->provider->getListenersForEvent($event) as $listener) {
             // Technically this has an extraneous stopped-check after the last listener,
             // but that doesn't violate the spec since it's still technically checking
             // before each listener is called, given the check above.
