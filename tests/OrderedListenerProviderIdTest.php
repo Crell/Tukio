@@ -49,12 +49,12 @@ class TestListeners
     }
 }
 
-class RegisterableListenerProviderIdTest extends TestCase
+class OrderedListenerProviderIdTest extends TestCase
 {
 
     public function test_natural_id_for_function() : void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         // Just to make the following lines shorter and easier to read.
         $ns = '\\Crell\\Tukio\\';
@@ -75,7 +75,7 @@ class RegisterableListenerProviderIdTest extends TestCase
 
     public function test_natural_id_for_static_method() : void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $p->addListener([TestListeners::class, 'listenerA'], -4);
         $p->addListenerBefore(TestListeners::class . '::listenerA', [TestListeners::class, 'listenerB']);
@@ -91,7 +91,7 @@ class RegisterableListenerProviderIdTest extends TestCase
 
     public function test_natural_id_for_object_method() : void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $l = new TestListeners();
 
@@ -109,7 +109,7 @@ class RegisterableListenerProviderIdTest extends TestCase
 
     public function test_explicit_id_for_function(): void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         // Just to make the following lines shorter and easier to read.
         $ns = '\\Crell\\Tukio\\';

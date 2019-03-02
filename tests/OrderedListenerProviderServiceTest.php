@@ -6,7 +6,7 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-class RegisterableListenerProviderServiceTest extends TestCase
+class OrderedListenerProviderServiceTest extends TestCase
 {
     /** @var MockContainer */
     protected $mockContainer;
@@ -65,7 +65,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
     public function test_add_listener_service(): void
     {
-        $p = new RegisterableListenerProvider($this->mockContainer);
+        $p = new OrderedListenerProvider($this->mockContainer);
 
         $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
         $p->addListenerService('E', 'listen', CollectingEvent::class, 80);
@@ -84,7 +84,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
     public function test_add_listener_service_before_another(): void
     {
-        $p = new RegisterableListenerProvider($this->mockContainer);
+        $p = new OrderedListenerProvider($this->mockContainer);
 
         $l1 = $p->addListenerService('L', 'hear', CollectingEvent::class);
         $l2 = $p->addListenerServiceBefore($l1, 'L', 'hear', CollectingEvent::class);
@@ -103,7 +103,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
     public function test_add_listener_service_after_another(): void
     {
-        $p = new RegisterableListenerProvider($this->mockContainer);
+        $p = new OrderedListenerProvider($this->mockContainer);
 
         $c = $p->addListenerService('C', 'listen', CollectingEvent::class);
         $r = $p->addListenerServiceAfter($c, 'R', 'listen', CollectingEvent::class);
@@ -124,7 +124,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
     {
         $this->expectException(ContainerMissingException::class);
 
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
     }
@@ -138,7 +138,7 @@ class RegisterableListenerProviderServiceTest extends TestCase
 
         $container->addService('subscriber', $subscriber);
 
-        $p = new RegisterableListenerProvider($container);
+        $p = new OrderedListenerProvider($container);
 
         $p->addSubscriber(MockSubscriber::class, 'subscriber');
 

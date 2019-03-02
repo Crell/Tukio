@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-interface RegisterableProviderInterface
+interface OrderedProviderInterface
 {
     /**
      * Adds a listener to the provider.

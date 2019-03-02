@@ -10,11 +10,11 @@ class EventOne extends CollectingEvent {}
 
 class EventTwo extends CollectingEvent {}
 
-class RegisterableListenerProviderTest extends TestCase
+class OrderedListenerProviderTest extends TestCase
 {
     public function test_only_type_correct_listeners_are_returned(): void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $p->addListener(function (EventOne $event) {
             $event->add('Y');
@@ -41,7 +41,7 @@ class RegisterableListenerProviderTest extends TestCase
 
     public function test_add_ordered_listeners(): void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $p->addListener(function (CollectingEvent $event) {
             $event->add('E');
@@ -70,7 +70,7 @@ class RegisterableListenerProviderTest extends TestCase
 
     public function test_add_listener_before(): void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $p->addListener(function (CollectingEvent $event) {
             $event->add('E');
@@ -99,7 +99,7 @@ class RegisterableListenerProviderTest extends TestCase
 
     public function test_add_listener_after(): void
     {
-        $p = new RegisterableListenerProvider();
+        $p = new OrderedListenerProvider();
 
         $rid = $p->addListener(function (CollectingEvent $event) {
             $event->add('R');

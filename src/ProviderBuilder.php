@@ -8,7 +8,7 @@ use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 
-class ProviderBuilder implements RegisterableProviderInterface, \IteratorAggregate
+class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 {
     use ProviderUtilitiesTrait;
 

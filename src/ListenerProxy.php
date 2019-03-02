@@ -9,7 +9,7 @@ class ListenerProxy
 {
     use ParameterDeriverTrait;
 
-    /** @var RegisterableProviderInterface */
+    /** @var OrderedProviderInterface */
     protected $provider;
 
     /** @var string */
@@ -21,7 +21,7 @@ class ListenerProxy
     /** @var array */
     protected $registeredMethods = [];
 
-    public function __construct(RegisterableProviderInterface $provider, string $serviceName, string $serviceClass)
+    public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
     {
         $this->provider = $provider;
         $this->serviceName = $serviceName;

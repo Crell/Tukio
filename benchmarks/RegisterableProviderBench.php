@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio\Benchmarks;
 
 use Crell\Tukio\CollectingEvent;
-use Crell\Tukio\RegisterableListenerProvider;
+use Crell\Tukio\OrderedListenerProvider;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -20,7 +20,7 @@ class RegisterableProviderBench extends ProviderBenchBase
 
     public function setUp()
     {
-        $this->provider = new RegisterableListenerProvider();
+        $this->provider = new OrderedListenerProvider();
 
         $priority = new \InfiniteIterator(new \ArrayIterator(static::$listenerPriorities));
         $priority->next();
