@@ -65,16 +65,19 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
     {
+        $id = $id ?? $serviceName . '-' . $methodName;
         return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
     }
 
     public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
     {
+        $id = $id ?? $serviceName . '-' . $methodName;
         return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
     }
 
     public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
     {
+        $id = $id ?? $serviceName . '-' . $methodName;
         return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
     }
 

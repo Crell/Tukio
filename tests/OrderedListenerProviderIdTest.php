@@ -128,4 +128,37 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
+    public function test_natural_id_for_service_listener() : void
+    {
+        $container = new MockContainer();
+
+        $container->addService('A', new class
+        {
+            public function listen(CollectingEvent $event)
+            {
+                $event->add('A');
+            }
+        });
+        $container->addService('B', new class
+        {
+            public function listen(CollectingEvent $event)
+            {
+                $event->add('B');
+            }
+        });
+
+        $p = new OrderedListenerProvider($container);
+
+        $idA = $p->addListenerService('A', 'listen', CollectingEvent::class, -4);
+        $p->addListenerServiceAfter('A-listen', 'B', 'listen', CollectingEvent::class);
+
+        $event = new CollectingEvent();
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('A-listen', $idA);
+        $this->assertEquals('AB', implode($event->result()));
+    }
+
 }

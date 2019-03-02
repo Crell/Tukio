@@ -79,6 +79,8 @@ class OrderedCollection implements \IteratorAggregate
      */
     public function addItemBefore(string $pivotId, $item, string $id = null) : string
     {
+        $id = $this->enforceUniqueId($id);
+
         // If the item this new item is pivoting off of is already defined, add it normally.
         if (isset($this->itemLookup[$pivotId])) {
             // Because high numbers come first, we have to ADD one to get the new item to be returned first.
@@ -113,6 +115,8 @@ class OrderedCollection implements \IteratorAggregate
      */
     public function addItemAfter(string $pivotId, $item, string $id = null) : string
     {
+        $id = $this->enforceUniqueId($id);
+
         // If the item this new item is pivoting off of is already defined, add it normally.
         if (isset($this->itemLookup[$pivotId])) {
             // Because high numbers come first, we have to SUBTRACT one to get the new item to be returned first.
