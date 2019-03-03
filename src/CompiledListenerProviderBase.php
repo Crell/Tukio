@@ -19,7 +19,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     // entry types in the classes seen in getListenerForEvent().  See each class's getProperties() method for the
     // exact structure.
     /** @var array */
-    // protected $listeners = [];
+    // protected const LISTENERS = [];
 
     public function __construct(ContainerInterface $container)
     {
