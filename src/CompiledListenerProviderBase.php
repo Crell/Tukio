@@ -28,18 +28,21 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
 
     public function getListenersForEvent(object $event): iterable
     {
-        /** @var array $listener */
-        foreach (static::LISTENERS as $listener) {
+        $count = count(static::LISTENERS);
+        $ret = [];
+        for ($i= 0; $i < $count; ++$i) {
+            /** @var array $listener */
+            $listener = static::LISTENERS[$i];
             if ($event instanceof $listener['type']) {
                 switch ($listener['entryType']) {
                     case ListenerFunctionEntry::class:
-                        yield $listener['listener'];
+                        $ret[] = $listener['listener'];
                         break;
                     case ListenerStaticMethodEntry::class:
-                        yield [$listener['class'], $listener['method']];
+                        $ret[] = [$listener['class'], $listener['method']];
                         break;
                     case ListenerServiceEntry::class:
-                        yield function (object $event) use ($listener) {
+                        $ret[] = function (object $event) use ($listener) {
                             $this->container->get($listener['serviceName'])->{$listener['method']}($event);
                         };
                         break;
@@ -48,5 +51,6 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
                 }
             }
         }
+        return $ret;
     }
 }
