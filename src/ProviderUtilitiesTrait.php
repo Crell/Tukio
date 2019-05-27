@@ -20,7 +20,7 @@ trait ProviderUtilitiesTrait
      *
      * @param callable $listener
      *   The listener for which to derive an ID.
-     * @return null|string
+     * @return string|null
      *   The derived ID if possible or null if no reasonable ID could be derived.
      */
     protected function getListenerId(callable $listener) : ?string

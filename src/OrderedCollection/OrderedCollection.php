@@ -187,7 +187,7 @@ class OrderedCollection implements \IteratorAggregate
     /**
      * Ensures a unique ID for all items in the collection.
      *
-     * @param null|string $id
+     * @param string|null $id
      *   The proposed ID of an item, or null to generate a random string.
      * @return string
      *   A confirmed unique ID string.

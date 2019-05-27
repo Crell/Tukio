@@ -118,7 +118,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface */
+            /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
 
