@@ -63,7 +63,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
+    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
     {
         $id = $id ?? $serviceName . '-' . $methodName;
         return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
@@ -118,7 +118,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface */
+            /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
 

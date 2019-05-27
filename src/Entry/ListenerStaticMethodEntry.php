@@ -8,7 +8,7 @@ namespace Crell\Tukio\Entry;
  *
  * @internal
  */
-class ListenerStaticMethodEntry implements CompileableListenerEntryInterface
+class ListenerStaticMethodEntry extends ListenerEntry implements CompileableListenerEntryInterface
 {
     /** @var string */
     public $class;

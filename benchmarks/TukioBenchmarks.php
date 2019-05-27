@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
 
-
 use PhpBench\Benchmark\Metadata\Annotations\AfterMethods;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;

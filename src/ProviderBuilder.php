@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Entry\ListenerEntry;
 use Crell\Tukio\Entry\ListenerFunctionEntry;
 use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
@@ -44,7 +45,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItemAfter($pivotId, $entry, $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
+    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
     {
         $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
 
@@ -99,7 +100,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         yield from $this->listeners;
     }
 
-    protected function getListenerEntry(callable $listener, string $type)
+    protected function getListenerEntry(callable $listener, string $type) : ListenerEntry
     {
         // We can't serialize a closure.
         if ($listener instanceof \Closure) {

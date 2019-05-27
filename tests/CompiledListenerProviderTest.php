@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\ListenerProviderInterface;
 
 function listenerA(CollectingEvent $event) : void
 {
