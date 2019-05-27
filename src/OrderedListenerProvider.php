@@ -63,7 +63,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string
+    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
     {
         $id = $id ?? $serviceName . '-' . $methodName;
         return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
