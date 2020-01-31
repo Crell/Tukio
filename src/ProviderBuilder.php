@@ -84,7 +84,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
                 $methodName = $rMethod->getName();
-                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') !== false) {
+                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType()->getName();
                     $this->addListenerService($serviceName, $rMethod->getName(), $type);
