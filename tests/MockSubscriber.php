@@ -42,6 +42,11 @@ class MockSubscriber implements SubscriberInterface
         throw new \Exception('What are you doing here?');
     }
 
+    public function ignoredMethodWithOnInTheName_on() : void
+    {
+        throw new \Exception('What are you doing here?');
+    }
+
     public static function registerListeners(ListenerProxy $proxy): void
     {
         $a = $proxy->addListener('onA');
