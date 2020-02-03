@@ -151,4 +151,69 @@ class OrderedListenerProviderServiceTest extends TestCase
         $this->assertEquals('BCAEDF', implode($event->result()));
     }
 
+    public function test_malformed_subscriber_automatic_fails(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $container = new MockContainer();
+
+        $subscriber = new MockMalformedSubscriber();
+
+        $container->addService('subscriber', $subscriber);
+
+        $p = new OrderedListenerProvider($container);
+
+        $p->addSubscriber(MockMalformedSubscriber::class, 'subscriber');
+    }
+
+    public function test_malformed_subscriber_manual_fails(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $container = new MockContainer();
+
+        $subscriber = new MockMalformedSubscriber();
+
+        $container->addService('subscriber', $subscriber);
+
+        $provider = new OrderedListenerProvider($container);
+
+        $proxy = new ListenerProxy($provider, 'subscriber', MockMalformedSubscriber::class);
+
+        MockMalformedSubscriber::registerListenersDirect($proxy);
+    }
+
+    public function test_malformed_subscriber_manual_before_fails(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $container = new MockContainer();
+
+        $subscriber = new MockMalformedSubscriber();
+
+        $container->addService('subscriber', $subscriber);
+
+        $provider = new OrderedListenerProvider($container);
+
+        $proxy = new ListenerProxy($provider, 'subscriber', MockMalformedSubscriber::class);
+
+        MockMalformedSubscriber::registerListenersBefore($proxy);
+    }
+
+    public function test_malformed_subscriber_manual_after_fails(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $container = new MockContainer();
+
+        $subscriber = new MockMalformedSubscriber();
+
+        $container->addService('subscriber', $subscriber);
+
+        $provider = new OrderedListenerProvider($container);
+
+        $proxy = new ListenerProxy($provider, 'subscriber', MockMalformedSubscriber::class);
+
+        MockMalformedSubscriber::registerListenersAfter($proxy);
+    }
 }

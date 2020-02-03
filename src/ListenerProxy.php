@@ -44,7 +44,11 @@ class ListenerProxy
      */
     public function addListener(string $methodName, int $priority = 0, string $id = null, string $type = null): string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        try {
+            $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        } catch (\InvalidArgumentException $e) {
+            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        }
         $this->registeredMethods[] = $methodName;
 
         return $this->provider->addListenerService($this->serviceName, $methodName, $type, $priority, $id);
@@ -69,7 +73,11 @@ class ListenerProxy
      */
     public function addListenerBefore(string $pivotId, string $methodName, string $id = null, string $type = null): string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        try {
+            $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        } catch (\InvalidArgumentException $e) {
+            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        }
         $this->registeredMethods[] = $methodName;
 
         return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
@@ -94,7 +102,11 @@ class ListenerProxy
      */
     public function addListenerAfter(string $pivotId, string $methodName, string $id = null, string $type = null) : string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        try {
+            $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        } catch (\InvalidArgumentException $e) {
+            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        }
         $this->registeredMethods[] = $methodName;
 
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);

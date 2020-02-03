@@ -125,4 +125,43 @@ class OrderedListenerProviderTest extends TestCase
 
         $this->assertEquals('CRELL', implode($event->result()));
     }
+
+    public function test_add_malformed_listener(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $p = new OrderedListenerProvider();
+
+        $p->addListener(function ($event) {
+            $event->add('A');
+        });
+    }
+
+    public function test_add_malformed_listener_before(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $p = new OrderedListenerProvider();
+
+        $a = $p->addListener(function (CollectingEvent $event) {
+            $event->add('A');
+        });
+        $p->addListenerBefore($a, function ($event) {
+            $event->add('B');
+        });
+    }
+
+    public function test_add_malformed_listener_after(): void
+    {
+        $this->expectException(InvalidTypeException::class);
+
+        $p = new OrderedListenerProvider();
+
+        $a = $p->addListener(function (CollectingEvent $event) {
+            $event->add('A');
+        });
+        $p->addListenerAfter($a, function ($event) {
+            $event->add('B');
+        });
+    }
 }

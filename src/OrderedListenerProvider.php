@@ -39,9 +39,31 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
+    /**
+     * Tries to get the type of a callable listener.
+     * If unable, throws an exception with information about the listener whose type could not be fetched.
+     * @param callable $listener
+     * @return string
+     */
+    private function getType(callable $listener)
+    {
+        try {
+            $type = $this->getParameterType($listener);
+        } catch (\InvalidArgumentException $e) {
+            if ($this->isClassCallable($listener) || $this->isObjectCallable($listener)) {
+                throw (new InvalidTypeException())->setMessageFromClass($listener[0], $listener[1]);
+            }
+            if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
+                throw (new InvalidTypeException())->setMessageFromFunction($listener);
+            }
+            throw new InvalidTypeException();
+        }
+        return $type;
+    }
+
     public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
     {
-        $type = $type ?? $this->getParameterType($listener);
+        $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
@@ -49,7 +71,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null) : string
     {
-        $type = $type ?? $this->getParameterType($listener);
+        $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemBefore($pivotId, new ListenerEntry($listener, $type), $id);
@@ -57,7 +79,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null) : string
     {
-        $type = $type ?? $this->getParameterType($listener);
+        $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
         return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
@@ -130,8 +152,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 $methodName = $rMethod->getName();
                 if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
-                    $type = $params[0]->getType()->getName();
-                    $this->addListenerService($serviceName, $rMethod->getName(), $type);
+                    $type = $params[0]->getType();
+                    if (is_null($type)) {
+                        throw (new InvalidTypeException())->setMessageFromClass($class, $rMethod->getName());
+                    }
+                    $this->addListenerService($serviceName, $rMethod->getName(), $type->getName());
                 }
             }
         } catch (\ReflectionException $e) {
