@@ -45,7 +45,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
      * @param callable $listener
      * @return string
      */
-    private function getType(callable $listener)
+    protected function getType(callable $listener)
     {
         try {
             $type = $this->getParameterType($listener);
