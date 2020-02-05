@@ -6,7 +6,7 @@ namespace Crell\Tukio;
 class MockMalformedSubscriber
 {
     /**
-     * This funcion should succeed in automatic registration.
+     * This function should succeed in automatic registration.
      */
     public function onA(CollectingEvent $event) : void
     {
