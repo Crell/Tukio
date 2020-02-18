@@ -66,12 +66,8 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(
-        string $pivotId,
-        string $methodName,
-        string $id = null,
-        string $type = null
-    ): string {
+    public function addListenerBefore(string $pivotId, string $methodName, string $id = null, string $type = null): string
+    {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
         return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
@@ -94,12 +90,8 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(
-        string $pivotId,
-        string $methodName,
-        string $id = null,
-        string $type = null
-    ) : string {
+    public function addListenerAfter(string $pivotId, string $methodName, string $id = null, string $type = null) : string
+    {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
