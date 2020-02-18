@@ -46,8 +46,8 @@ class ListenerProxy
     {
         try {
             $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
-        } catch (\InvalidArgumentException $e) {
-            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        } catch (\InvalidArgumentException $exception) {
+            throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);
         }
         $this->registeredMethods[] = $methodName;
 
@@ -75,8 +75,8 @@ class ListenerProxy
     {
         try {
             $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
-        } catch (\InvalidArgumentException $e) {
-            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        } catch (\InvalidArgumentException $exception) {
+            throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);
         }
         $this->registeredMethods[] = $methodName;
 
@@ -104,8 +104,8 @@ class ListenerProxy
     {
         try {
             $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
-        } catch (\InvalidArgumentException $e) {
-            throw (new InvalidTypeException())->setMessageFromClass($this->serviceClass, $methodName);
+        } catch (\InvalidArgumentException $exception) {
+            throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);
         }
         $this->registeredMethods[] = $methodName;
 

@@ -49,14 +49,14 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     {
         try {
             $type = $this->getParameterType($listener);
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $exception) {
             if ($this->isClassCallable($listener) || $this->isObjectCallable($listener)) {
-                throw (new InvalidTypeException())->setMessageFromClass($listener[0], $listener[1]);
+                throw InvalidTypeException::fromClassCallable($listener[0], $listener[1], $exception);
             }
             if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
-                throw (new InvalidTypeException())->setMessageFromFunction($listener);
+                throw InvalidTypeException::fromFunctionCallable($listener, $exception);
             }
-            throw new InvalidTypeException();
+            throw new InvalidTypeException($exception);
         }
         return $type;
     }
@@ -154,7 +154,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {
-                        throw (new InvalidTypeException())->setMessageFromClass($class, $rMethod->getName());
+                        throw InvalidTypeException::fromClassCallable($class, $rMethod->getName());
                     }
                     $this->addListenerService($serviceName, $rMethod->getName(), $type->getName());
                 }
