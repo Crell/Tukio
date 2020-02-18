@@ -41,7 +41,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     /**
      * Tries to get the type of a callable listener.
+     *
      * If unable, throws an exception with information about the listener whose type could not be fetched.
+     *
      * @param callable $listener
      * @return string
      */
