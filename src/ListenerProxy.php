@@ -44,9 +44,8 @@ class ListenerProxy
      */
     public function addListener(string $methodName, int $priority = 0, string $id = null, string $type = null): string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-
         return $this->provider->addListenerService($this->serviceName, $methodName, $type, $priority, $id);
     }
 
@@ -69,9 +68,8 @@ class ListenerProxy
      */
     public function addListenerBefore(string $pivotId, string $methodName, string $id = null, string $type = null): string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-
         return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
@@ -94,14 +92,33 @@ class ListenerProxy
      */
     public function addListenerAfter(string $pivotId, string $methodName, string $id = null, string $type = null) : string
     {
-        $type = $type ?? $this->getParameterType([$this->serviceClass, $methodName]);
+        $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
     public function getRegisteredMethods() : array
     {
         return $this->registeredMethods;
+    }
+
+    /**
+     * Safely gets the required Type for a given method from the service class.
+     *
+     * @param string $methodName
+     *   The method name of the listener being registered.
+     * @return string
+     *   The type required by the listener.
+     * @throws InvalidTypeException
+     *   If the method has invalid type-hinting, throws an error with a service/method trace.
+     */
+    protected function getServiceMethodType(string $methodName) : string
+    {
+        try {
+            $type = $this->getParameterType([$this->serviceClass, $methodName]);
+        } catch (\InvalidArgumentException $exception) {
+            throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);
+        }
+        return $type;
     }
 }
