@@ -213,7 +213,7 @@ $container = new SomePsr11Container();
 $provider = new OrderedListenerProvider($container);
 
 
-$provider->addSubscriber('listeners', Subscriber::class);
+$provider->addSubscriber(Subscriber::class, 'listeners');
 ```
 
 That's it!  Because we don't know what the class of the service is it will need to be specified explicitly, but the rest is automatic.  Any public method whose name begins with "on" will be registered as a listener, and the Event type it is for will be derived from reflection, while the rest of the class is ignored.  There is no limit to how many listeners can be added this way.  The method names can be anything that makes sense in context, so make it descriptive.  And because the service is pulled on-demand from the container it will only be instantiated once, and not before it's needed.  That's the ideal.
@@ -244,7 +244,7 @@ $container = new SomePsr11Container();
 
 $provider = new OrderedListenerProvider($container);
 
-$provider->addSubscriber('listeners', Subscriber::class);
+$provider->addSubscriber(Subscriber::class, 'listeners');
 ```
 
 As before, `onThingsHappen()` will be registered automatically.  However, `somethingElse()` will also be registered as a Listener with a priority of 10, and `onSpecialEvent()` will be registered to fire after it.
