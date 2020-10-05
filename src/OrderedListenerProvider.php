@@ -71,38 +71,38 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null) : string
     {
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemBefore($pivotId, new ListenerEntry($listener, $type), $id);
+        return $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null) : string
     {
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
+        return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, int $priority = 0, string $id = null): string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
     }
 
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null) : string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        return $this->addListenerBefore($before, $this->makeListenerForService($service, $method), $id, $type);
     }
 
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null) : string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        return $this->addListenerAfter($after, $this->makeListenerForService($service, $method), $id, $type);
     }
 
     /**
@@ -136,9 +136,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $listener;
     }
 
-    public function addSubscriber(string $class, string $serviceName) : void
+    public function addSubscriber(string $class, string $service) : void
     {
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
@@ -158,7 +158,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                     if (is_null($type)) {
                         throw InvalidTypeException::fromClassCallable($class, $rMethod->getName());
                     }
-                    $this->addListenerService($serviceName, $rMethod->getName(), $type->getName());
+                    $this->addListenerService($service, $rMethod->getName(), $type->getName());
                 }
             }
         } catch (\ReflectionException $e) {

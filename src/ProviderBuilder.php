@@ -29,48 +29,48 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string
+    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
+        return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string
+    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string
     {
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
+        return $this->listeners->addItemAfter($after, $entry, $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, int $priority = 0, string $id = null): string
     {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
+        $entry = new ListenerServiceEntry($service, $method, $type);
 
         return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null): string
     {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
+        $entry = new ListenerServiceEntry($service, $method, $type);
 
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
+        return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null): string
     {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
+        $entry = new ListenerServiceEntry($service, $method, $type);
 
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
+        return $this->listeners->addItemAfter($after, $entry, $id);
     }
 
-    public function addSubscriber(string $class, string $serviceName): void
+    public function addSubscriber(string $class, string $service): void
     {
         // @todo This method is identical to the one in RegisterableListenerProvider. Is it worth merging them?
 
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
@@ -87,7 +87,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
                 if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType()->getName();
-                    $this->addListenerService($serviceName, $rMethod->getName(), $type);
+                    $this->addListenerService($service, $rMethod->getName(), $type);
                 }
             }
         } catch (\ReflectionException $e) {
