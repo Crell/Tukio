@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class ListenerBefore
+class ListenerBefore implements ListenerAttribute
 {
     public function __construct(
         public string $before,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
-class Listener
+class Listener implements ListenerAttribute
 {
     public function __construct(
         public ?int $priority = 0,
