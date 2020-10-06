@@ -27,7 +27,7 @@
     "require-dev": {
         "nunomaduro/phpinsights": "^1.3",
         "phpbench/phpbench": "@dev",
-        "phpunit/phpunit": "~7.0"
+        "phpunit/phpunit": "~8.0"
     },
     "provide": {
         "psr/event-dispatcher-implementation": "1.0"

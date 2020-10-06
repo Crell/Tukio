@@ -16,7 +16,7 @@ class DebugEventDispatcherTest extends TestCase
     /** @var LoggerInterface */
     protected $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

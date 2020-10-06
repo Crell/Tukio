@@ -14,7 +14,7 @@ class OrderedListenerProviderAttributeServiceTest extends TestCase
     /** @var MockContainer */
     protected $mockContainer;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
