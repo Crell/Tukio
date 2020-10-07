@@ -69,6 +69,7 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
     public function test_id_from_attribute_is_found() : void
     {
+        printf("In %s\n", __FUNCTION__);
         $p = new OrderedListenerProvider();
 
         // Just to make the following lines shorter and easier to read.

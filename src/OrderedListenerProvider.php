@@ -65,6 +65,29 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
     {
+        printf("In %s\n", __FUNCTION__);
+        $attributes = $this->getAttributes($listener);
+        print "NARF". PHP_EOL;
+        var_dump($attributes);
+        if (count($attributes)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                if ($attrib instanceof ListenerBefore) {
+                    $this->addListenerBefore($attrib->before, $listener, $id, $type);
+                }
+                else if ($attrib instanceof ListenerAfter) {
+                    $this->addListenerAfter($attrib->after, $listener, $id, $type);
+                }
+                else {
+                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
+                }
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
