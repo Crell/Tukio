@@ -69,7 +69,7 @@ class OrderedListenerProviderAttributeServiceTest extends TestCase
 
         $this->mockContainer = $container;
     }
-
+/*
     public function test_add_listener_service(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
@@ -87,7 +87,7 @@ class OrderedListenerProviderAttributeServiceTest extends TestCase
 
         $this->assertEquals('CREL', implode($event->result()));
     }
-
+*/
     public function test_add_subscriber() : void
     {
         $container = new MockContainer();

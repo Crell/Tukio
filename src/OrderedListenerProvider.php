@@ -168,14 +168,43 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         try {
             $rClass = new \ReflectionClass($class);
             $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+
+            // Explicitly registered methods ignore all auto-registration mechanisms.
+            $methods = array_filter($methods, fn(\ReflectionMethod $r) => !in_array($r->getName(), $proxy->getRegisteredMethods()));
+
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
                 $methodName = $rMethod->getName();
-                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
+
+                $attributes = array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $rMethod->getAttributes());
+
+                if (count($attributes)) {
+                    /** @var ListenerAttribute $attrib */
+                    foreach ($attributes as $attrib) {
+                        $params = $rMethod->getParameters();
+                        $paramType = $params[0]->getType();
+                        // This can simplify to ?-> once we require PHP 8.0.
+                        $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
+                        if (is_null($type)) {
+                            throw InvalidTypeException::fromClassCallable($class, $methodName);
+                        }
+                        if ($attrib instanceof ListenerBefore) {
+                            $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
+                        }
+                        else if ($attrib instanceof ListenerAfter) {
+                            $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
+                        }
+                        else {
+                            $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
+                        }
+                    }
+                }
+                else if (strpos($methodName, 'on') === 0) {
+                    printf("Method %s auto-processing.\n", $methodName);
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {
-                        throw InvalidTypeException::fromClassCallable($class, $rMethod->getName());
+                        throw InvalidTypeException::fromClassCallable($class, $methodName);
                     }
                     $this->addListenerService($service, $rMethod->getName(), $type->getName());
                 }

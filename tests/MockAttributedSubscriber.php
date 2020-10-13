@@ -24,11 +24,12 @@ class MockAttributedSubscriber
         $event->add('C');
     }
 
-    #[ListenerBefore(before: 'a')]
+    #[ListenerAfter(after: 'a')]
     public function onD(CollectingEvent $event) : void
     {
         $event->add('D');
     }
+
     public function onE(CollectingEvent $event) : void
     {
         $event->add('E');
