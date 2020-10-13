@@ -32,7 +32,7 @@ trait ProviderUtilitiesTrait
             return [];
         }
 
-        $attribs = $ref->getAttributes();
+        $attribs = $ref->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }

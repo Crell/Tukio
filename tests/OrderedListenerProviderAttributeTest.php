@@ -6,6 +6,7 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 
 #[Listener(0, 'a')]
+#[JunkAttribute]
 function at_listener_one(CollectingEvent $event): void
 {
     $event->add('A');
