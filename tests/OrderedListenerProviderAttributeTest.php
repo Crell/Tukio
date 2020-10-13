@@ -66,7 +66,6 @@ class TestAttributedListeners
  */
 class OrderedListenerProviderAttributeTest extends TestCase
 {
-
     public function test_id_from_attribute_is_found() : void
     {
         printf("In %s\n", __FUNCTION__);
@@ -164,5 +163,4 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
         $this->assertEquals('DC', implode($event->result()));
     }
-
 }
