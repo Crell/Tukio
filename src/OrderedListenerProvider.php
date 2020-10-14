@@ -176,7 +176,13 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             foreach ($methods as $rMethod) {
                 $methodName = $rMethod->getName();
 
-                $attributes = array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $rMethod->getAttributes());
+                // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once
+                // 8.0 is made a requirement.
+                $attributes = [];
+                if (class_exists('ReflectionAttribute', false)) {
+                    $attributes = array_map(fn(\ReflectionAttribute $attrib)
+                        => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+                }
 
                 if (count($attributes)) {
                     /** @var ListenerAttribute $attrib */
