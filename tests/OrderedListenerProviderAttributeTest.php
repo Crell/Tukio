@@ -163,4 +163,24 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
         $this->assertEquals('DC', implode($event->result()));
     }
+
+    public function test_before_after_methods_win_over_attributes(): void
+    {
+        $p = new OrderedListenerProvider();
+
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $idOne = $p->addListener("{$ns}at_listener_one", 0);
+        $idTwo = $p->addListenerBefore($idOne, "{$ns}at_listener_three");
+        $p->addListenerAfter($idTwo, "{$ns}at_listener_four");
+
+        $event = new CollectingEvent();
+
+        foreach ($p->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('CAD', implode($event->result()));
+    }
 }

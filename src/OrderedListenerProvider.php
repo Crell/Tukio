@@ -47,10 +47,10 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
                 if ($attrib instanceof ListenerBefore) {
-                    $generatedId = $this->addListenerBefore($attrib->before, $listener, $id, $type);
+                    $generatedId = $this->listeners->addItemBefore($attrib->before, new ListenerEntry($listener, $type), $id);
                 }
                 else if ($attrib instanceof ListenerAfter) {
-                    $generatedId = $this->addListenerAfter($attrib->after, $listener, $id, $type);
+                    $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
                 }
                 else {
                     $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
@@ -68,6 +68,18 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null) : string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                // The before-ness of this method call always overrides the attribute.
+                $generatedId = $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
@@ -76,6 +88,18 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null) : string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                // The after-ness of this method call always overrides the attribute.
+                $generatedId = $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 

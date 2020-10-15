@@ -28,14 +28,14 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
                 if ($attrib instanceof ListenerBefore) {
-                    $generatedId = $this->addListenerBefore($attrib->before, $listener, $id, $type);
+                    $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
                 }
                 else if ($attrib instanceof ListenerAfter) {
-                    $generatedId = $this->addListenerAfter($attrib->after, $listener, $id, $type);
+                    $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
                 }
                 else {
-                    $entry = $this->getListenerEntry($listener, $type);
                     $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
                 }
             }
@@ -51,14 +51,39 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 
     public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string
     {
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
+                // The before-ness of this method takes priority over the attribute.
+                $generatedId = $this->listeners->addItemBefore($before, $entry, $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
 
+        $id = $id ?? $this->getListenerId($listener);
+        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
     public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
+                // The before-ness of this method takes priority over the attribute.
+                $generatedId = $this->listeners->addItemBefore($after, $entry, $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);
 
@@ -88,7 +113,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 
     public function addSubscriber(string $class, string $service): void
     {
-        // @todo This method is identical to the one in RegisterableListenerProvider. Is it worth merging them?
+        // @todo This method is identical to the one in OrderedListenerProvider. Is it worth merging them?
 
         $proxy = new ListenerProxy($this, $service, $class);
 
