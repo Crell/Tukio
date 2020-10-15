@@ -5,7 +5,7 @@ namespace Crell\Tukio;
 
 use \Attribute;
 
-#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class ListenerBefore implements ListenerAttribute
 {
     public function __construct(
