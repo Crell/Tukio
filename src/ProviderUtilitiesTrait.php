@@ -37,6 +37,31 @@ trait ProviderUtilitiesTrait
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }
 
+
+    /**
+     * Tries to get the type of a callable listener.
+     *
+     * If unable, throws an exception with information about the listener whose type could not be fetched.
+     *
+     * @param callable $listener
+     * @return string
+     */
+    protected function getType(callable $listener)
+    {
+        try {
+            $type = $this->getParameterType($listener);
+        } catch (\InvalidArgumentException $exception) {
+            if ($this->isClassCallable($listener) || $this->isObjectCallable($listener)) {
+                throw InvalidTypeException::fromClassCallable($listener[0], $listener[1], $exception);
+            }
+            if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
+                throw InvalidTypeException::fromFunctionCallable($listener, $exception);
+            }
+            throw new InvalidTypeException($exception);
+        }
+        return $type;
+    }
+
     /**
      * Derives a predictable ID from the listener if possible.
      *
