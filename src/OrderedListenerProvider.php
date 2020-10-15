@@ -206,7 +206,6 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                     }
                 }
                 else if (strpos($methodName, 'on') === 0) {
-                    printf("Method %s auto-processing.\n", $methodName);
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {
