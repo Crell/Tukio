@@ -23,6 +23,26 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 
     public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                if ($attrib instanceof ListenerBefore) {
+                    $generatedId = $this->addListenerBefore($attrib->before, $listener, $id, $type);
+                }
+                else if ($attrib instanceof ListenerAfter) {
+                    $generatedId = $this->addListenerAfter($attrib->after, $listener, $id, $type);
+                }
+                else {
+                    $entry = $this->getListenerEntry($listener, $type);
+                    $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
+                }
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);
 
