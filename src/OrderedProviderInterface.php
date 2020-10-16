@@ -23,7 +23,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string;
+    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string;
 
     /**
      * Adds a listener to trigger before another existing listener.
@@ -89,7 +89,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerService(string $service, string $method, string $type, int $priority = 0, string $id = null): string;
+    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.

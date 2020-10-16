@@ -12,7 +12,7 @@ class MockAttributedSubscriber
         $event->add('A');
     }
 
-    #[Listener(priority: 5)]
+    #[ListenerPriority(priority: 5)]
     public function onB(CollectingEvent $event) : void
     {
         $event->add('B');
@@ -35,7 +35,7 @@ class MockAttributedSubscriber
         $event->add('E');
     }
 
-    #[Listener(priority: -5)]
+    #[ListenerPriority(priority: -5)]
     public function notNormalName(CollectingEvent $event) : void
     {
         $event->add('F');

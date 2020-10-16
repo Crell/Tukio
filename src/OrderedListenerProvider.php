@@ -39,7 +39,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
-    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -52,8 +52,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 else if ($attrib instanceof ListenerAfter) {
                     $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
                 }
-                else {
+                else if ($attrib instanceof ListenerPriority) {
                     $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
+                }
+                else {
+                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
                 }
             }
             // Return the last id only, because that's all we can do.
@@ -63,7 +66,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
+        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
     }
 
     public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null) : string
@@ -106,9 +109,10 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $service, string $method, string $type, int $priority = 0, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string
     {
         $id = $id ?? $service . '-' . $method;
+        $priority = $priority ?? 0;
         return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
     }
 
@@ -211,8 +215,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                         else if ($attrib instanceof ListenerAfter) {
                             $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
                         }
-                        else {
+                        else if ($attrib instanceof ListenerPriority) {
                             $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
+                        }
+                        else {
+                            $this->addListenerService($service, $methodName, $type, null, $attrib->id);
                         }
                     }
                 }

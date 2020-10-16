@@ -5,7 +5,7 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-#[Listener(3, 'A', CollectingEvent::class)]
+#[ListenerPriority(3, 'A', CollectingEvent::class)]
 function atListenerA(CollectingEvent $event) : void
 {
     $event->add('A');
@@ -20,7 +20,7 @@ function atListenerB(CollectingEvent $event) : void
 /**
  * @throws \Exception
  */
-#[Listener]
+#[Listener('nope')]
 function atNoListen(EventOne $event) : void
 {
     throw new \Exception('This should not be called');

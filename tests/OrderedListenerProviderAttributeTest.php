@@ -5,7 +5,7 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-#[Listener(0, 'a')]
+#[ListenerPriority(0, 'a')]
 #[JunkAttribute]
 function at_listener_one(CollectingEvent $event): void
 {
@@ -18,13 +18,13 @@ function at_listener_two(CollectingEvent $event): void
     $event->add('B');
 }
 
-#[Listener(id: 'c', priority: 4)]
+#[ListenerPriority(id: 'c', priority: 4)]
 function at_listener_three(CollectingEvent $event): void
 {
     $event->add('C');
 }
 
-#[Listener(id: 'd', priority: 2, type: CollectingEvent::class)]
+#[ListenerPriority(id: 'd', priority: 2, type: CollectingEvent::class)]
 function at_listener_four($event): void
 {
     $event->add('D');
@@ -37,7 +37,7 @@ class DoNothingEvent
 
 class TestAttributedListeners
 {
-    #[Listener(id: 'a', priority: -4)]
+    #[ListenerPriority(id: 'a', priority: -4)]
     public static function listenerA(CollectingEvent $event) : void
     {
         $event->add('A');
@@ -49,7 +49,7 @@ class TestAttributedListeners
         $event->add('B');
     }
 
-    #[Listener(id: 'c', priority: -4)]
+    #[ListenerPriority(id: 'c', priority: -4)]
     public function listenerC(CollectingEvent $event) : void
     {
         $event->add('C');
@@ -62,9 +62,9 @@ class TestAttributedListeners
     }
 }
 
-#[Listener(1, 'A')]
-#[Listener(2, 'B')]
-#[Listener(3, 'C')]
+#[Listener('A')]
+#[Listener('B')]
+#[Listener('C')]
 function at_multi_one(CollectingEvent $event): void
 {
     $event->add('A');
