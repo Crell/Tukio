@@ -13,12 +13,6 @@ jobs:
                 php: [ '7.2', '7.3', '7.4', '8.0' ]
                 composer-flags: [ '' ]
                 phpunit-flags: [ '--coverage-text' ]
-#                include:
-#                    - php: '8.0'
-#                       Some of the test dependencies don't officially support PHP 8 yet (Diactoros, specifically),
-#                       so we have to skip that check for now.
-#                      composer-flags: '--ignore-platform-req=php'
-#                      phpunit-flags: '--no-coverage'
         steps:
             - uses: actions/checkout@v2
             - uses: shivammathur/setup-php@v2
