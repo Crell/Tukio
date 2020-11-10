@@ -21,56 +21,105 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $this->listeners = new OrderedCollection();
     }
 
-    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
+    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
+                if ($attrib instanceof ListenerBefore) {
+                    $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
+                }
+                else if ($attrib instanceof ListenerAfter) {
+                    $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
+                }
+                else if ($attrib instanceof ListenerPriority) {
+                    $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
+                }
+                else {
+                    $generatedId = $this->listeners->addItem($entry, $priority ?? 0, $id);
+                }
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         $id = $id ?? $this->getListenerId($listener);
+
+        return $this->listeners->addItem($entry, $priority ?? 0, $id);
+    }
+
+    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string
+    {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
+                // The before-ness of this method takes priority over the attribute.
+                $generatedId = $this->listeners->addItemBefore($before, $entry, $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
+        $id = $id ?? $this->getListenerId($listener);
+        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
+        return $this->listeners->addItemBefore($before, $entry, $id);
+    }
+
+    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string
+    {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $entry = $this->getListenerEntry($listener, $type);
+                // The before-ness of this method takes priority over the attribute.
+                $generatedId = $this->listeners->addItemBefore($after, $entry, $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
+        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
+        $id = $id ?? $this->getListenerId($listener);
+
+        return $this->listeners->addItemAfter($after, $entry, $id);
+    }
+
+    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string
+    {
+        $entry = new ListenerServiceEntry($service, $method, $type);
+        $priority = $priority ?? 0;
 
         return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null): string
     {
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        $entry = new ListenerServiceEntry($service, $method, $type);
 
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
+        return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null): string
     {
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        $entry = new ListenerServiceEntry($service, $method, $type);
 
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
+        return $this->listeners->addItemAfter($after, $entry, $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
+    public function addSubscriber(string $class, string $service): void
     {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
+        // @todo This method is identical to the one in OrderedListenerProvider. Is it worth merging them?
 
-        return $this->listeners->addItem($entry, $priority, $id);
-    }
-
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
-
-        return $this->listeners->addItemBefore($pivotId, $entry, $id);
-    }
-
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($serviceName, $methodName, $type);
-
-        return $this->listeners->addItemAfter($pivotId, $entry, $id);
-    }
-
-    public function addSubscriber(string $class, string $serviceName): void
-    {
-        // @todo This method is identical to the one in RegisterableListenerProvider. Is it worth merging them?
-
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
@@ -87,7 +136,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
                 if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType()->getName();
-                    $this->addListenerService($serviceName, $rMethod->getName(), $type);
+                    $this->addListenerService($service, $rMethod->getName(), $type);
                 }
             }
         } catch (\ReflectionException $e) {

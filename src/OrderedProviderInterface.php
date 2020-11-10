@@ -8,6 +8,9 @@ interface OrderedProviderInterface
     /**
      * Adds a listener to the provider.
      *
+     * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
+     * the priority, id, or type.  Values specified in the method call take priority over the attribute.
+     *
      * @param callable $listener
      *   The listener to register.
      * @param int $priority
@@ -20,7 +23,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string;
+    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string;
 
     /**
      * Adds a listener to trigger before another existing listener.
@@ -28,7 +31,10 @@ interface OrderedProviderInterface
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
+     * the id or type.  The $before parameter specified here will always be used and the type of attribute ignored.
+     *
+     * @param string $before
      *   The ID of an existing listener.
      * @param callable $listener
      *   The listener to register.
@@ -40,7 +46,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string;
+    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string;
 
     /**
      * Adds a listener to trigger after another existing listener.
@@ -48,7 +54,10 @@ interface OrderedProviderInterface
      * Note: The new listener is only guaranteed to come after the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
+     * the id or type.  The $after parameter specified here will always be used and the type of attribute ignored.
+     *
+     * @param string $after
      *   The ID of an existing listener.
      * @param callable $listener
      *   The listener to register.
@@ -60,14 +69,16 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string;
+    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string;
 
     /**
      * Adds a method on a service as a listener.
      *
-     * @param string $serviceName
+     * This method does not support attributes, as the class name is unknown at registration.
+     *
+     * @param string $service
      *   The name of a service on which this listener lives.
-     * @param string $methodName
+     * @param string $method
      *   The method name of the service that is the listener being registered.
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered.
@@ -78,7 +89,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string;
+    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.
@@ -86,11 +97,13 @@ interface OrderedProviderInterface
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * This method does not support attributes, as the class name is unknown at registration.
+     *
+     * @param string $before
      *   The ID of an existing listener.
-     * @param string $serviceName
+     * @param string $service
      *   The name of a service on which this listener lives.
-     * @param string $methodName
+     * @param string $method
      *   The method name of the service that is the listener being registered.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
@@ -99,7 +112,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string;
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null): string;
 
     /**
      * Adds a service listener to trigger before another existing listener.
@@ -107,11 +120,13 @@ interface OrderedProviderInterface
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * This method does not support attributes, as the class name is unknown at registration.
+     *
+     * @param string $after
      *   The ID of an existing listener.
-     * @param string $serviceName
+     * @param string $service
      *   The name of a service on which this listener lives.
-     * @param string $methodName
+     * @param string $method
      *   The method name of the service that is the listener being registered.
      * @param string $type
      *   The class or interface type of events for which this listener will be registered.
@@ -120,7 +135,7 @@ interface OrderedProviderInterface
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string;
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null) : string;
 
     /**
      * Registers all listener methods on a service as listeners.
@@ -128,13 +143,14 @@ interface OrderedProviderInterface
      * A method on the specified class is a listener if:
      * - It is public.
      * - It's name is in the form on*.  onUpdate(), onUserLogin(), onHammerTime() will all be registered.
+     * - It has a Listener/ListenerBefore/ListenerAfter attribute.
      *
      * The event type the listener is for will be derived from the type hint in the method signature.
      *
      * @param string $class
      *   The class name to be registered as a subscriber.
-     * @param string $serviceName
+     * @param string $service
      *   The name of a service in the container.
      */
-    public function addSubscriber(string $class, string $serviceName): void;
+    public function addSubscriber(string $class, string $service): void;
 }

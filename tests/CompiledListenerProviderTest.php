@@ -78,7 +78,7 @@ class CompiledEventDispatcherTest extends TestCase
     public function test_add_subscriber()
     {
         // This test is parallel to and uses the same mock subscriber as
-        // RegisterableListenerProviderServiceTest::test_add_subscriber().
+        // OrderedListenerProviderServiceTest::test_add_subscriber().
         // Thus if both work it means the same subscriber works the same
         // transparently in both compiled and non-compiled versions.
 

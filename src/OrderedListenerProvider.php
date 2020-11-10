@@ -39,70 +39,93 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
-    /**
-     * Tries to get the type of a callable listener.
-     *
-     * If unable, throws an exception with information about the listener whose type could not be fetched.
-     *
-     * @param callable $listener
-     * @return string
-     */
-    protected function getType(callable $listener)
+    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string
     {
-        try {
-            $type = $this->getParameterType($listener);
-        } catch (\InvalidArgumentException $exception) {
-            if ($this->isClassCallable($listener) || $this->isObjectCallable($listener)) {
-                throw InvalidTypeException::fromClassCallable($listener[0], $listener[1], $exception);
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                if ($attrib instanceof ListenerBefore) {
+                    $generatedId = $this->listeners->addItemBefore($attrib->before, new ListenerEntry($listener, $type), $id);
+                }
+                else if ($attrib instanceof ListenerAfter) {
+                    $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
+                }
+                else if ($attrib instanceof ListenerPriority) {
+                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
+                }
+                else {
+                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
+                }
             }
-            if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
-                throw InvalidTypeException::fromFunctionCallable($listener, $exception);
-            }
-            throw new InvalidTypeException($exception);
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
         }
-        return $type;
-    }
 
-    public function addListener(callable $listener, int $priority = 0, string $id = null, string $type = null): string
-    {
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority, $id);
+        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
     }
 
-    public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null) : string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                // The before-ness of this method call always overrides the attribute.
+                $generatedId = $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemBefore($pivotId, new ListenerEntry($listener, $type), $id);
+        return $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null) : string
     {
+        if ($attributes = $this->getAttributes($listener)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $type = $type ?? $attrib->type ?? $this->getType($listener);
+                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                // The after-ness of this method call always overrides the attribute.
+                $generatedId = $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
+            }
+            // Return the last id only, because that's all we can do.
+            return $generatedId;
+        }
+
         $type = $type ?? $this->getType($listener);
         $id = $id ?? $this->getListenerId($listener);
 
-        return $this->listeners->addItemAfter($pivotId, new ListenerEntry($listener, $type), $id);
+        return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $serviceName, string $methodName, string $type, int $priority = 0, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListener($this->makeListenerForService($serviceName, $methodName), $priority, $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        $priority = $priority ?? 0;
+        return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
     }
 
-    public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null) : string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListenerBefore($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        return $this->addListenerBefore($before, $this->makeListenerForService($service, $method), $id, $type);
     }
 
-    public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null) : string
     {
-        $id = $id ?? $serviceName . '-' . $methodName;
-        return $this->addListenerAfter($pivotId, $this->makeListenerForService($serviceName, $methodName), $id, $type);
+        $id = $id ?? $service . '-' . $method;
+        return $this->addListenerAfter($after, $this->makeListenerForService($service, $method), $id, $type);
     }
 
     /**
@@ -136,9 +159,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $listener;
     }
 
-    public function addSubscriber(string $class, string $serviceName) : void
+    public function addSubscriber(string $class, string $service) : void
     {
-        $proxy = new ListenerProxy($this, $serviceName, $class);
+        $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
@@ -149,16 +172,64 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         try {
             $rClass = new \ReflectionClass($class);
             $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+
+            // Explicitly registered methods ignore all auto-registration mechanisms.
+            $methods = array_filter($methods, function(\ReflectionMethod $r) use ($proxy) {
+                return !in_array($r->getName(), $proxy->getRegisteredMethods());
+            });
+
+            // Once we require PHP 7.4, replace the above with this line.
+            //$methods = array_filter($methods, fn(\ReflectionMethod $r) => !in_array($r->getName(), $proxy->getRegisteredMethods()));
+
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
                 $methodName = $rMethod->getName();
-                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
+
+                // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once
+                // 8.0 is made a requirement.
+                $attributes = [];
+                if (class_exists('ReflectionAttribute', false)) {
+                    // Fugly because PHP < 7.4
+                    $attributes = array_map(function(\ReflectionAttribute $attrib) {
+                        return $attrib->newInstance();
+                    } , $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+
+                    // Once we require PHP 7.4, replace the above with these lines.
+                    //$attributes = array_map(fn(\ReflectionAttribute $attrib)
+                    //    => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+                }
+
+                if (count($attributes)) {
+                    /** @var ListenerAttribute $attrib */
+                    foreach ($attributes as $attrib) {
+                        $params = $rMethod->getParameters();
+                        $paramType = $params[0]->getType();
+                        // This can simplify to ?-> once we require PHP 8.0.
+                        $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
+                        if (is_null($type)) {
+                            throw InvalidTypeException::fromClassCallable($class, $methodName);
+                        }
+                        if ($attrib instanceof ListenerBefore) {
+                            $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
+                        }
+                        else if ($attrib instanceof ListenerAfter) {
+                            $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
+                        }
+                        else if ($attrib instanceof ListenerPriority) {
+                            $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
+                        }
+                        else {
+                            $this->addListenerService($service, $methodName, $type, null, $attrib->id);
+                        }
+                    }
+                }
+                else if (strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {
-                        throw InvalidTypeException::fromClassCallable($class, $rMethod->getName());
+                        throw InvalidTypeException::fromClassCallable($class, $methodName);
                     }
-                    $this->addListenerService($serviceName, $rMethod->getName(), $type->getName());
+                    $this->addListenerService($service, $rMethod->getName(), $type->getName());
                 }
             }
         } catch (\ReflectionException $e) {
