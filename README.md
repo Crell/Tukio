@@ -2,15 +2,12 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
 [![Coverage Status][ico-scrutinizer]][link-scrutinizer]
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 
-Tukio is a complete and robust implementation of the [PSR-14](http://www.php-fig.org/psr/psr-14/) Event Dispatcher specification.
-
-PSR-14 is still in draft.  This library will be updated accordingly as PSR-14 evolves.  A stable release will be made once PSR-14 is complete.
+Tukio is a complete and robust implementation of the [PSR-14](http://www.php-fig.org/psr/psr-14/) Event Dispatcher specification.  It supports normal and debug Event Dispatchers, both runtime and compiled Providers, complex ordering of Listeners, and attribute-based registration on PHP 8.
 
 "Tukio" is the Swahili word for "Event".
 
@@ -48,7 +45,7 @@ Note that `dispatch()` will return `$thingHappened` as well, so if Listeners are
 $reactions = $dispatcher->dispatch(new ThingHappened($thing))->getReactions();
 ```
 
-In practice most of that will be handled through a Dependency Injection Container most of the time, but there's no requirement that it do so.
+In practice most of that will be handled through a Dependency Injection Container, but there's no requirement that it do so.
 
 ## Dispatchers
 
@@ -124,7 +121,7 @@ $provider->addListener('handleStuff', 20);
 
 Now, the named function Listener will get called before the anonymous function does.  (Higher priority number comes first, and negative numbers are totally legal.) If two listeners have the same priority then their order relative to each other is undefined.
 
-Sometimes, though, you may not know the priority of another Listener but it's important that your Listener happen before or after it.  For that we need to add a new concept: IDs.  Every Listener has an ID, which can be provided when the Listener is added or will be auto-generated if not.  The auto-generated value is predictable (the name of a function, the class-and-method of an object method, etc.), so in most cases it's not necessary to read the return value of `addListener()` although that is slightly more robust.
+Sometimes, though, you may not know the priority of another Listener, but it's important your Listener happen before or after it.  For that we need to add a new concept: IDs.  Every Listener has an ID, which can be provided when the Listener is added or will be auto-generated if not.  The auto-generated value is predictable (the name of a function, the class-and-method of an object method, etc.), so in most cases it's not necessary to read the return value of `addListener()` although that is slightly more robust.
 
 ```php
 use Crell\Tukio\OrderedListenerProvider;
@@ -149,9 +146,9 @@ The full API for those three methods is:
 ```php
 public function addListener(callable $listener, $priority = 0, string $id = null, string $type = null): string;
 
-public function addListenerBefore(string $pivotId, callable $listener, string $id = null, string $type = null): string;
+public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string;
 
-public function addListenerAfter(string $pivotId, callable $listener, string $id = null, string $type = null): string;
+public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string;
 ```
 
 All three can register any callable as a Listener and return an ID.  If desired the `$type` parameter allows a user to specify the Event type that the Listener is for if different than the type declaration in the function.  For example, if the Listener doesn't have a type declaration or should only apply to some parent class of what it's type declaration is.  (That's a rare edge case, which is why it's the last parameter.)
@@ -163,9 +160,9 @@ Often, though, Listeners are themselves methods of objects that should not be in
 ```php
 public function addListenerService(string $serviceName, string $methodName, string $type, $priority = 0, string $id = null): string;
 
-public function addListenerServiceBefore(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null): string;
+public function addListenerServiceBefore(string $before, string $serviceName, string $methodName, string $type, string $id = null): string;
 
-public function addListenerServiceAfter(string $pivotId, string $serviceName, string $methodName, string $type, string $id = null) : string;
+public function addListenerServiceAfter(string $after, string $serviceName, string $methodName, string $type, string $id = null) : string;
 ```
 
 All three take a service name and method name to identify a Listener.  However, since the callable itself doesn't exist yet it's not possible to derive the Event it should listen to through reflection.  It must be specified explicitly.  All three also return an ID, so the same "priority-or-before/after" functionality is supported.
@@ -187,9 +184,9 @@ $id = $provider->addListenerServiceBefore('some_service-methodA', 'some_service'
 $provider->addListenerServiceAfter($id, 'some_other_service', 'methodC', SpecificThingHappened::class);
 ```
 
-In this example, we assume that `$container` has two services defined: `some_service` and `some_other_service`.  (Creative, I know.)  We then register three Listners: Two of them are methods on `some_service`, the other on `some_other_service`.  Both services will be requested from the container as needed, so won't be instantiated until the Listener method is about to be called.
+In this example, we assume that `$container` has two services defined: `some_service` and `some_other_service`.  (Creative, I know.)  We then register three Listeners: Two of them are methods on `some_service`, the other on `some_other_service`.  Both services will be requested from the container as needed, so won't be instantiated until the Listener method is about to be called.
 
-Of note, the `methodB` Listener is referencing the `methodA` listener by an explict ID.  The generated ID is as noted predictable, so in most cases you don't need to use the return value.  The return value is the more robust and reliable option, though, as if the requested ID is already taken a new one will be generated.
+Of note, the `methodB` Listener is referencing the `methodA` listener by an explict ID.  The generated ID is as noted predictable, so in most cases you don't need to use the return value.  The return value is the more robust and reliable option, though, as if the requested ID is already in-use a new one will be generated.
 
 #### Subscribers
 
@@ -251,6 +248,8 @@ As before, `onThingsHappen()` will be registered automatically.  However, `somet
 
 In practice, using Subscribers is the most robust way to register Listeners in a production system and so is the recommended approach.  However, all approaches have their uses and can be used as desired.
 
+If you are using PHP 8.0 or later, you can use attributes to register your subscriber methods instead.  That is preferred, in fact.  See the section below.
+
 ### Compiled Provider
 
 All of that registration and ordering logic is powerful, and it's surprisingly fast in practice.  What's even faster, though, is not having to re-register on every request.  For that, Tukio offers a compiled provider option.
@@ -305,6 +304,76 @@ And boom!  `$provider` is now a fully functional Provider you can pass to a Disp
 
 
 But what if you want to have most of your listeners pre-registered, but have some that you add conditionally at runtime?  Have a look at the FIG's [`AggregateProvider`](https://github.com/php-fig/event-dispatcher-util/blob/master/src/AggregateProvider.php), and combine your compiled Provider with an instance of `OrderedListenerProvider`.
+
+### Attribute-based registration
+
+If you are using PHP 8.0 or later, Tukio fully supports attributes as a means of registration for both `OrderedListenerProvider` and `ProviderBuilder`.  There are four relevant attributes: `Listener`, `ListenerPriority`, `ListenerBefore`, and `ListenerAfter`.  All can be used with sequential parameters or named parameters.  In most cases, named parameters will be more self-documenting.  All attributes are valid only on functions and methods.
+
+* `Listener` declares a callable a listener and optionally sets the `id` and `type`: `#[Listener(id: 'a_listener', type: `SomeClass`)].
+* `ListenerPriority` has a required `priority` parameter, and optional `id` and `type: `#[ListenerPriority(5)]` or `#[ListeenPriority(priority: 3, id: "a_listener")]`.
+* `ListenerBefore` has a required `before` parameter, and optional `id` and `type: `#[ListenerBefore('other_listener')]` or `#[ListenerBefore(before: 'other_listener', id: "a_listener")]`.
+* `ListenerAfter` has a required `after` parameter, and optional `id` and `type: `#[ListenerAfter('other_listener')]` or `#[ListenerAfter(after: 'other_listener', id: "a_listener")]`.
+
+Each attribute matches a corresponding method, and the values in the attribute will be used as if they were passed directly to the `addListener*()` method.  If a value is passed directly to `addListener()` and specified in the attribute, the directly-passed value takes precedence.
+
+If you call `addListenerBefore()`/`addListenerAfter()`, the `before`/`after`/`priority` attribute parameter is ignored in favor of the method's standard behavior.  That is, `addListenerBefore()`, if called with a function that has a `#[ListenerAfter]` attribute, will still add the listener "before" the specified other listener.
+
+There are two common use cases for attributes: One, using just `#[Listener]` to define a custom `id` or `type` and then calling the appropriate `add*` method as normal.  The other is on Subscribers, where attributes completely eliminate the need for the `registerListeners()` method.  If you're on PHP 8.0, please use attributes instead of `registerListeners()`.  It's not deprecated yet, but it may end up deprecated sometime in the future.
+
+For example:
+
+```php
+class SomeSubscriber
+{
+    // Registers, with a custom ID.
+    #[Listener(id: 'a')]
+    public function onA(CollectingEvent $event) : void
+    {
+        $event->add('A');
+    }
+
+    // Registers, with a custom priority.
+    #[ListenerPriority(priority: 5)]
+    public function onB(CollectingEvent $event) : void
+    {
+        $event->add('B');
+    }
+
+    // Registers, before listener "a" above.
+    #[ListenerBefore(before: 'a')]
+    public function onC(CollectingEvent $event) : void
+    {
+        $event->add('C');
+    }
+
+    // Registers, after listener "a" above.
+    #[ListenerAfter(after: 'a')]
+    public function onD(CollectingEvent $event) : void
+    {
+        $event->add('D');
+    }
+
+    // This still self-registers because of the name.
+    public function onE(CollectingEvent $event) : void
+    {
+        $event->add('E');
+    }
+
+    // Registers, with a given priority despite its non-standard name.
+    #[ListenerPriority(priority: -5)]
+    public function notNormalName(CollectingEvent $event) : void
+    {
+        $event->add('F');
+    }
+
+    // No attribute, non-standard name, this method is not registered.
+    public function ignoredMethodThatDoesNothing() : void
+    {
+        throw new \Exception('What are you doing here?');
+    }
+}
+```
+
 
 ### `CallbackProvider`
 
@@ -397,7 +466,6 @@ The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for mor
 [ico-downloads]: https://img.shields.io/packagist/dt/Crell/Tukio.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/Crell/Tukio
-[link-travis]: https://travis-ci.org/Crell/Tukio
 [link-scrutinizer]: https://scrutinizer-ci.com/g/Crell/Tukio/code-structure
 [link-code-quality]: https://scrutinizer-ci.com/g/Crell/Tukio
 [link-downloads]: https://packagist.org/packages/Crell/Tukio
