@@ -25,8 +25,7 @@
         "psr/log": "^1.0"
     },
     "require-dev": {
-        "nunomaduro/phpinsights": "^1.3",
-        "phpbench/phpbench": "@dev",
+        "bamarni/composer-bin-plugin": "^1.4",
         "phpunit/phpunit": "~8.0"
     },
     "provide": {
@@ -46,7 +45,10 @@
     "scripts": {
         "test": "phpunit",
         "check-style": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
-        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests"
+        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
+        "bin": "echo 'bin not installed'",
+        "post-install-cmd": ["@composer bin all install --ansi"],
+        "post-update-cmd": ["@composer bin all update --ansi"]
     },
     "extra": {
         "branch-alias": {
@@ -54,9 +56,6 @@
         }
     },
     "config": {
-        "sort-packages": true,
-        "platform": {
-            "php": "7.4"
-        }
+        "sort-packages": true
     }
 }
