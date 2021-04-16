@@ -43,12 +43,12 @@ class ProviderCompiler
 
 declare(strict_types=1);
 
-namespace $namespace;
+namespace {$namespace};
 
 use Crell\Tukio\CompiledListenerProviderBase;
 use Psr\EventDispatcher\EventInterface;
 
-class $class extends CompiledListenerProviderBase
+class {$class} extends CompiledListenerProviderBase
 {
   protected const LISTENERS = [
 

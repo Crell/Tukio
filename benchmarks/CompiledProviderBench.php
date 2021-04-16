@@ -25,10 +25,13 @@ class CompiledProviderBench extends ProviderBenchBase
      */
     protected $provider;
 
+    /** @var string */
     protected static $filename = 'compiled_provider.php';
 
+    /** @var string */
     protected static $className = 'CompiledProvider';
 
+    /** @var string */
     protected static $namespace = 'Test\\Space';
 
     public static function createCompiledProvider(): void

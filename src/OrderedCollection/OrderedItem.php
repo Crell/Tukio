@@ -11,6 +11,10 @@ namespace Crell\Tukio\OrderedCollection;
  */
 class OrderedItem
 {
+    /**
+     * @var mixed|null
+     *   The actual item being stored.
+     */
     public $item;
 
     /** @var int */
@@ -32,7 +36,7 @@ class OrderedItem
         $this->id = $id;
     }
 
-    public static function createWithPriority($item, int $priority, string $id) : self
+    public static function createWithPriority($item, int $priority, string $id): self
     {
         $new = new static();
         $new->item = $item;
@@ -42,7 +46,7 @@ class OrderedItem
         return $new;
     }
 
-    public static function createBefore($item, string $pivotId, $id) : self
+    public static function createBefore($item, string $pivotId, string $id): self
     {
         $new = new static();
         $new->item = $item;
@@ -52,7 +56,7 @@ class OrderedItem
         return $new;
     }
 
-    public static function createAfter($item, string $pivotId, $id) : self
+    public static function createAfter($item, string $pivotId, string $id): self
     {
         $new = new static();
         $new->item = $item;

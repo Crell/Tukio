@@ -16,7 +16,7 @@ class OrderedCollection implements \IteratorAggregate
 {
 
     /**
-     * @var array
+     * @var array<int, array>
      *
      * An indexed array of arrays of Item entries. The key is the priority, the value is an array of Items.
      */
@@ -34,7 +34,7 @@ class OrderedCollection implements \IteratorAggregate
      */
     protected $sorted = false;
 
-    /** @var array */
+    /** @var array<OrderedItem> */
     protected $toPrioritize = [];
 
     /**
@@ -42,14 +42,15 @@ class OrderedCollection implements \IteratorAggregate
      *
      * @param mixed $item
      *   The item to add. May be any data type.
-     * @param int $priority
+     * @param ?int $priority
      *   The priority order of the item. Higher numbers will come first.
-     * @param string $id
+     * @param ?string $id
      *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
+     *
      * @return string
      *   An opaque ID string uniquely identifying the item for future reference.
      */
-    public function addItem($item, int $priority = 0, string $id = null) : string
+    public function addItem($item, ?int $priority = 0, ?string $id = null): string
     {
         $id = $this->enforceUniqueId($id);
 
@@ -73,12 +74,13 @@ class OrderedCollection implements \IteratorAggregate
      *   The existing ID of an item in the collection.
      * @param mixed $item
      *   The new item to add.
-     * @param string $id
+     * @param ?string $id
      *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
+     *
      * @return string
      *   An opaque ID string uniquely identifying the new item for future reference.
      */
-    public function addItemBefore(string $pivotId, $item, string $id = null) : string
+    public function addItemBefore(string $pivotId, $item, ?string $id = null): string
     {
         $id = $this->enforceUniqueId($id);
 
@@ -109,12 +111,13 @@ class OrderedCollection implements \IteratorAggregate
      *   The existing ID of an item in the collection.
      * @param mixed $item
      *   The new item to add.
-     * @param string $id
+     * @param ?string $id
      *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
+     *
      * @return string
      *   An opaque ID string uniquely identifying the new item for future reference.
      */
-    public function addItemAfter(string $pivotId, $item, string $id = null) : string
+    public function addItemAfter(string $pivotId, $item, ?string $id = null): string
     {
         $id = $this->enforceUniqueId($id);
 
@@ -137,13 +140,14 @@ class OrderedCollection implements \IteratorAggregate
 
     /**
      * {@inheritdoc}
+     *
      * @return \ArrayIterator|\Traversable
      *
      * Note: Because of how iterator_to_array() works, you MUST pass `false` as the second parameter to that function
      * if calling it on the return from this object.  If not, only the last list's worth of values will be included in
      * the resulting array.
      */
-    public function getIterator()
+    public function getIterator(): iterable
     {
         if (!$this->sorted) {
             $this->prioritizePendingItems();
@@ -160,7 +164,7 @@ class OrderedCollection implements \IteratorAggregate
         })();
     }
 
-    protected function prioritizePendingItems() : void
+    protected function prioritizePendingItems(): void
     {
         /** @var OrderedItem $item */
         foreach ($this->toPrioritize as $item) {
@@ -190,10 +194,11 @@ class OrderedCollection implements \IteratorAggregate
      *
      * @param string|null $id
      *   The proposed ID of an item, or null to generate a random string.
+     *
      * @return string
      *   A confirmed unique ID string.
      */
-    protected function enforceUniqueId(?string $id) : string
+    protected function enforceUniqueId(?string $id): string
     {
         $candidateId = $id ?? uniqid('', true);
 

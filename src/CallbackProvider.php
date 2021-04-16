@@ -8,7 +8,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 
 class CallbackProvider implements ListenerProviderInterface
 {
-    /** @var array */
+    /** @var array<string, array> */
     protected $callbacks = [];
 
     public function getListenersForEvent(object $event): iterable
@@ -30,7 +30,7 @@ class CallbackProvider implements ListenerProviderInterface
         }
     }
 
-    public function addCallbackMethod(string $type, string $method) : self
+    public function addCallbackMethod(string $type, string $method): self
     {
         $this->callbacks[$type][] = $method;
         return $this;

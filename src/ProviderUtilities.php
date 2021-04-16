@@ -6,7 +6,12 @@ namespace Crell\Tukio;
 
 use Fig\EventDispatcher\ParameterDeriverTrait;
 
-trait ProviderUtilitiesTrait
+/**
+ * For internal use only.
+ *
+ * @internal
+ */
+trait ProviderUtilities
 {
     use ParameterDeriverTrait;
 
@@ -20,11 +25,11 @@ trait ProviderUtilitiesTrait
         if ($this->isFunctionCallable($listener)) {
             $ref = new \ReflectionFunction($listener);
         }
-        else if ($this->isClassCallable($listener)) {
+        elseif ($this->isClassCallable($listener)) {
             list($class, $method) = $listener;
             $ref = (new \ReflectionClass($class))->getMethod($method);
         }
-        else if ($this->isObjectCallable($listener)) {
+        elseif ($this->isObjectCallable($listener)) {
             list($class, $method) = $listener;
             $ref = (new \ReflectionObject($class))->getMethod($method);
         }
@@ -50,9 +55,10 @@ trait ProviderUtilitiesTrait
      *
      * @param callable $listener
      *   The callable from which to extract a type.
+     *
      * @return string
      */
-    protected function getType(callable $listener)
+    protected function getType(callable $listener): string
     {
         try {
             $type = $this->getParameterType($listener);
@@ -77,10 +83,11 @@ trait ProviderUtilitiesTrait
      *
      * @param callable $listener
      *   The listener for which to derive an ID.
+     *
      * @return string|null
      *   The derived ID if possible or null if no reasonable ID could be derived.
      */
-    protected function getListenerId(callable $listener) : ?string
+    protected function getListenerId(callable $listener): ?string
     {
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
@@ -103,9 +110,10 @@ trait ProviderUtilitiesTrait
      * Or at least a reasonable approximation, since a function name may not be defined yet.
      *
      * @param callable $callable
+     *
      * @return True if the callable represents a function, false otherwise.
      */
-    protected function isFunctionCallable(callable $callable) : bool
+    protected function isFunctionCallable(callable $callable): bool
     {
         // We can't check for function_exists() because it may be included later by the time it matters.
         return is_string($callable);
@@ -115,9 +123,10 @@ trait ProviderUtilitiesTrait
      * Determines if a callable represents a method on an object.
      *
      * @param callable $callable
+     *
      * @return True if the callable represents a method object, false otherwise.
      */
-    protected function isObjectCallable(callable $callable) : bool
+    protected function isObjectCallable(callable $callable): bool
     {
         return is_array($callable) && is_object($callable[0]);
     }
@@ -126,9 +135,10 @@ trait ProviderUtilitiesTrait
      * Determines if a callable represents a closure/anonymous function.
      *
      * @param callable $callable
+     *
      * @return True if the callable represents a closure object, false otherwise.
      */
-    protected function isClosureCallable(callable $callable) : bool
+    protected function isClosureCallable(callable $callable): bool
     {
         return $callable instanceof \Closure;
     }

@@ -7,5 +7,5 @@ namespace Crell\Tukio;
 interface SubscriberInterface
 {
 
-    public static function registerListeners(ListenerProxy $proxy) : void;
+    public static function registerListeners(ListenerProxy $proxy): void;
 }

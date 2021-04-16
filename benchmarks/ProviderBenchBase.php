@@ -26,7 +26,7 @@ abstract class ProviderBenchBase extends TukioBenchmarks
     protected static $numListeners = 5000;
 
     /**
-     * @var array
+     * @var array<int>
      *
      * Deliberately in an unsorted order to force it to need to be sorted.
      */

@@ -17,5 +17,5 @@ interface CallbackEventInterface
      *
      * @return object
      */
-    public function getSubject() : object;
+    public function getSubject(): object;
 }

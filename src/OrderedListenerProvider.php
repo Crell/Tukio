@@ -11,7 +11,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 
 class OrderedListenerProvider implements ListenerProviderInterface, OrderedProviderInterface
 {
-    use ProviderUtilitiesTrait;
+    use ProviderUtilities;
 
     /**
      * @var OrderedCollection
@@ -19,11 +19,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     protected $listeners;
 
     /**
-     * @var ContainerInterface
+     * @var ?ContainerInterface
      */
     protected $container;
 
-    public function __construct(ContainerInterface $container = null)
+    public function __construct(?ContainerInterface $container = null)
     {
         $this->listeners = new OrderedCollection();
         $this->container = $container;
@@ -39,7 +39,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
-    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string
+    public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -49,10 +49,10 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 if ($attrib instanceof ListenerBefore) {
                     $generatedId = $this->listeners->addItemBefore($attrib->before, new ListenerEntry($listener, $type), $id);
                 }
-                else if ($attrib instanceof ListenerAfter) {
+                elseif ($attrib instanceof ListenerAfter) {
                     $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
                 }
-                else if ($attrib instanceof ListenerPriority) {
+                elseif ($attrib instanceof ListenerPriority) {
                     $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
                 }
                 else {
@@ -69,7 +69,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
     }
 
-    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -89,7 +89,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null) : string
+    public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -109,20 +109,20 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
     }
 
-    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
     {
         $id = $id ?? $service . '-' . $method;
         $priority = $priority ?? 0;
         return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
     }
 
-    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null) : string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
         $id = $id ?? $service . '-' . $method;
         return $this->addListenerBefore($before, $this->makeListenerForService($service, $method), $id, $type);
     }
 
-    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null) : string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
     {
         $id = $id ?? $service . '-' . $method;
         return $this->addListenerAfter($after, $this->makeListenerForService($service, $method), $id, $type);
@@ -138,7 +138,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
      * @return callable
      *   A callable that proxies to the the provided method and service.
      */
-    protected function makeListenerForService(string $serviceName, string $methodName) : callable
+    protected function makeListenerForService(string $serviceName, string $methodName): callable
     {
         if (!$this->container) {
             throw new ContainerMissingException();
@@ -153,12 +153,12 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         // the wrapping listener must listen to just object.  The explicit $type means it will still get only
         // the right event type, and the real listener can still type itself properly.
         $container = $this->container;
-        return static function (object $event) use ($serviceName, $methodName, $container) : void {
+        return static function (object $event) use ($serviceName, $methodName, $container): void {
             $container->get($serviceName)->$methodName($event);
         };
     }
 
-    public function addSubscriber(string $class, string $service) : void
+    public function addSubscriber(string $class, string $service): void
     {
         $proxy = new ListenerProxy($this, $service, $class);
 
@@ -211,10 +211,10 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                         if ($attrib instanceof ListenerBefore) {
                             $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
                         }
-                        else if ($attrib instanceof ListenerAfter) {
+                        elseif ($attrib instanceof ListenerAfter) {
                             $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
                         }
-                        else if ($attrib instanceof ListenerPriority) {
+                        elseif ($attrib instanceof ListenerPriority) {
                             $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
                         }
                         else {
@@ -222,7 +222,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                         }
                     }
                 }
-                else if (strpos($methodName, 'on') === 0) {
+                elseif (strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {

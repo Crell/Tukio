@@ -52,6 +52,7 @@ return [
 
     'exclude' => [
         //  'path/to/directory-or-file'
+        'benchmarks',
     ],
 
     'add' => [
@@ -62,9 +63,9 @@ return [
 
     'remove' => [
         // Public properties on internal classes are fine.
-        \ObjectCalisthenics\Sniffs\Classes\ForbiddenPublicPropertySniff::class,
+        ObjectCalisthenics\Sniffs\Classes\ForbiddenPublicPropertySniff::class,
         // It's not unusual for an implementing class to not need every optional parameter.
-        \SlevomatCodingStandard\Sniffs\Functions\UnusedParameterSniff::class,
+        SlevomatCodingStandard\Sniffs\Functions\UnusedParameterSniff::class,
         // This is broken, because sometimes you have to late static bind a constant
         // if the constant won't be defined until the child class, which is exactly what we
         // do in the compiled provider.
@@ -77,6 +78,17 @@ return [
         SlevomatCodingStandard\Sniffs\ControlStructures\AssignmentInConditionSniff::class,
         // This is a well-meaning but over-aggressive rule.
         SlevomatCodingStandard\Sniffs\Operators\RequireOnlyStandaloneIncrementAndDecrementOperatorsSniff::class,
+        // I don't even know why this exists.
+        SlevomatCodingStandard\Sniffs\Commenting\InlineDocCommentDeclarationSniff::class,
+        // Most of the time this is good, but OrderedCollection has to support mixed.
+        SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff::class,
+        // Now you're just being stupid.
+        NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits::class,
+        // In hindsight I agree with these, but it would be an API break to change. Consider doing that in the next major.
+        SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff::class,
+        SlevomatCodingStandard\Sniffs\Classes\SuperfluousInterfaceNamingSniff::class,
+        // Oh hells no.  Keep that anal retentive stupidity out of my code base.
+        NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses::class,
     ],
 
     'config' => [
@@ -87,9 +99,11 @@ return [
         \ObjectCalisthenics\Sniffs\Metrics\MaxNestingLevelSniff::class => [
             'maxNestingLevel' => 3,
         ],
-        //  ExampleInsight::class => [
-        //      'key' => 'value',
-        //  ],
+        \PHP_CodeSniffer\Standards\Generic\Sniffs\Files\LineLengthSniff::class => [
+            'lineLimit' => 80,
+            'absoluteLineLimit' => 120,
+            'ignoreComments' => false,
+        ],
     ],
 
     /*

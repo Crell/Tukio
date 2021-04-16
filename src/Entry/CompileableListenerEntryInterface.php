@@ -6,5 +6,5 @@ namespace Crell\Tukio\Entry;
 
 interface CompileableListenerEntryInterface
 {
-    public function getProperties() : array;
+    public function getProperties(): array;
 }
