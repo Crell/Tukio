@@ -18,7 +18,7 @@ class OrderedProviderBench extends ProviderBenchBase
      */
     protected $provider;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->provider = new OrderedListenerProvider();
 

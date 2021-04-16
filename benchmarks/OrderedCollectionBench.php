@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
@@ -13,7 +14,7 @@ use PhpBench\Benchmark\Metadata\Annotations\ParamProviders;
 class OrderedCollectionBench extends TukioBenchmarks
 {
 
-    public function provideItems() : iterable
+    public function provideItems(): iterable
     {
         foreach ([1, 20, 50, 100, 500] as $count) {
             yield array_fill(1, $count, 'a');

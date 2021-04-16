@@ -20,7 +20,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  */
 class TukioBenchmarks
 {
-    public function setUp() {}
+    public function setUp(): void {}
 
-    public function tearDown() {}
+    public function tearDown(): void {}
 }
