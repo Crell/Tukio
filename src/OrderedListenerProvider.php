@@ -130,13 +130,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addSubscriber(string $class, string $service): void
     {
-        $proxy = new ListenerProxy($this, $service, $class);
-
-        // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface $class */
-            $class::registerListeners($proxy);
-        }
+        $proxy = $this->addSubscribersByProxy($class, $service);
 
         try {
             $methods = (new \ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -151,53 +145,77 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
-                $methodName = $rMethod->getName();
-
-                // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once
-                // 8.0 is made a requirement.
-                $attributes = [];
-                if (class_exists('ReflectionAttribute', false)) {
-                    // Fugly because PHP < 7.4
-                    $attributes = array_map(static function(\ReflectionAttribute $attrib) {
-                        return $attrib->newInstance();
-                    }, $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
-
-                    // Once we require PHP 7.4, replace the above with these lines.
-                    //$attributes = array_map(fn(\ReflectionAttribute $attrib)
-                    //    => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
-                }
-
-                if (count($attributes)) {
-                    /** @var ListenerAttribute $attrib */
-                    foreach ($attributes as $attrib) {
-                        $params = $rMethod->getParameters();
-                        $paramType = $params[0]->getType();
-                        // This can simplify to ?-> once we require PHP 8.0.
-                        $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
-                        if (is_null($type)) {
-                            throw InvalidTypeException::fromClassCallable($class, $methodName);
-                        }
-                        if ($attrib instanceof ListenerBefore) {
-                            $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
-                        } elseif ($attrib instanceof ListenerAfter) {
-                            $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
-                        } elseif ($attrib instanceof ListenerPriority) {
-                            $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
-                        } else {
-                            $this->addListenerService($service, $methodName, $type, null, $attrib->id);
-                        }
-                    }
-                } elseif (strpos($methodName, 'on') === 0) {
-                    $params = $rMethod->getParameters();
-                    $type = $params[0]->getType();
-                    if (is_null($type)) {
-                        throw InvalidTypeException::fromClassCallable($class, $methodName);
-                    }
-                    $this->addListenerService($service, $rMethod->getName(), $type->getName());
-                }
+               $this->addSubscriberMethod($rMethod, $class, $service);
             }
         } catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
+        }
+    }
+
+    protected function addSubscribersByProxy(string $class, string $service): ListenerProxy
+    {
+        $proxy = new ListenerProxy($this, $service, $class);
+
+        // Explicit registration is opt-in.
+        if (in_array(SubscriberInterface::class, class_implements($class))) {
+            /** @var SubscriberInterface $class */
+            $class::registerListeners($proxy);
+        }
+        return $proxy;
+    }
+
+    protected function findAttributesOnMethod(\ReflectionMethod $rMethod): array
+    {
+        // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once
+        // 8.0 is made a requirement.
+        $attributes = [];
+        if (class_exists('ReflectionAttribute', false)) {
+            // Fugly because PHP < 7.4
+            $attributes = array_map(static function(\ReflectionAttribute $attrib) {
+                return $attrib->newInstance();
+            }, $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+
+            // Once we require PHP 7.4, replace the above with these lines.
+            //$attributes = array_map(fn(\ReflectionAttribute $attrib)
+            //    => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+        }
+
+        return $attributes;
+    }
+
+    protected function addSubscriberMethod(\ReflectionMethod $rMethod, string $class, string $service): void
+    {
+        $methodName = $rMethod->getName();
+
+        $attributes = $this->findAttributesOnMethod($rMethod);
+
+        if (count($attributes)) {
+            /** @var ListenerAttribute $attrib */
+            foreach ($attributes as $attrib) {
+                $params = $rMethod->getParameters();
+                $paramType = $params[0]->getType();
+                // This can simplify to ?-> once we require PHP 8.0.
+                $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
+                if (is_null($type)) {
+                    throw InvalidTypeException::fromClassCallable($class, $methodName);
+                }
+                if ($attrib instanceof ListenerBefore) {
+                    $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
+                } elseif ($attrib instanceof ListenerAfter) {
+                    $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
+                } elseif ($attrib instanceof ListenerPriority) {
+                    $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
+                } else {
+                    $this->addListenerService($service, $methodName, $type, null, $attrib->id);
+                }
+            }
+        } elseif (strpos($methodName, 'on') === 0) {
+            $params = $rMethod->getParameters();
+            $type = $params[0]->getType();
+            if (is_null($type)) {
+                throw InvalidTypeException::fromClassCallable($class, $methodName);
+            }
+            $this->addListenerService($service, $rMethod->getName(), $type->getName());
         }
     }
 
