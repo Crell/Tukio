@@ -34,16 +34,16 @@ class ListenerProxy
      *
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
-     * @param int $priority
+     * @param ?int $priority
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
-     * @param string|null $id
+     * @param ?string $id
      *   The ID of this listener, so it can be referenced by other listeners.
-     * @param string|null $type
+     * @param ?string $type
      *   The class or interface type of events for which this listener will be registered.
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(string $methodName, int $priority = 0, string $id = null, string $type = null): string
+    public function addListener(string $methodName, ?int $priority = 0, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
