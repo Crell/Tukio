@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -28,6 +29,9 @@ class DebugEventDispatcher implements EventDispatcherInterface
         $this->logger = $logger;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch(object $event)
     {
         $this->logger->debug('Processing event of type {type}.', ['type' => get_class($event), 'event' => $event]);

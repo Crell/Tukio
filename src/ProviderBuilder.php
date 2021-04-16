@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -11,7 +12,7 @@ use Crell\Tukio\OrderedCollection\OrderedCollection;
 
 class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 {
-    use ProviderUtilitiesTrait;
+    use ProviderUtilities;
 
     /** @var OrderedCollection */
     protected $listeners;
@@ -21,7 +22,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $this->listeners = new OrderedCollection();
     }
 
-    public function addListener(callable $listener, int $priority = null, string $id = null, string $type = null): string
+    public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -31,14 +32,11 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
                 $entry = $this->getListenerEntry($listener, $type);
                 if ($attrib instanceof ListenerBefore) {
                     $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
-                }
-                else if ($attrib instanceof ListenerAfter) {
+                } elseif ($attrib instanceof ListenerAfter) {
                     $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
-                }
-                else if ($attrib instanceof ListenerPriority) {
+                } elseif ($attrib instanceof ListenerPriority) {
                     $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
-                }
-                else {
+                } else {
                     $generatedId = $this->listeners->addItem($entry, $priority ?? 0, $id);
                 }
             }
@@ -52,7 +50,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItem($entry, $priority ?? 0, $id);
     }
 
-    public function addListenerBefore(string $before, callable $listener, string $id = null, string $type = null): string
+    public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -72,7 +70,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
-    public function addListenerAfter(string $after, callable $listener, string $id = null, string $type = null): string
+    public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
             /** @var ListenerAttribute $attrib */
@@ -93,7 +91,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItemAfter($after, $entry, $id);
     }
 
-    public function addListenerService(string $service, string $method, string $type, int $priority = null, string $id = null): string
+    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
         $priority = $priority ?? 0;
@@ -101,14 +99,14 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listeners->addItem($entry, $priority, $id);
     }
 
-    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, string $id = null): string
+    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
 
         return $this->listeners->addItemBefore($before, $entry, $id);
     }
 
-    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, string $id = null): string
+    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
 
@@ -123,7 +121,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 
         // Explicit registration is opt-in.
         if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface */
+            /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
 
@@ -149,7 +147,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         yield from $this->listeners;
     }
 
-    protected function getListenerEntry(callable $listener, string $type) : ListenerEntry
+    protected function getListenerEntry(callable $listener, string $type): ListenerEntry
     {
         // We can't serialize a closure.
         if ($listener instanceof \Closure) {

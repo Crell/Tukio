@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
@@ -20,7 +21,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  */
 class TukioBenchmarks
 {
-    public function setUp() {}
+    public function setUp(): void {}
 
-    public function tearDown() {}
+    public function tearDown(): void {}
 }

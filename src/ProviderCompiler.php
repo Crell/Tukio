@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -17,7 +18,7 @@ class ProviderCompiler
      * @param string $namespace
      *   the namespace for the compiled class.
      */
-    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled') : void
+    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled'): void
     {
         fwrite($stream, $this->createPreamble($class, $namespace));
 
@@ -30,30 +31,31 @@ class ProviderCompiler
         fwrite($stream, $this->createClosing());
     }
 
-    protected function createEntry(CompileableListenerEntryInterface $listenerEntry) : string
+    protected function createEntry(CompileableListenerEntryInterface $listenerEntry): string
     {
         return var_export($listenerEntry->getProperties(), true) . ',' . PHP_EOL;
     }
 
-    protected function createPreamble(string $class, string $namespace) : string
+    protected function createPreamble(string $class, string $namespace): string
     {
         return <<<END
 <?php
+
 declare(strict_types=1);
 
-namespace $namespace;
+namespace {$namespace};
 
 use Crell\Tukio\CompiledListenerProviderBase;
 use Psr\EventDispatcher\EventInterface;
 
-class $class extends CompiledListenerProviderBase
+class {$class} extends CompiledListenerProviderBase
 {
   protected const LISTENERS = [
 
 END;
     }
 
-    protected function createClosing() : string
+    protected function createClosing(): string
     {
         return <<<'END'
     ];

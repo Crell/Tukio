@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -17,12 +18,15 @@ class Dispatcher implements EventDispatcherInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    public function __construct(ListenerProviderInterface $provider, LoggerInterface $logger = null)
+    public function __construct(ListenerProviderInterface $provider, ?LoggerInterface $logger = null)
     {
         $this->provider = $provider;
         $this->logger = $logger ?? new NullLogger();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch(object $event)
     {
         // If the event is already stopped, this method becomes a no-op.

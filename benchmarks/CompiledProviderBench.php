@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
@@ -24,13 +25,16 @@ class CompiledProviderBench extends ProviderBenchBase
      */
     protected $provider;
 
-    static protected $filename = 'compiled_provider.php';
+    /** @var string */
+    protected static $filename = 'compiled_provider.php';
 
-    static protected $className = 'CompiledProvider';
+    /** @var string */
+    protected static $className = 'CompiledProvider';
 
-    static protected $namespace = 'Test\\Space';
+    /** @var string */
+    protected static $namespace = 'Test\\Space';
 
-    public static function createCompiledProvider() : void
+    public static function createCompiledProvider(): void
     {
         $builder = new ProviderBuilder();
         $compiler = new ProviderCompiler();
@@ -49,24 +53,23 @@ class CompiledProviderBench extends ProviderBenchBase
         fclose($out);
     }
 
-    public static function removeCompiledProvider() : void
+    public static function removeCompiledProvider(): void
     {
         unlink(static::$filename);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
-        include(static::$filename);
+        include static::$filename;
 
         $container = new MockContainer();
 
-        /** @var ListenerProviderInterface $provider */
         $compiledClassName = static::$namespace . '\\' . static::$className;
         $this->provider = new $compiledClassName($container);
     }
 
-    public static function fakeListener(CollectingEvent $task) : void
+    public static function fakeListener(CollectingEvent $task): void
     {
     }
 }

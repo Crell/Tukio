@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -30,10 +31,11 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     {
         $count = count(static::LISTENERS);
         $ret = [];
-        for ($i= 0; $i < $count; ++$i) {
+        for ($i = 0; $i < $count; ++$i) {
             /** @var array $listener */
             $listener = static::LISTENERS[$i];
             if ($event instanceof $listener['type']) {
+                // Turn this into a match() in PHP 8.
                 switch ($listener['entryType']) {
                     case ListenerFunctionEntry::class:
                         $ret[] = $listener['listener'];
@@ -42,7 +44,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
                         $ret[] = [$listener['class'], $listener['method']];
                         break;
                     case ListenerServiceEntry::class:
-                        $ret[] = function (object $event) use ($listener) {
+                        $ret[] = function (object $event) use ($listener): void {
                             $this->container->get($listener['serviceName'])->{$listener['method']}($event);
                         };
                         break;

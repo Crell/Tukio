@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio;
@@ -18,7 +19,10 @@ class ListenerProxy
     /** @var string */
     protected $serviceClass;
 
-    /** @var array */
+    /**
+     * @var array<string>
+     *     Methods that have already been registered on this subscriber, so we know not to double-subscribe them.
+     */
     protected $registeredMethods = [];
 
     public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
@@ -33,16 +37,17 @@ class ListenerProxy
      *
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
-     * @param int $priority
+     * @param ?int $priority
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
-     * @param string|null $id
+     * @param ?string $id
      *   The ID of this listener, so it can be referenced by other listeners.
-     * @param string|null $type
+     * @param ?string $type
      *   The class or interface type of events for which this listener will be registered.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListener(string $methodName, int $priority = 0, string $id = null, string $type = null): string
+    public function addListener(string $methodName, ?int $priority = 0, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
@@ -59,14 +64,15 @@ class ListenerProxy
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
-     * @param string|null $id
+     * @param ?string $id
      *   The ID of this listener, so it can be referenced by other listeners.
-     * @param string $type
+     * @param ?string $type
      *   The class or interface type of events for which this listener will be registered.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, string $methodName, string $id = null, string $type = null): string
+    public function addListenerBefore(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
@@ -83,21 +89,22 @@ class ListenerProxy
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
-     * @param string|null $id
+     * @param ?string $id
      *   The ID of this listener, so it can be referenced by other listeners.
-     * @param string $type
+     * @param ?string $type
      *   The class or interface type of events for which this listener will be registered.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, string $methodName, string $id = null, string $type = null) : string
+    public function addListenerAfter(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
-    public function getRegisteredMethods() : array
+    public function getRegisteredMethods(): array
     {
         return $this->registeredMethods;
     }
@@ -107,12 +114,14 @@ class ListenerProxy
      *
      * @param string $methodName
      *   The method name of the listener being registered.
+     *
      * @return string
      *   The type required by the listener.
+     *
      * @throws InvalidTypeException
      *   If the method has invalid type-hinting, throws an error with a service/method trace.
      */
-    protected function getServiceMethodType(string $methodName) : string
+    protected function getServiceMethodType(string $methodName): string
     {
         try {
             $type = $this->getParameterType([$this->serviceClass, $methodName]);

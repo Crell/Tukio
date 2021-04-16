@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Entry;
@@ -26,6 +27,9 @@ class ListenerStaticMethodEntry extends ListenerEntry implements CompileableList
         $this->type = $type;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getProperties(): array
     {
         return [

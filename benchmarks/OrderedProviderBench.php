@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
@@ -18,7 +19,7 @@ class OrderedProviderBench extends ProviderBenchBase
      */
     protected $provider;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->provider = new OrderedListenerProvider();
 
@@ -26,7 +27,7 @@ class OrderedProviderBench extends ProviderBenchBase
         $priority->next();
 
         foreach(range(1, static::$numListeners) as $counter) {
-            $this->provider->addListener(function(CollectingEvent $task) {}, $priority->current());
+            $this->provider->addListener(static function(CollectingEvent $task): void {}, $priority->current());
             $priority->next();
         }
     }

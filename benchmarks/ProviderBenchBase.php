@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
@@ -25,13 +26,13 @@ abstract class ProviderBenchBase extends TukioBenchmarks
     protected static $numListeners = 5000;
 
     /**
-     * @var array
+     * @var array<int>
      *
      * Deliberately in an unsorted order to force it to need to be sorted.
      */
     protected static $listenerPriorities = [1, 2, -2, 3, 0, -1, -3];
 
-    public function setUp()
+    public function setUp(): void
     {
         throw new \Exception('You need to implement setUp().');
     }
@@ -39,13 +40,13 @@ abstract class ProviderBenchBase extends TukioBenchmarks
     /**
      * ParamProviders({"provideItems"})
      */
-    public function bench_match_provider() : void
+    public function bench_match_provider(): void
     {
         $task = new CollectingEvent();
 
         $listeners = $this->provider->getListenersForEvent($task);
 
         // Run out the generator.
-        foreach ($listeners as $listener);
+        iterator_to_array($listeners);
     }
 }

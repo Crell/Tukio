@@ -1,9 +1,24 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Crell\Tukio\Entry;
 
 interface CompileableListenerEntryInterface
 {
-    public function getProperties() : array;
+    /**
+     * Extracts relevant information for the listener.
+     *
+     * @internal
+     *
+     * @return array{
+     *  entryType: string,
+     *  type: string,
+     *  listener: ?callable,
+     *  class: ?string,
+     *  serviceName: ?string,
+     *  method: ?string,
+     * }
+     */
+    public function getProperties(): array;
 }
