@@ -27,6 +27,9 @@ class ListenerStaticMethodEntry extends ListenerEntry implements CompileableList
         $this->type = $type;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getProperties(): array
     {
         return [

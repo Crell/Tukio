@@ -29,6 +29,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $this->container = $container;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getListenersForEvent(object $event): iterable
     {
         /** @var ListenerEntry $listener */
@@ -48,14 +51,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
                 if ($attrib instanceof ListenerBefore) {
                     $generatedId = $this->listeners->addItemBefore($attrib->before, new ListenerEntry($listener, $type), $id);
-                }
-                elseif ($attrib instanceof ListenerAfter) {
+                } elseif ($attrib instanceof ListenerAfter) {
                     $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
-                }
-                elseif ($attrib instanceof ListenerPriority) {
+                } elseif ($attrib instanceof ListenerPriority) {
                     $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
-                }
-                else {
+                } else {
                     $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
                 }
             }
@@ -128,36 +128,6 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->addListenerAfter($after, $this->makeListenerForService($service, $method), $id, $type);
     }
 
-    /**
-     * Creates a callable that will proxy to the provided service and method.
-     *
-     * @param string $serviceName
-     *   The name of a service.
-     * @param string $methodName
-     *   A method on the service.
-     * @return callable
-     *   A callable that proxies to the the provided method and service.
-     */
-    protected function makeListenerForService(string $serviceName, string $methodName): callable
-    {
-        if (!$this->container) {
-            throw new ContainerMissingException();
-        }
-
-        // We cannot verify the service name as existing at this time, as the container may be populated in any
-        // order.  Thus the referenced service may not be registered now but could be registered by the time the
-        // listener is called.
-
-        // Fun fact: We cannot auto-detect the listener target type from a container without instantiating it, which
-        // defeats the purpose of a service registration. Therefore this method requires an explicit event type. Also,
-        // the wrapping listener must listen to just object.  The explicit $type means it will still get only
-        // the right event type, and the real listener can still type itself properly.
-        $container = $this->container;
-        return static function (object $event) use ($serviceName, $methodName, $container): void {
-            $container->get($serviceName)->$methodName($event);
-        };
-    }
-
     public function addSubscriber(string $class, string $service): void
     {
         $proxy = new ListenerProxy($this, $service, $class);
@@ -169,12 +139,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
 
         try {
-            $rClass = new \ReflectionClass($class);
-            $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+            $methods = (new \ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
 
             // Explicitly registered methods ignore all auto-registration mechanisms.
-            $methods = array_filter($methods, static function(\ReflectionMethod $r) use ($proxy) {
-                return !in_array($r->getName(), $proxy->getRegisteredMethods());
+            $methods = array_filter($methods, static function(\ReflectionMethod $refm) use ($proxy) {
+                return !in_array($refm->getName(), $proxy->getRegisteredMethods());
             });
 
             // Once we require PHP 7.4, replace the above with this line.
@@ -210,19 +179,15 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                         }
                         if ($attrib instanceof ListenerBefore) {
                             $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
-                        }
-                        elseif ($attrib instanceof ListenerAfter) {
+                        } elseif ($attrib instanceof ListenerAfter) {
                             $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
-                        }
-                        elseif ($attrib instanceof ListenerPriority) {
+                        } elseif ($attrib instanceof ListenerPriority) {
                             $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
-                        }
-                        else {
+                        } else {
                             $this->addListenerService($service, $methodName, $type, null, $attrib->id);
                         }
                     }
-                }
-                elseif (strpos($methodName, 'on') === 0) {
+                } elseif (strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
                     $type = $params[0]->getType();
                     if (is_null($type)) {
@@ -234,5 +199,35 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         } catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
         }
+    }
+
+    /**
+     * Creates a callable that will proxy to the provided service and method.
+     *
+     * @param string $serviceName
+     *   The name of a service.
+     * @param string $methodName
+     *   A method on the service.
+     * @return callable
+     *   A callable that proxies to the the provided method and service.
+     */
+    protected function makeListenerForService(string $serviceName, string $methodName): callable
+    {
+        if (!$this->container) {
+            throw new ContainerMissingException();
+        }
+
+        // We cannot verify the service name as existing at this time, as the container may be populated in any
+        // order.  Thus the referenced service may not be registered now but could be registered by the time the
+        // listener is called.
+
+        // Fun fact: We cannot auto-detect the listener target type from a container without instantiating it, which
+        // defeats the purpose of a service registration. Therefore this method requires an explicit event type. Also,
+        // the wrapping listener must listen to just object.  The explicit $type means it will still get only
+        // the right event type, and the real listener can still type itself properly.
+        $container = $this->container;
+        return static function (object $event) use ($serviceName, $methodName, $container): void {
+            $container->get($serviceName)->$methodName($event);
+        };
     }
 }

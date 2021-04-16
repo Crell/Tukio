@@ -8,9 +8,12 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 
 class CallbackProvider implements ListenerProviderInterface
 {
-    /** @var array<string, array> */
+    /** @var array<string, array<string>> */
     protected $callbacks = [];
 
+    /**
+     * {@inheritdoc}
+     */
     public function getListenersForEvent(object $event): iterable
     {
         if (!$event instanceof CallbackEventInterface) {

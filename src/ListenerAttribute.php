@@ -6,5 +6,4 @@ namespace Crell\Tukio;
 
 interface ListenerAttribute
 {
-
 }

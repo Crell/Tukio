@@ -62,6 +62,9 @@ return [
     ],
 
     'remove' => [
+        // In hindsight I agree with these, but it would be an API break to change. Consider doing that in the next major.
+        SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff::class,
+        SlevomatCodingStandard\Sniffs\Classes\SuperfluousInterfaceNamingSniff::class,
         // Public properties on internal classes are fine.
         ObjectCalisthenics\Sniffs\Classes\ForbiddenPublicPropertySniff::class,
         // It's not unusual for an implementing class to not need every optional parameter.
@@ -84,11 +87,12 @@ return [
         SlevomatCodingStandard\Sniffs\TypeHints\DisallowMixedTypeHintSniff::class,
         // Now you're just being stupid.
         NunoMaduro\PhpInsights\Domain\Insights\ForbiddenTraits::class,
-        // In hindsight I agree with these, but it would be an API break to change. Consider doing that in the next major.
-        SlevomatCodingStandard\Sniffs\Classes\SuperfluousExceptionNamingSniff::class,
-        SlevomatCodingStandard\Sniffs\Classes\SuperfluousInterfaceNamingSniff::class,
         // Oh hells no.  Keep that anal retentive stupidity out of my code base.
         NunoMaduro\PhpInsights\Domain\Insights\ForbiddenNormalClasses::class,
+        // I just don't agree with this one.
+        PhpCsFixer\Fixer\CastNotation\CastSpacesFixer::class,
+        // Or this one.
+        PHP_CodeSniffer\Standards\Generic\Sniffs\Formatting\SpaceAfterNotSniff::class,
     ],
 
     'config' => [

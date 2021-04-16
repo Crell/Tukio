@@ -14,9 +14,8 @@ namespace Crell\Tukio\OrderedCollection;
  */
 class OrderedCollection implements \IteratorAggregate
 {
-
     /**
-     * @var array<int, array>
+     * @var array<int, array<OrderedItem>>
      *
      * An indexed array of arrays of Item entries. The key is the priority, the value is an array of Items.
      */

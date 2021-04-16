@@ -19,7 +19,7 @@ class InvalidTypeException extends \RuntimeException
         $message = static::$baseMessage;
         try {
             $reflector = new ReflectionClass($class);
-            $message .= " (" . $reflector->getName() . "::{$method})";
+            $message .= sprintf(' (%s::%s)', $reflector->getName(), $method);
         } catch (ReflectionException $e) {
             $message .= " ((unknown class)::{$method})";
         }
@@ -32,7 +32,7 @@ class InvalidTypeException extends \RuntimeException
         if (is_string($function) || $function instanceof \Closure) {
             try {
                 $reflector = new ReflectionFunction($function);
-                $message .= sprintf(" (%s:%s)", $reflector->getFileName(), $reflector->getStartLine());
+                $message .= sprintf(' (%s:%s)', $reflector->getFileName(), $reflector->getStartLine());
             } catch (ReflectionException $e) {
                 // No meaningful data to add
             }

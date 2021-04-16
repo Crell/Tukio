@@ -32,14 +32,11 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
                 $entry = $this->getListenerEntry($listener, $type);
                 if ($attrib instanceof ListenerBefore) {
                     $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
-                }
-                elseif ($attrib instanceof ListenerAfter) {
+                } elseif ($attrib instanceof ListenerAfter) {
                     $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
-                }
-                elseif ($attrib instanceof ListenerPriority) {
+                } elseif ($attrib instanceof ListenerPriority) {
                     $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
-                }
-                else {
+                } else {
                     $generatedId = $this->listeners->addItem($entry, $priority ?? 0, $id);
                 }
             }

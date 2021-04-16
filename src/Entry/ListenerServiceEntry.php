@@ -27,6 +27,9 @@ class ListenerServiceEntry implements CompileableListenerEntryInterface
         $this->type = $type;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getProperties(): array
     {
         return [

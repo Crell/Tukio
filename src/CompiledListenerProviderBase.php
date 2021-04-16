@@ -31,10 +31,11 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     {
         $count = count(static::LISTENERS);
         $ret = [];
-        for ($i= 0; $i < $count; ++$i) {
+        for ($i = 0; $i < $count; ++$i) {
             /** @var array $listener */
             $listener = static::LISTENERS[$i];
             if ($event instanceof $listener['type']) {
+                // Turn this into a match() in PHP 8.
                 switch ($listener['entryType']) {
                     case ListenerFunctionEntry::class:
                         $ret[] = $listener['listener'];

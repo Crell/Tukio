@@ -24,12 +24,10 @@ trait ProviderUtilities
 
         if ($this->isFunctionCallable($listener)) {
             $ref = new \ReflectionFunction($listener);
-        }
-        elseif ($this->isClassCallable($listener)) {
+        } elseif ($this->isClassCallable($listener)) {
             [$class, $method] = $listener;
             $ref = (new \ReflectionClass($class))->getMethod($method);
-        }
-        elseif ($this->isObjectCallable($listener)) {
+        } elseif ($this->isObjectCallable($listener)) {
             [$class, $method] = $listener;
             $ref = (new \ReflectionObject($class))->getMethod($method);
         }
@@ -57,6 +55,7 @@ trait ProviderUtilities
      *   The callable from which to extract a type.
      *
      * @return string
+     *   The type of the first argument.
      */
     protected function getType(callable $listener): string
     {
@@ -109,8 +108,6 @@ trait ProviderUtilities
      *
      * Or at least a reasonable approximation, since a function name may not be defined yet.
      *
-     * @param callable $callable
-     *
      * @return True if the callable represents a function, false otherwise.
      */
     protected function isFunctionCallable(callable $callable): bool
@@ -122,8 +119,6 @@ trait ProviderUtilities
     /**
      * Determines if a callable represents a method on an object.
      *
-     * @param callable $callable
-     *
      * @return True if the callable represents a method object, false otherwise.
      */
     protected function isObjectCallable(callable $callable): bool
@@ -133,8 +128,6 @@ trait ProviderUtilities
 
     /**
      * Determines if a callable represents a closure/anonymous function.
-     *
-     * @param callable $callable
      *
      * @return True if the callable represents a closure object, false otherwise.
      */

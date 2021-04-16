@@ -6,5 +6,4 @@ namespace Crell\Tukio\OrderedCollection;
 
 class MissingItemException extends \RuntimeException
 {
-
 }

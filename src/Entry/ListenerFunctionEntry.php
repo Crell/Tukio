@@ -11,6 +11,9 @@ namespace Crell\Tukio\Entry;
  */
 class ListenerFunctionEntry extends ListenerEntry implements CompileableListenerEntryInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getProperties(): array
     {
         return [

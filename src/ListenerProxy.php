@@ -104,7 +104,7 @@ class ListenerProxy
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
-    public function getRegisteredMethods() : array
+    public function getRegisteredMethods(): array
     {
         return $this->registeredMethods;
     }

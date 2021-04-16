@@ -29,6 +29,9 @@ class OrderedItem
     /** @var string */
     public $after;
 
+    /**
+     * @param mixed $item
+     */
     public function __construct($item = null, int $priority = 0, string $id = '')
     {
         $this->item = $item;
@@ -36,6 +39,9 @@ class OrderedItem
         $this->id = $id;
     }
 
+    /**
+     * @param mixed $item
+     */
     public static function createWithPriority($item, int $priority, string $id): self
     {
         $new = new static();
@@ -46,6 +52,9 @@ class OrderedItem
         return $new;
     }
 
+    /**
+     * @param mixed $item
+     */
     public static function createBefore($item, string $pivotId, string $id): self
     {
         $new = new static();
@@ -56,6 +65,9 @@ class OrderedItem
         return $new;
     }
 
+    /**
+     * @param mixed $item
+     */
     public static function createAfter($item, string $pivotId, string $id): self
     {
         $new = new static();

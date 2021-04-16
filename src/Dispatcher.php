@@ -24,6 +24,9 @@ class Dispatcher implements EventDispatcherInterface
         $this->logger = $logger ?? new NullLogger();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dispatch(object $event)
     {
         // If the event is already stopped, this method becomes a no-op.
