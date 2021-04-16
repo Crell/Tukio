@@ -26,11 +26,11 @@ trait ProviderUtilities
             $ref = new \ReflectionFunction($listener);
         }
         elseif ($this->isClassCallable($listener)) {
-            list($class, $method) = $listener;
+            [$class, $method] = $listener;
             $ref = (new \ReflectionClass($class))->getMethod($method);
         }
         elseif ($this->isObjectCallable($listener)) {
-            list($class, $method) = $listener;
+            [$class, $method] = $listener;
             $ref = (new \ReflectionObject($class))->getMethod($method);
         }
 
