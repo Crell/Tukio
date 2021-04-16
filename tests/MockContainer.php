@@ -24,7 +24,7 @@ class MockContainer implements ContainerInterface
         throw new class extends \Exception implements NotFoundExceptionInterface {};
     }
 
-    public function has($id)
+    public function has($id): bool
     {
         return isset($this->services[$id]);
     }
