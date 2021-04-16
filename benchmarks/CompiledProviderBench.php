@@ -62,7 +62,6 @@ class CompiledProviderBench extends ProviderBenchBase
 
         $container = new MockContainer();
 
-        /** @var ListenerProviderInterface $provider */
         $compiledClassName = static::$namespace . '\\' . static::$className;
         $this->provider = new $compiledClassName($container);
     }

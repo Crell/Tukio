@@ -23,7 +23,7 @@ class OrderedCollection implements \IteratorAggregate
     protected $items = [];
 
     /**
-     * @var OrderedItem[]
+     * @var array<OrderedItem>
      *
      * A list of the items in the collection indexed by ID. Order is undefined.
      */
@@ -40,7 +40,7 @@ class OrderedCollection implements \IteratorAggregate
     /**
      * Adds an item to the collection with a given priority.  (Higher numbers come first.)
      *
-     * @param $item
+     * @param mixed $item
      *   The item to add. May be any data type.
      * @param int $priority
      *   The priority order of the item. Higher numbers will come first.
@@ -71,7 +71,7 @@ class OrderedCollection implements \IteratorAggregate
      *
      * @param string $pivotId
      *   The existing ID of an item in the collection.
-     * @param $item
+     * @param mixed $item
      *   The new item to add.
      * @param string $id
      *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
@@ -107,7 +107,7 @@ class OrderedCollection implements \IteratorAggregate
      *
      * @param string $pivotId
      *   The existing ID of an item in the collection.
-     * @param $item
+     * @param mixed $item
      *   The new item to add.
      * @param string $id
      *   An opaque string ID by which this item should be known. If it already exists a counter suffix will be added.
@@ -153,7 +153,7 @@ class OrderedCollection implements \IteratorAggregate
 
         return (function () {
             foreach ($this->items as $itemList) {
-                yield from array_map(function (OrderedItem $item) {
+                yield from array_map(static function (OrderedItem $item) {
                     return $item->item;
                 }, $itemList);
             }

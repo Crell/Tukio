@@ -49,6 +49,7 @@ trait ProviderUtilitiesTrait
      * If unable, throws an exception with information about the listener whose type could not be fetched.
      *
      * @param callable $listener
+     *   The callable from which to extract a type.
      * @return string
      */
     protected function getType(callable $listener)
@@ -81,9 +82,9 @@ trait ProviderUtilitiesTrait
      */
     protected function getListenerId(callable $listener) : ?string
     {
-        if (is_string($listener)) {
+        if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
-            return $listener;
+            return (string)$listener;
         }
         if ($this->isClassCallable($listener)) {
             return $listener[0] . '::' . $listener[1];
@@ -94,5 +95,41 @@ trait ProviderUtilitiesTrait
 
         // Anything else we can't derive an ID for logically.
         return null;
+    }
+
+    /**
+     * Determines if a callable represents a function.
+     *
+     * Or at least a reasonable approximation, since a function name may not be defined yet.
+     *
+     * @param callable $callable
+     * @return True if the callable represents a function, false otherwise.
+     */
+    protected function isFunctionCallable(callable $callable) : bool
+    {
+        // We can't check for function_exists() because it may be included later by the time it matters.
+        return is_string($callable);
+    }
+
+    /**
+     * Determines if a callable represents a method on an object.
+     *
+     * @param callable $callable
+     * @return True if the callable represents a method object, false otherwise.
+     */
+    protected function isObjectCallable(callable $callable) : bool
+    {
+        return is_array($callable) && is_object($callable[0]);
+    }
+
+    /**
+     * Determines if a callable represents a closure/anonymous function.
+     *
+     * @param callable $callable
+     * @return True if the callable represents a closure object, false otherwise.
+     */
+    protected function isClosureCallable(callable $callable) : bool
+    {
+        return $callable instanceof \Closure;
     }
 }

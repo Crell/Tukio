@@ -27,7 +27,7 @@ class OrderedProviderBench extends ProviderBenchBase
         $priority->next();
 
         foreach(range(1, static::$numListeners) as $counter) {
-            $this->provider->addListener(function(CollectingEvent $task) {}, $priority->current());
+            $this->provider->addListener(static function(CollectingEvent $task): void {}, $priority->current());
             $priority->next();
         }
     }
