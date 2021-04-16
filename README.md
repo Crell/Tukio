@@ -2,8 +2,6 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
 
@@ -460,9 +458,6 @@ The Lesser GPL version 3 or later. Please see [License File](LICENSE.md) for mor
 
 [ico-version]: https://img.shields.io/packagist/v/Crell/Tukio.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/License-LGPLv3-green.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/Crell/Tukio/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/Crell/Tukio.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/Crell/Tukio.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/Crell/Tukio.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/Crell/Tukio
