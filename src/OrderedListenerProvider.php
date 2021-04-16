@@ -6,7 +6,6 @@ namespace Crell\Tukio;
 use Crell\Tukio\Entry\ListenerEntry;
 use Crell\Tukio\OrderedCollection\OrderedCollection;
 use Psr\Container\ContainerInterface;
-use Psr\EventDispatcher\EventInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 class OrderedListenerProvider implements ListenerProviderInterface, OrderedProviderInterface
@@ -174,7 +173,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
 
             // Explicitly registered methods ignore all auto-registration mechanisms.
-            $methods = array_filter($methods, function(\ReflectionMethod $r) use ($proxy) {
+            $methods = array_filter($methods, static function(\ReflectionMethod $r) use ($proxy) {
                 return !in_array($r->getName(), $proxy->getRegisteredMethods());
             });
 
@@ -190,9 +189,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                 $attributes = [];
                 if (class_exists('ReflectionAttribute', false)) {
                     // Fugly because PHP < 7.4
-                    $attributes = array_map(function(\ReflectionAttribute $attrib) {
+                    $attributes = array_map(static function(\ReflectionAttribute $attrib) {
                         return $attrib->newInstance();
-                    } , $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+                    }, $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
 
                     // Once we require PHP 7.4, replace the above with these lines.
                     //$attributes = array_map(fn(\ReflectionAttribute $attrib)

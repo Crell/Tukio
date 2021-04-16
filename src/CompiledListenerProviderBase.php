@@ -42,7 +42,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
                         $ret[] = [$listener['class'], $listener['method']];
                         break;
                     case ListenerServiceEntry::class:
-                        $ret[] = function (object $event) use ($listener) {
+                        $ret[] = function (object $event) use ($listener): void {
                             $this->container->get($listener['serviceName'])->{$listener['method']}($event);
                         };
                         break;

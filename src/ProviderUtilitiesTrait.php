@@ -34,12 +34,11 @@ trait ProviderUtilitiesTrait
 
         $attribs = $ref->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
 
-        return array_map(function(\ReflectionAttribute $attrib) { return $attrib->newInstance(); }, $attribs);
+        return array_map(static function(\ReflectionAttribute $attrib) { return $attrib->newInstance(); }, $attribs);
 
         // Replace the above with this line once we require PHP 7.4.
         //return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }
-
 
     /**
      * Tries to get the type of a callable listener.
@@ -68,9 +67,9 @@ trait ProviderUtilitiesTrait
     /**
      * Derives a predictable ID from the listener if possible.
      *
-     * It's OK for this method to return null, as OrderedCollection will generate a random
-     * ID if necessary.  It will also handle duplicates for us.  This method is just a
-     * suggestion.
+     * It's OK for this method to return null, as OrderedCollection will
+     * generate a random ID if necessary.  It will also handle duplicates
+     * for us.  This method is just a suggestion.
      *
      * @param callable $listener
      *   The listener for which to derive an ID.
@@ -79,14 +78,14 @@ trait ProviderUtilitiesTrait
      */
     protected function getListenerId(callable $listener) : ?string
     {
-        if ($this->isFunctionCallable($listener)) {
+        if (is_string($listener)) {
             // Function callables are strings, so use that directly.
-            return (string)$listener;
+            return $listener;
         }
         if ($this->isClassCallable($listener)) {
             return $listener[0] . '::' . $listener[1];
         }
-        if ($this->isObjectCallable($listener)) {
+        if (is_array($listener) && is_object($listener[0])) {
             return get_class($listener[0]) . '::' . $listener[1];
         }
 

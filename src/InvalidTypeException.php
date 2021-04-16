@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use \ReflectionClass;
-use \ReflectionFunction;
-use \ReflectionException;
-use \Throwable;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionFunction;
+use Throwable;
 
 class InvalidTypeException extends \RuntimeException
 {
@@ -23,7 +23,7 @@ class InvalidTypeException extends \RuntimeException
         }
         return new static($message, 0, $previous);
     }
-    
+
     public static function fromFunctionCallable(callable $function, ?Throwable $previous = null)
     {
         $message = static::$baseMessage;

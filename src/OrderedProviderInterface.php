@@ -20,6 +20,7 @@ interface OrderedProviderInterface
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
@@ -43,6 +44,7 @@ interface OrderedProviderInterface
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
@@ -66,6 +68,7 @@ interface OrderedProviderInterface
      * @param string|null $type
      *   The class or interface type of events for which this listener will be registered. If not provided
      *   it will be derived based on the type hint of the listener.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
@@ -86,6 +89,7 @@ interface OrderedProviderInterface
      *   The numeric priority of the listener. Higher numbers will trigger before lower numbers.
      * @param string $id
      *   The identifier by which this listener should be known. If not specified one will be generated.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
@@ -109,6 +113,7 @@ interface OrderedProviderInterface
      *   The class or interface type of events for which this listener will be registered.
      * @param string $id
      *   The identifier by which this listener should be known. If not specified one will be generated.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
@@ -132,6 +137,7 @@ interface OrderedProviderInterface
      *   The class or interface type of events for which this listener will be registered.
      * @param string $id
      *   The identifier by which this listener should be known. If not specified one will be generated.
+     *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
