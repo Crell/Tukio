@@ -23,7 +23,7 @@ class DispatcherTest extends TestCase
         $this->logger = new class extends AbstractLogger {
             public $messages = [];
 
-            public function log($level, $message, array $context = [])
+            public function log($level, $message, array $context = []): void
             {
                 $this->messages[$level][] = [
                     'message' => $message,
