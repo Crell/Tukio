@@ -26,7 +26,7 @@
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
-        "bamarni/composer-bin-plugin": "^1.4",
+        "phpbench/phpbench": "^1.2",
         "phpunit/phpunit": "^9.5"
     },
     "provide": {
@@ -46,10 +46,7 @@
     "scripts": {
         "test": "phpunit",
         "check-style": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
-        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests",
-        "bin": "echo 'bin not installed'",
-        "post-install-cmd": ["@composer bin all install --ansi"],
-        "post-update-cmd": ["@composer bin all update --ansi"]
+        "fix-style": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 src tests"
     },
     "extra": {
         "branch-alias": {
@@ -57,9 +54,6 @@
         }
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "bamarni/composer-bin-plugin": true
-        }
+        "sort-packages": true
     }
 }
