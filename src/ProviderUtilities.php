@@ -22,6 +22,7 @@ trait ProviderUtilities
             return [];
         }
 
+        $ref = null;
         if ($this->isFunctionCallable($listener)) {
             $ref = new \ReflectionFunction($listener);
         } elseif ($this->isClassCallable($listener)) {
@@ -32,7 +33,7 @@ trait ProviderUtilities
             $ref = (new \ReflectionObject($class))->getMethod($method);
         }
 
-        if (!isset($ref)) {
+        if (!$ref) {
             return [];
         }
 

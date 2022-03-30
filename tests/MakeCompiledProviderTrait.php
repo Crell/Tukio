@@ -46,7 +46,12 @@ trait MakeCompiledProviderTrait
             $provider = new $compiledClassName($container);
         }
         finally {
-            unlink($filename);
+            // This check is not actually needed as no exception could be
+            // thrown before $filename gets defined, but PHPStan doesn't
+            // understand that.
+            if (isset($filename)) {
+                unlink($filename);
+            }
         }
 
         return $provider;

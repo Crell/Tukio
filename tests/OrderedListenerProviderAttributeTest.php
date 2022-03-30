@@ -7,6 +7,7 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerPriority(0, 'a')]
+// @phpstan-ignore-next-line
 #[JunkAttribute]
 function at_listener_one(CollectingEvent $event): void
 {

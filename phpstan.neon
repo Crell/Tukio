@@ -1,5 +1,11 @@
 parameters:
-	level: 1
-	paths:
-		- src
-		- tests
+    level: 1
+    paths:
+        - src
+        - tests
+    excludePaths:
+        # Attribute classes use PHP 8 syntax that's invalid on 7.4, but we don't care.
+        - src/Listener.php
+        - src/ListenerBefore.php
+        - src/ListenerAfter.php
+        - src/ListenerPriority.php

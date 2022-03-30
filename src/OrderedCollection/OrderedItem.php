@@ -32,7 +32,7 @@ class OrderedItem
     /**
      * @param mixed $item
      */
-    public function __construct($item = null, int $priority = 0, string $id = '')
+    final public function __construct($item = null, int $priority = 0, string $id = '')
     {
         $this->item = $item;
         $this->priority = $priority;

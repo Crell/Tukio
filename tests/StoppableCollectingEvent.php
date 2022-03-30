@@ -8,7 +8,7 @@ use Psr\EventDispatcher\StoppableEventInterface;
 
 class StoppableCollectingEvent extends CollectingEvent implements StoppableEventInterface
 {
-    protected $stopPropagation = false;
+    protected bool $stopPropagation = false;
 
     public function isPropagationStopped() : bool
     {

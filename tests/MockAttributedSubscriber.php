@@ -43,6 +43,7 @@ class MockAttributedSubscriber
     }
 
     #[Listener]
+    // @phpstan-ignore-next-line
     public function onG(NoEvent $event) : void
     {
         $event->add('G');

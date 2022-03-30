@@ -23,7 +23,7 @@ class InvalidTypeException extends \RuntimeException
         } catch (ReflectionException $e) {
             $message .= " ((unknown class)::{$method})";
         }
-        return new static($message, 0, $previous);
+        return new self($message, 0, $previous);
     }
 
     public static function fromFunctionCallable(callable $function, ?Throwable $previous = null)
@@ -37,6 +37,6 @@ class InvalidTypeException extends \RuntimeException
                 // No meaningful data to add
             }
         }
-        return new static($message, 0, $previous);
+        return new self($message, 0, $previous);
     }
 }

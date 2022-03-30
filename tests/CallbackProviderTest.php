@@ -40,6 +40,7 @@ class FakeEntity
         $event->add('B');
     }
 
+    // @phpstan-ignore-next-line
     public function stuff(StuffEvent $event) : void
     {
         $event->add('C');
