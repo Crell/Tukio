@@ -11,14 +11,11 @@ namespace Crell\Tukio\Entry;
  */
 class ListenerStaticMethodEntry extends ListenerEntry implements CompileableListenerEntryInterface
 {
-    /** @var string */
-    public $class;
+    public string $class;
 
-    /** @var string */
-    public $method;
+    public string $method;
 
-    /** @var string */
-    public $type;
+    public string $type;
 
     public function __construct(string $class, string $method, string $type)
     {
@@ -28,7 +25,12 @@ class ListenerStaticMethodEntry extends ListenerEntry implements CompileableList
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{
+     *  entryType: string,
+     *  type: string,
+     *  class: ?string,
+     *  method: ?string,
+     * }
      */
     public function getProperties(): array
     {

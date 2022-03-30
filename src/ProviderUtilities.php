@@ -26,9 +26,15 @@ trait ProviderUtilities
         if ($this->isFunctionCallable($listener)) {
             $ref = new \ReflectionFunction($listener);
         } elseif ($this->isClassCallable($listener)) {
+            // PHPStan says you cannot use array destructuring on a callable, but you can
+            // if you know that it's an array (which in context we do).
+            // @phpstan-ignore-next-line
             [$class, $method] = $listener;
             $ref = (new \ReflectionClass($class))->getMethod($method);
         } elseif ($this->isObjectCallable($listener)) {
+            // PHPStan says you cannot use array destructuring on a callable, but you can
+            // if you know that it's an array (which in context we do).
+            // @phpstan-ignore-next-line
             [$class, $method] = $listener;
             $ref = (new \ReflectionObject($class))->getMethod($method);
         }
@@ -110,7 +116,8 @@ trait ProviderUtilities
      *
      * Or at least a reasonable approximation, since a function name may not be defined yet.
      *
-     * @return True if the callable represents a function, false otherwise.
+     * @return bool
+     *  True if the callable represents a function, false otherwise.
      */
     protected function isFunctionCallable(callable $callable): bool
     {
@@ -121,7 +128,8 @@ trait ProviderUtilities
     /**
      * Determines if a callable represents a method on an object.
      *
-     * @return True if the callable represents a method object, false otherwise.
+     * @return bool
+     *  True if the callable represents a method object, false otherwise.
      */
     protected function isObjectCallable(callable $callable): bool
     {
@@ -131,7 +139,8 @@ trait ProviderUtilities
     /**
      * Determines if a callable represents a closure/anonymous function.
      *
-     * @return True if the callable represents a closure object, false otherwise.
+     * @return bool
+     *  True if the callable represents a closure object, false otherwise.
      */
     protected function isClosureCallable(callable $callable): bool
     {

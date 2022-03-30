@@ -11,14 +11,6 @@ interface CompileableListenerEntryInterface
      *
      * @internal
      *
-     * @return array{
-     *  entryType: string,
-     *  type: string,
-     *  listener: ?callable,
-     *  class: ?string,
-     *  serviceName: ?string,
-     *  method: ?string,
-     * }
      */
     public function getProperties(): array;
 }

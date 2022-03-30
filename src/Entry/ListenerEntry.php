@@ -14,8 +14,7 @@ class ListenerEntry
     /** @var callable */
     public $listener;
 
-    /** @var string */
-    public $type;
+    public string $type;
 
     public function __construct(callable $listener, string $type)
     {

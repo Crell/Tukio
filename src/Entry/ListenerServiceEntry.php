@@ -11,14 +11,11 @@ namespace Crell\Tukio\Entry;
  */
 class ListenerServiceEntry implements CompileableListenerEntryInterface
 {
-    /** @var string */
-    public $serviceName;
+    public string $serviceName;
 
-    /** @var string */
-    public $method;
+    public string $method;
 
-    /** @var string */
-    public $type;
+    public string $type;
 
     public function __construct(string $serviceName, string $method, string $type)
     {
@@ -28,7 +25,12 @@ class ListenerServiceEntry implements CompileableListenerEntryInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array{
+     *  entryType: string,
+     *  type: string,
+     *  serviceName: ?string,
+     *  method: ?string,
+     * }
      */
     public function getProperties(): array
     {
