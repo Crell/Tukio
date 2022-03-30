@@ -36,6 +36,7 @@ class MockSubscriber implements SubscriberInterface
     // @phpstan-ignore-next-line
     public function onG(NoEvent $event) : void
     {
+        // @phpstan-ignore-next-line
         $event->add('G');
     }
 

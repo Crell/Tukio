@@ -29,6 +29,7 @@ class OrderedListenerProviderTest extends TestCase
         // This class doesn't exist but should not result in an error.
         // @phpstan-ignore-next-line
         $p->addListener(function (NoEvent $event) {
+            // @phpstan-ignore-next-line
             $event->add('F');
         });
 

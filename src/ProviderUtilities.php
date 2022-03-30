@@ -91,6 +91,7 @@ trait ProviderUtilities
     {
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
+            // @phpstan-ignore-next-line
             return (string)$listener;
         }
         if ($this->isClassCallable($listener)) {

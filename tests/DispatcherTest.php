@@ -12,25 +12,13 @@ use Psr\Log\LogLevel;
 
 class DispatcherTest extends TestCase
 {
-
-    /** @var LoggerInterface */
-    protected $logger;
+    protected MockLogger $logger;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->logger = new class extends AbstractLogger {
-            public $messages = [];
-
-            public function log($level, $message, array $context = []): void
-            {
-                $this->messages[$level][] = [
-                    'message' => $message,
-                    'context' => $context,
-                ];
-            }
-        };
+        $this->logger = new MockLogger();
     }
 
     public function test_dispatcher_calls_all_listeners() : void

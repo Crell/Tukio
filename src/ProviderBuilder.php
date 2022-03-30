@@ -25,7 +25,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -53,7 +54,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -73,7 +75,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
     public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -133,6 +136,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
                 $methodName = $rMethod->getName();
                 if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
                     $params = $rMethod->getParameters();
+                    // getName() is not part of the declared reflection API, but it's there.
+                    // @phpstan-ignore-next-line
                     $type = $params[0]->getType()->getName();
                     $this->addListenerService($service, $rMethod->getName(), $type);
                 }

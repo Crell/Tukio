@@ -13,25 +13,13 @@ use Psr\Log\LogLevel;
 
 class DebugEventDispatcherTest extends TestCase
 {
-
-    /** @var LoggerInterface */
-    protected $logger;
+    protected MockLogger $logger;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->logger = new class extends AbstractLogger {
-            public $messages = [];
-
-            public function log($level, $message, array $context = []): void
-            {
-                $this->messages[$level][] = [
-                    'message' => $message,
-                    'context' => $context,
-                ];
-            }
-        };
+        $this->logger = new MockLogger();
     }
 
     public function test_event_is_logged() : void

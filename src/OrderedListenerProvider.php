@@ -45,7 +45,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -72,7 +73,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -92,7 +94,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
         if ($attributes = $this->getAttributes($listener)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -170,7 +173,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         // 8.0 is made a requirement.
         $attributes = [];
         if (class_exists('ReflectionAttribute', false)) {
-            $attributes = array_map(fn(\ReflectionAttribute $attrib)
+            $attributes = array_map(static fn (\ReflectionAttribute $attrib): object
                 => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
         }
 
@@ -184,11 +187,14 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $attributes = $this->findAttributesOnMethod($rMethod);
 
         if (count($attributes)) {
-            /** @var ListenerAttribute $attrib */
+            // @todo We can probably do better than this in the next major.
+            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $params = $rMethod->getParameters();
                 $paramType = $params[0]->getType();
                 // This can simplify to ?-> once we require PHP 8.0.
+                // getName() is not part of the declared reflection API, but it's there.
+                // @phpstan-ignore-next-line
                 $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
                 if (is_null($type)) {
                     throw InvalidTypeException::fromClassCallable($class, $methodName);
@@ -209,6 +215,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             if (is_null($type)) {
                 throw InvalidTypeException::fromClassCallable($class, $methodName);
             }
+            // getName() is not part of the declared reflection API, but it's there.
+            // @phpstan-ignore-next-line
             $this->addListenerService($service, $rMethod->getName(), $type->getName());
         }
     }

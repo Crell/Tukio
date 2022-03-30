@@ -43,6 +43,7 @@ class FakeEntity
     // @phpstan-ignore-next-line
     public function stuff(StuffEvent $event) : void
     {
+        // @phpstan-ignore-next-line
         $event->add('C');
     }
 

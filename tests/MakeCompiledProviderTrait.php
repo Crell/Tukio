@@ -41,8 +41,8 @@ trait MakeCompiledProviderTrait
             // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
             include($filename);
 
-            /** @var ListenerProviderInterface $provider */
             $compiledClassName = "$namespace\\$class";
+            /** @var ListenerProviderInterface $provider */
             $provider = new $compiledClassName($container);
         }
         finally {
