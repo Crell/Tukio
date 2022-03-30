@@ -23,6 +23,7 @@ trait ProviderUtilities
         }
 
         $ref = null;
+
         if ($this->isFunctionCallable($listener)) {
             $ref = new \ReflectionFunction($listener);
         } elseif ($this->isClassCallable($listener)) {
@@ -75,7 +76,7 @@ trait ProviderUtilities
             if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
                 throw InvalidTypeException::fromFunctionCallable($listener, $exception);
             }
-            throw new InvalidTypeException($exception);
+            throw new InvalidTypeException($exception->getMessage(), $exception->getCode(), $exception);
         }
         return $type;
     }
