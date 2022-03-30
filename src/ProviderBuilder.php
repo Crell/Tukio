@@ -142,7 +142,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         }
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         yield from $this->listeners;
     }

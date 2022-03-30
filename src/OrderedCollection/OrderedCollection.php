@@ -146,7 +146,7 @@ class OrderedCollection implements \IteratorAggregate
      * if calling it on the return from this object.  If not, only the last list's worth of values will be included in
      * the resulting array.
      */
-    public function getIterator(): iterable
+    public function getIterator(): \Traversable
     {
         if (!$this->sorted) {
             $this->prioritizePendingItems();
