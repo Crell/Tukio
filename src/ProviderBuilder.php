@@ -14,8 +14,10 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
 {
     use ProviderUtilities;
 
-    /** @var OrderedCollection */
-    protected $listeners;
+    /**
+     * @var OrderedCollection<callable>
+     */
+    protected OrderedCollection $listeners;
 
     public function __construct()
     {

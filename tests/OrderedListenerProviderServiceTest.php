@@ -20,42 +20,42 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $container->addService('A', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('A');
             }
         });
         $container->addService('B', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('B');
             }
         });
         $container->addService('C', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('C');
             }
         });
         $container->addService('R', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('R');
             }
         });
         $container->addService('E', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('E');
             }
         });
         $container->addService('L', new class
         {
-            public function hear(CollectingEvent $event)
+            public function hear(CollectingEvent $event): void
             {
                 $event->add('L');
             }

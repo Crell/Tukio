@@ -26,6 +26,7 @@ function at_listener_three(CollectingEvent $event): void
     $event->add('C');
 }
 
+// @phpstan-ignore-next-line
 #[ListenerPriority(id: 'd', priority: 2, type: CollectingEvent::class)]
 function at_listener_four($event): void
 {
@@ -34,7 +35,7 @@ function at_listener_four($event): void
 
 class DoNothingEvent
 {
-    public $called = false;
+    public bool $called = false;
 }
 
 class TestAttributedListeners

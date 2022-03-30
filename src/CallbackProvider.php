@@ -9,10 +9,10 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 class CallbackProvider implements ListenerProviderInterface
 {
     /** @var array<string, array<string>> */
-    protected $callbacks = [];
+    protected array $callbacks = [];
 
     /**
-     * {@inheritdoc}
+     * @return iterable<callable>
      */
     public function getListenersForEvent(object $event): iterable
     {

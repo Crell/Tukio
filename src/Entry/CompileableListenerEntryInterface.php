@@ -11,6 +11,7 @@ interface CompileableListenerEntryInterface
      *
      * @internal
      *
+     * @return array<string, string>
      */
     public function getProperties(): array;
 }

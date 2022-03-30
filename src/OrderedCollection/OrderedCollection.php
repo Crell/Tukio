@@ -19,22 +19,19 @@ class OrderedCollection implements \IteratorAggregate
      *
      * An indexed array of arrays of Item entries. The key is the priority, the value is an array of Items.
      */
-    protected $items = [];
+    protected array $items = [];
 
     /**
      * @var array<OrderedItem>
      *
      * A list of the items in the collection indexed by ID. Order is undefined.
      */
-    protected $itemLookup = [];
+    protected array $itemLookup = [];
 
-    /**
-     * @var bool
-     */
-    protected $sorted = false;
+    protected bool $sorted = false;
 
     /** @var array<OrderedItem> */
-    protected $toPrioritize = [];
+    protected array $toPrioritize = [];
 
     /**
      * Adds an item to the collection with a given priority.  (Higher numbers come first.)
@@ -140,7 +137,7 @@ class OrderedCollection implements \IteratorAggregate
     /**
      * {@inheritdoc}
      *
-     * @return \ArrayIterator|\Traversable
+     * @return \Traversable<mixed>
      *
      * Note: Because of how iterator_to_array() works, you MUST pass `false` as the second parameter to that function
      * if calling it on the return from this object.  If not, only the last list's worth of values will be included in
@@ -167,13 +164,13 @@ class OrderedCollection implements \IteratorAggregate
     {
         /** @var OrderedItem $item */
         foreach ($this->toPrioritize as $item) {
-            if ($item->before) {
+            if (isset($item->before)) {
                 if (!isset($this->itemLookup[$item->before])) {
                     throw new MissingItemException(sprintf('Cannot add item %s before non-existent item %s', $item->id, $item->before));
                 }
                 $priority = $this->itemLookup[$item->before]->priority + 1;
                 $this->items[$priority][] = $item;
-            } elseif ($item->after) {
+            } elseif (isset($item->after)) {
                 if (!isset($this->itemLookup[$item->after])) {
                     throw new MissingItemException(sprintf('Cannot add item %s after non-existent item %s', $item->id, $item->after));
                 }

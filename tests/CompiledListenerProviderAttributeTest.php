@@ -7,13 +7,13 @@ namespace Crell\Tukio;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerPriority(3, 'A', CollectingEvent::class)]
-function atListenerA(CollectingEvent $event) : void
+function atListenerA(CollectingEvent $event): void
 {
     $event->add('A');
 }
 
 #[ListenerAfter('A')]
-function atListenerB(CollectingEvent $event) : void
+function atListenerB(CollectingEvent $event): void
 {
     $event->add('B');
 }
@@ -22,7 +22,7 @@ function atListenerB(CollectingEvent $event) : void
  * @throws \Exception
  */
 #[Listener('nope')]
-function atNoListen(EventOne $event) : void
+function atNoListen(EventOne $event): void
 {
     throw new \Exception('This should not be called');
 }
@@ -30,7 +30,7 @@ function atNoListen(EventOne $event) : void
 class AtListen
 {
     #[Listener]
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingEvent $event): void
     {
         $event->add('C');
     }
@@ -38,7 +38,7 @@ class AtListen
 
 class AtListenService
 {
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingEvent $event): void
     {
         $event->add('D');
     }
@@ -51,7 +51,7 @@ class CompiledEventDispatcherAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    function test_compiled_provider_triggers_in_order()
+    function test_compiled_provider_triggers_in_order(): void
     {
         $class = 'AtCompiledProvider';
         $namespace = 'Test\\Space';
@@ -78,7 +78,7 @@ class CompiledEventDispatcherAttributeTest extends TestCase
         $this->assertEquals('ABC', implode($event->result()));
     }
 
-    public function test_add_subscriber()
+    public function test_add_subscriber(): void
     {
         // This test is parallel to and uses the same mock subscriber as
         // RegisterableListenerProviderServiceTest::test_add_subscriber().

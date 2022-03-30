@@ -17,17 +17,13 @@ class OrderedItem
      */
     public $item;
 
-    /** @var int */
-    public $priority;
+    public int $priority;
 
-    /** @var string */
-    public $id;
+    public string $id;
 
-    /** @var string */
-    public $before;
+    public string $before;
 
-    /** @var string */
-    public $after;
+    public string $after;
 
     /**
      * @param mixed $item

@@ -14,14 +14,11 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     use ProviderUtilities;
 
     /**
-     * @var OrderedCollection
+     * @var OrderedCollection<callable>
      */
-    protected $listeners;
+    protected OrderedCollection $listeners;
 
-    /**
-     * @var ?ContainerInterface
-     */
-    protected $container;
+    protected ?ContainerInterface $container;
 
     public function __construct(?ContainerInterface $container = null)
     {
@@ -30,7 +27,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     }
 
     /**
-     * {@inheritdoc}
+     * @return iterable<callable>
      */
     public function getListenersForEvent(object $event): iterable
     {
@@ -167,6 +164,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $proxy;
     }
 
+    /**
+     * @return array<ListenerAttribute>
+     */
     protected function findAttributesOnMethod(\ReflectionMethod $rMethod): array
     {
         // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once

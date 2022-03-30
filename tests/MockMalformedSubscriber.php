@@ -9,21 +9,23 @@ class MockMalformedSubscriber
     /**
      * This function should succeed in automatic registration.
      */
-    public function onA(CollectingEvent $event) : void
+    public function onA(CollectingEvent $event): void
     {
         $event->add('A');
     }
     /**
      * This function should have automatic registration attempted, and fail due to missing a type.
      */
-    public function onNone($event) : void
+    // @phpstan-ignore-next-line
+    public function onNone($event): void
     {
         $event->add('A');
     }
     /**
      * This function should have manual registration attempted, and fail due to missing a type.
      */
-    public function abnormalNameWithoutType($event) : void
+    // @phpstan-ignore-next-line
+    public function abnormalNameWithoutType($event): void
     {
         $event->add('B');
     }

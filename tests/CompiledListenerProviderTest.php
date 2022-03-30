@@ -6,12 +6,12 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-function listenerA(CollectingEvent $event) : void
+function listenerA(CollectingEvent $event): void
 {
     $event->add('A');
 }
 
-function listenerB(CollectingEvent $event) : void
+function listenerB(CollectingEvent $event): void
 {
     $event->add('B');
 }
@@ -19,14 +19,14 @@ function listenerB(CollectingEvent $event) : void
 /**
  * @throws \Exception
  */
-function noListen(EventOne $event) : void
+function noListen(EventOne $event): void
 {
     throw new \Exception('This should not be called');
 }
 
 class Listen
 {
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingEvent $event): void
     {
         $event->add('C');
     }
@@ -34,7 +34,7 @@ class Listen
 
 class ListenService
 {
-    public static function listen(CollectingEvent $event)
+    public static function listen(CollectingEvent $event): void
     {
         $event->add('D');
     }
@@ -44,7 +44,7 @@ class CompiledEventDispatcherTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    function test_compiled_provider_triggers_in_order()
+    function test_compiled_provider_triggers_in_order(): void
     {
         $class = 'CompiledProvider';
         $namespace = 'Test\\Space';
@@ -76,7 +76,7 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_add_subscriber()
+    public function test_add_subscriber(): void
     {
         // This test is parallel to and uses the same mock subscriber as
         // OrderedListenerProviderServiceTest::test_add_subscriber().
@@ -103,7 +103,7 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertEquals('BCAEDF', implode($event->result()));
     }
 
-    public function test_natural_id_on_compiled_provider() : void
+    public function test_natural_id_on_compiled_provider(): void
     {
         $class = 'NaturalIdProvider';
         $namespace = 'Test\\Space';
@@ -129,7 +129,7 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_explicit_id_on_compiled_provider() : void
+    public function test_explicit_id_on_compiled_provider(): void
     {
         $class = 'ExplicitIdProvider';
         $namespace = 'Test\\Space';

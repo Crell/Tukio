@@ -12,11 +12,9 @@ use Psr\Log\NullLogger;
 
 class Dispatcher implements EventDispatcherInterface
 {
-    /** @var ListenerProviderInterface  */
-    protected $provider;
+    protected ListenerProviderInterface $provider;
 
-    /** @var LoggerInterface */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     public function __construct(ListenerProviderInterface $provider, ?LoggerInterface $logger = null)
     {

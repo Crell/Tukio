@@ -15,6 +15,9 @@ trait ProviderUtilities
 {
     use ParameterDeriverTrait;
 
+    /**
+     * @return array<ListenerAttribute>
+     */
     protected function getAttributes(callable $listener): array
     {
         // Bail out < PHP 8.0.
@@ -46,12 +49,7 @@ trait ProviderUtilities
 
         $attribs = $ref->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
 
-        return array_map(static function(\ReflectionAttribute $attrib) {
-            return $attrib->newInstance();
-        }, $attribs);
-
-        // Replace the above with this line once we require PHP 7.4.
-        //return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
+        return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }
 
     /**

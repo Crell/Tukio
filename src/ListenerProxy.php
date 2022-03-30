@@ -10,20 +10,17 @@ class ListenerProxy
 {
     use ParameterDeriverTrait;
 
-    /** @var OrderedProviderInterface */
-    protected $provider;
+    protected OrderedProviderInterface $provider;
 
-    /** @var string */
-    protected $serviceName;
+    protected string $serviceName;
 
-    /** @var string */
-    protected $serviceClass;
+    protected string $serviceClass;
 
     /**
      * @var array<string>
      *     Methods that have already been registered on this subscriber, so we know not to double-subscribe them.
      */
-    protected $registeredMethods = [];
+    protected array $registeredMethods = [];
 
     public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
     {
@@ -104,6 +101,9 @@ class ListenerProxy
         return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
     }
 
+    /**
+     * @return array<string>
+     */
     public function getRegisteredMethods(): array
     {
         return $this->registeredMethods;

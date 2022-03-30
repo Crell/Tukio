@@ -11,10 +11,12 @@ use Throwable;
 
 class InvalidTypeException extends \RuntimeException
 {
-    /** @var string */
-    protected static $baseMessage = 'Function does not specify a valid type';
+    protected static string $baseMessage = 'Function does not specify a valid type';
 
-    public static function fromClassCallable($class, string $method, ?Throwable $previous = null)
+    /**
+     * @param class-string $class
+     */
+    public static function fromClassCallable(string $class, string $method, ?Throwable $previous = null): self
     {
         $message = static::$baseMessage;
         try {
@@ -26,7 +28,7 @@ class InvalidTypeException extends \RuntimeException
         return new self($message, 0, $previous);
     }
 
-    public static function fromFunctionCallable(callable $function, ?Throwable $previous = null)
+    public static function fromFunctionCallable(callable $function, ?Throwable $previous = null): self
     {
         $message = static::$baseMessage;
         if (is_string($function) || $function instanceof \Closure) {

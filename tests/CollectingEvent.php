@@ -7,14 +7,14 @@ namespace Crell\Tukio;
 
 class CollectingEvent
 {
-    protected $out = [];
+    protected array $out = [];
 
-    public function add(string $val) : void
+    public function add(string $val): void
     {
         $this->out[] = $val;
     }
 
-    public function result() : array
+    public function result(): array
     {
         return $this->out;
     }

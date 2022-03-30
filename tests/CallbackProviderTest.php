@@ -10,14 +10,14 @@ use PHPUnit\Framework\TestCase;
 
 class LifecycleEvent extends CollectingEvent implements CallbackEventInterface
 {
-    protected $entity;
+    protected FakeEntity $entity;
 
     public function __construct(FakeEntity $entity)
     {
         $this->entity = $entity;
     }
 
-    public function getSubject() : object
+    public function getSubject(): object
     {
         return $this->entity;
     }
@@ -30,24 +30,24 @@ class SaveEvent extends LifecycleEvent {}
 class FakeEntity
 {
 
-    public function load(LoadEvent $event) : void
+    public function load(LoadEvent $event): void
     {
         $event->add('A');
     }
 
-    public function save(SaveEvent $event) : void
+    public function save(SaveEvent $event): void
     {
         $event->add('B');
     }
 
     // @phpstan-ignore-next-line
-    public function stuff(StuffEvent $event) : void
+    public function stuff(StuffEvent $event): void
     {
         // @phpstan-ignore-next-line
         $event->add('C');
     }
 
-    public function all(LifecycleEvent $event) : void
+    public function all(LifecycleEvent $event): void
     {
         $event->add('D');
     }
@@ -57,7 +57,7 @@ class FakeEntity
 class CallbackProviderTest extends TestCase
 {
 
-    public function test_callback() : void
+    public function test_callback(): void
     {
         $p = new CallbackProvider();
 
@@ -76,7 +76,7 @@ class CallbackProviderTest extends TestCase
         $this->assertEquals('AD', implode($event->result()));
     }
 
-    public function test_non_callback_event_skips_silently() : void
+    public function test_non_callback_event_skips_silently(): void
     {
         $p = new CallbackProvider();
 

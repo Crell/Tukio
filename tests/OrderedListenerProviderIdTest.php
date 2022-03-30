@@ -7,22 +7,22 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-function event_listener_one(CollectingEvent $event) : void
+function event_listener_one(CollectingEvent $event): void
 {
     $event->add('A');
 }
 
-function event_listener_two(CollectingEvent $event) : void
+function event_listener_two(CollectingEvent $event): void
 {
     $event->add('B');
 }
 
-function event_listener_three(CollectingEvent $event) : void
+function event_listener_three(CollectingEvent $event): void
 {
     $event->add('C');
 }
 
-function event_listener_four(CollectingEvent $event) : void
+function event_listener_four(CollectingEvent $event): void
 {
     $event->add('D');
 }
@@ -30,21 +30,21 @@ function event_listener_four(CollectingEvent $event) : void
 
 class TestListeners
 {
-    public static function listenerA(CollectingEvent $event) : void
+    public static function listenerA(CollectingEvent $event): void
     {
         $event->add('A');
     }
-    public static function listenerB(CollectingEvent $event) : void
+    public static function listenerB(CollectingEvent $event): void
     {
         $event->add('B');
     }
 
-    public function listenerC(CollectingEvent $event) : void
+    public function listenerC(CollectingEvent $event): void
     {
         $event->add('C');
     }
 
-    public function listenerD(CollectingEvent $event) : void
+    public function listenerD(CollectingEvent $event): void
     {
         $event->add('D');
     }
@@ -53,7 +53,7 @@ class TestListeners
 class OrderedListenerProviderIdTest extends TestCase
 {
 
-    public function test_natural_id_for_function() : void
+    public function test_natural_id_for_function(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -74,7 +74,7 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_static_method() : void
+    public function test_natural_id_for_static_method(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -90,7 +90,7 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BA', implode($event->result()));
     }
 
-    public function test_natural_id_for_object_method() : void
+    public function test_natural_id_for_object_method(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -129,20 +129,20 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_service_listener() : void
+    public function test_natural_id_for_service_listener(): void
     {
         $container = new MockContainer();
 
         $container->addService('A', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('A');
             }
         });
         $container->addService('B', new class
         {
-            public function listen(CollectingEvent $event)
+            public function listen(CollectingEvent $event): void
             {
                 $event->add('B');
             }

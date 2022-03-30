@@ -9,10 +9,13 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class MockContainer implements ContainerInterface
 {
+    /**
+     * @var array<string, object>
+     */
+    protected array $services = [];
 
-    protected $services = [];
-
-    public function addService(string $id, $service)
+    // @phpstan-ignore-next-line
+    public function addService(string $id, $service): void
     {
         $this->services[$id] = $service;
     }

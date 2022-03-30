@@ -8,14 +8,14 @@ use PHPUnit\Framework\TestCase;
 
 interface EventParentInterface
 {
-    public function add(string $val) : void;
-    public function result() : array;
+    public function add(string $val): void;
+    public function result(): array;
 }
 
 class ListenedDirectly implements EventParentInterface {
-    protected $out = [];
+    protected array $out = [];
 
-    public function add(string $val) : void
+    public function add(string $val): void
     {
         $this->out[] = $val;
     }
@@ -29,30 +29,30 @@ class ListenedDirectly implements EventParentInterface {
 class Subclass extends ListenedDirectly {}
 
 class NotListenedDirectly implements EventParentInterface {
-    protected $out = [];
+    protected array $out = [];
 
-    public function add(string $val) : void
+    public function add(string $val): void
     {
         $this->out[] = $val;
     }
 
-    public function result() : array
+    public function result(): array
     {
         return $this->out;
     }
 }
 
-function inheritanceListenerA(EventParentInterface $event) : void
+function inheritanceListenerA(EventParentInterface $event): void
 {
     $event->add('A');
 }
 
-function inheritanceListenerB(ListenedDirectly $event) : void
+function inheritanceListenerB(ListenedDirectly $event): void
 {
     $event->add('B');
 }
 
-function inheritanceListenerC(Subclass $event) : void
+function inheritanceListenerC(Subclass $event): void
 {
     $event->add('C');
 }
@@ -62,7 +62,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    public function test_interface_listener_catches_everything() : void
+    public function test_interface_listener_catches_everything(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';
@@ -91,7 +91,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         }
     }
 
-    public function test_class_listener_catches_subclass() : void
+    public function test_class_listener_catches_subclass(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';
@@ -120,7 +120,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         }
     }
 
-    public function test_subclass_listener_catches_subclass() : void
+    public function test_subclass_listener_catches_subclass(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';

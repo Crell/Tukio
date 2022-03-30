@@ -9,11 +9,9 @@ use Psr\Log\LoggerInterface;
 
 class DebugEventDispatcher implements EventDispatcherInterface
 {
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    protected EventDispatcherInterface $dispatcher;
 
-    /** @var LoggerInterface */
-    protected $logger;
+    protected LoggerInterface $logger;
 
     /**
      * DebugEventDispatcher constructor.
