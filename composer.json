@@ -19,9 +19,10 @@
     ],
     "require": {
         "php": "~7.4 || ~8.0",
+        "fig/event-dispatcher-util": "^1.0",
+        "phpstan/phpstan": "^1.5",
         "psr/container": "^1.0 || ^2.0",
         "psr/event-dispatcher": "^1.0",
-        "fig/event-dispatcher-util": "^1.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0"
     },
     "require-dev": {
