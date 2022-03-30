@@ -95,14 +95,20 @@ trait ProviderUtilities
      */
     protected function getListenerId(callable $listener): ?string
     {
+        // The methods called in this method are from an external trait, and
+        // its docblock is a bit buggy.  Just ignore that on our end until
+        // it's fixed in the util package.
+        // @phpstan-ignore-next-line
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
             // @phpstan-ignore-next-line
             return (string)$listener;
         }
+        // @phpstan-ignore-next-line
         if ($this->isClassCallable($listener)) {
             return $listener[0] . '::' . $listener[1];
         }
+        // @phpstan-ignore-next-line
         if (is_array($listener) && is_object($listener[0])) {
             return get_class($listener[0]) . '::' . $listener[1];
         }
