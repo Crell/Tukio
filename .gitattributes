@@ -9,3 +9,5 @@
 /.scrutinizer.yml   export-ignore
 /tests              export-ignore
 /docs               export-ignore
+/docker             export-ignore
+/docker-compose.yml export-ignore
