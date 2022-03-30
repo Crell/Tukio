@@ -170,14 +170,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         // 8.0 is made a requirement.
         $attributes = [];
         if (class_exists('ReflectionAttribute', false)) {
-            // Fugly because PHP < 7.4
-            $attributes = array_map(static function(\ReflectionAttribute $attrib) {
-                return $attrib->newInstance();
-            }, $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
-
-            // Once we require PHP 7.4, replace the above with these lines.
-            //$attributes = array_map(fn(\ReflectionAttribute $attrib)
-            //    => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+            $attributes = array_map(fn(\ReflectionAttribute $attrib)
+                => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
         }
 
         return $attributes;
