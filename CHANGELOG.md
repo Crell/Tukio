@@ -4,6 +4,17 @@ All notable changes to `Tukio` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.4.1 - 2022-06-02
+
+### Added
+- Nothing
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Moved phpstan to a dev dependency, where it should have been in the first place.
+
 ## 1.4.0 - 2022-03-30
 
 ### Added
