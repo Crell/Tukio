@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use Crell\Tukio\Entry\ListenerEntry;
-use Crell\Tukio\OrderedCollection\OrderedCollection;
+use Crell\OrderedCollection\OrderedCollection;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
