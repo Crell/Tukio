@@ -4,6 +4,17 @@ All notable changes to `Tukio` will be documented in this file.
 
 Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) principles.
 
+## 1.5.0 - 2023-03-25
+
+### Added
+- Tukio now depends on Crell/OrderedCollection, which used to be part of this library.
+
+### Deprecated
+- Nothing
+
+### Fixed
+- Nothing
+
 ## 1.4.1 - 2022-06-02
 
 ### Added
