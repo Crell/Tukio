@@ -155,5 +155,31 @@ class CompiledEventDispatcherTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
+    public function test_optimize_event(): void
+    {
+        $class = 'OptimizedEventProvider';
+        $namespace = 'Test\\Space';
 
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $builder->addListener("{$ns}event_listener_one", -4, 'id-1');
+        $builder->addListenerBefore('id-1', "{$ns}event_listener_two", 'id-2');
+        $builder->addListenerAfter('id-2', "{$ns}event_listener_three", 'id-3');
+        $builder->addListenerAfter('id-3', "{$ns}event_listener_four");
+
+        $builder->optimizeEvent(CollectingEvent::class);
+
+        $provider = $this->makeProvider($builder, $container, $class, $namespace);
+
+        $event = new CollectingEvent();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('BACD', implode($event->result()));
+    }
 }

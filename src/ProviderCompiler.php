@@ -18,9 +18,24 @@ class ProviderCompiler
      * @param string $namespace
      *   the namespace for the compiled class.
      */
-    public function compile(ProviderBuilder $listeners, $stream, string $class = 'CompiledListenerProvider', string $namespace = '\\Crell\\Tukio\\Compiled'): void
-    {
+    public function compile(
+        ProviderBuilder $listeners,
+        $stream,
+        string $class = 'CompiledListenerProvider',
+        string $namespace = '\\Crell\\Tukio\\Compiled'
+    ): void {
         fwrite($stream, $this->createPreamble($class, $namespace));
+
+        $this->writeMainListenersList($listeners, $stream);
+
+        $this->writeOptimizedList($listeners, $stream);
+
+        fwrite($stream, $this->createClosing());
+    }
+
+    protected function writeMainListenersList(ProviderBuilder $listeners, $stream): void
+    {
+        fwrite($stream, $this->startMainListenersList());
 
         /** @var CompileableListenerEntryInterface $listenerEntry */
         foreach ($listeners as $listenerEntry) {
@@ -28,7 +43,76 @@ class ProviderCompiler
             fwrite($stream, $item);
         }
 
-        fwrite($stream, $this->createClosing());
+        fwrite($stream, $this->endMainListenersList());
+    }
+
+    protected function writeOptimizedList(ProviderBuilder $listeners, $stream): void
+    {
+        fwrite($stream, $this->startOptimizedList());
+
+        $listenerDefs = iterator_to_array($listeners);
+
+        foreach ($listeners->optimizedEvents() as $event) {
+            $ancestors = $this->classAncestors($event);
+
+            fwrite($stream, $this->startOptimizedEntry($event));
+
+            $relevantListeners = array_filter($listenerDefs, fn(CompileableListenerEntryInterface $entry) => in_array($entry->getProperties()['type'], $ancestors));
+
+            /** @var CompileableListenerEntryInterface $listenerEntry */
+            foreach ($relevantListeners as $listenerEntry) {
+                $item = $this->createEntry($listenerEntry);
+                fwrite($stream, $item);
+            }
+
+            fwrite($stream, $this->endOptimizedEntry());
+        }
+
+        fwrite($stream, $this->endOptimizedList());
+    }
+
+    protected function startOptimizedEntry(string $event): string
+    {
+        return <<<END
+    $event::class => [
+END;
+    }
+
+    protected function endOptimizedEntry(): string
+    {
+        return <<<'END'
+    ],
+END;
+    }
+
+    /**
+     * Returns a list of all class and interface parents of a class.
+     *
+     * @return array<class-string>
+     */
+    protected function classAncestors(string $class, bool $includeClass = true): array
+    {
+        // These methods both return associative arrays, making + safe.
+        $ancestors = class_parents($class) + class_implements($class);
+        return $includeClass
+            ? [$class => $class] + $ancestors
+            : $ancestors
+            ;
+    }
+
+    protected function startOptimizedList(): string
+    {
+        return <<<END
+  protected const OPTIMIZED = [
+
+END;
+    }
+
+    protected function endOptimizedList(): string
+    {
+        return <<<'END'
+    ];
+END;
     }
 
     protected function createEntry(CompileableListenerEntryInterface $listenerEntry): string
@@ -50,15 +134,28 @@ use Psr\EventDispatcher\EventInterface;
 
 class {$class} extends CompiledListenerProviderBase
 {
+END;
+    }
+
+    protected function startMainListenersList(): string
+    {
+        return <<<END
   protected const LISTENERS = [
 
+END;
+
+    }
+
+    protected function endMainListenersList(): string
+    {
+        return <<<'END'
+    ];
 END;
     }
 
     protected function createClosing(): string
     {
         return <<<'END'
-    ];
 }
 END;
     }
