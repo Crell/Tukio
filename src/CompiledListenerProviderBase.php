@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\Tukio\Entry\ListenerFunctionEntry;
-use Crell\Tukio\Entry\ListenerServiceEntry;
-use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -19,9 +16,9 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     // entry types in the classes seen in getListenerForEvent().  See each class's getProperties() method for the
     // exact structure.
     /** @var array<mixed> */
-    protected const LISTENERS = [];
+    protected array $listeners = [];
 
-    protected const OPTIMIZED = [];
+    protected array $optimized = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -33,55 +30,17 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
      */
     public function getListenersForEvent(object $event): iterable
     {
-        if (isset(static::OPTIMIZED[$event::class])) {
-            $count = count(static::OPTIMIZED[$event::class]);
-            $ret = [];
-            for ($i = 0; $i < $count; ++$i) {
-                $listener = static::OPTIMIZED[$event::class];
-                if ($event instanceof $listener['type']) {
-                    // Turn this into a match() in PHP 8.
-                    switch ($listener['entryType']) {
-                        case ListenerFunctionEntry::class:
-                            $ret[] = $listener['listener'];
-                            break;
-                        case ListenerStaticMethodEntry::class:
-                            $ret[] = [$listener['class'], $listener['method']];
-                            break;
-                        case ListenerServiceEntry::class:
-                            $ret[] = function (object $event) use ($listener): void {
-                                $this->container->get($listener['serviceName'])->{$listener['method']}($event);
-                            };
-                            break;
-                        default:
-                            throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
-                    }
-                }
-            }
-            return $ret;
+        if (isset($this->optimized[$event::class])) {
+            return $this->optimized[$event::class];
         }
 
-        $count = count(static::LISTENERS);
+        $count = count($this->listeners);
         $ret = [];
         for ($i = 0; $i < $count; ++$i) {
             /** @var array<mixed> $listener */
-            $listener = static::LISTENERS[$i];
+            $listener = $this->listeners[$i];
             if ($event instanceof $listener['type']) {
-                // Turn this into a match() in PHP 8.
-                switch ($listener['entryType']) {
-                    case ListenerFunctionEntry::class:
-                        $ret[] = $listener['listener'];
-                        break;
-                    case ListenerStaticMethodEntry::class:
-                        $ret[] = [$listener['class'], $listener['method']];
-                        break;
-                    case ListenerServiceEntry::class:
-                        $ret[] = function (object $event) use ($listener): void {
-                            $this->container->get($listener['serviceName'])->{$listener['method']}($event);
-                        };
-                        break;
-                    default:
-                        throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
-                }
+                $ret[] = $listener['callable'];
             }
         }
         return $ret;

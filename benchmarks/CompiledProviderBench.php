@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio\Benchmarks;
 
 use Crell\Tukio\CollectingEvent;
+use Crell\Tukio\DummyEvent;
 use Crell\Tukio\MockContainer;
 use Crell\Tukio\ProviderBuilder;
 use Crell\Tukio\ProviderCompiler;
@@ -24,14 +25,13 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  */
 class CompiledProviderBench extends ProviderBenchBase
 {
-    /** @var string */
-    protected static $filename = 'compiled_provider.php';
+    protected static string $filename = 'compiled_provider.php';
 
-    /** @var string */
-    protected static $className = 'CompiledProvider';
+    protected static string $className = 'CompiledProvider';
 
-    /** @var string */
-    protected static $namespace = 'Test\\Space';
+    protected static string $namespace = 'Test\\Space';
+
+    protected static array $optimizeClasses = [];
 
     public static function createCompiledProvider(): void
     {
@@ -41,9 +41,14 @@ class CompiledProviderBench extends ProviderBenchBase
         $priority = new \InfiniteIterator(new \ArrayIterator(static::$listenerPriorities));
         $priority->next();
 
-        foreach(range(1, static::$numListeners) as $counter) {
+        foreach(range(1, ceil(static::$numListeners/2)) as $counter) {
             $builder->addListener([static::class, 'fakeListener'], $priority->current());
+            $builder->addListenerService('Foo', 'bar', DummyEvent::class, $priority->current());
             $priority->next();
+        }
+
+        foreach (static::$optimizeClasses as $class) {
+            $builder->optimizeEvent($class);
         }
 
         // Write the generated compiler out to a temp file.
@@ -54,7 +59,7 @@ class CompiledProviderBench extends ProviderBenchBase
 
     public static function removeCompiledProvider(): void
     {
-        //unlink(static::$filename);
+        unlink(static::$filename);
     }
 
     public function setUp(): void

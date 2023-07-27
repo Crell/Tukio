@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use Crell\Tukio\Entry\CompileableListenerEntryInterface;
+use Crell\Tukio\Entry\ListenerFunctionEntry;
+use Crell\Tukio\Entry\ListenerServiceEntry;
+use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 
 class ProviderCompiler
 {
@@ -50,18 +53,21 @@ class ProviderCompiler
     {
         fwrite($stream, $this->startOptimizedList());
 
-        $listenerDefs = iterator_to_array($listeners);
+        $listenerDefs = iterator_to_array($listeners, false);
 
         foreach ($listeners->optimizedEvents() as $event) {
             $ancestors = $this->classAncestors($event);
 
             fwrite($stream, $this->startOptimizedEntry($event));
 
-            $relevantListeners = array_filter($listenerDefs, fn(CompileableListenerEntryInterface $entry) => in_array($entry->getProperties()['type'], $ancestors));
+            $relevantListeners = array_filter($listenerDefs,
+                static fn(CompileableListenerEntryInterface $entry)
+                    => in_array($entry->getProperties()['type'], $ancestors, true)
+            );
 
             /** @var CompileableListenerEntryInterface $listenerEntry */
             foreach ($relevantListeners as $listenerEntry) {
-                $item = $this->createEntry($listenerEntry);
+                $item = $this->createOptimizedEntry($listenerEntry);
                 fwrite($stream, $item);
             }
 
@@ -74,7 +80,7 @@ class ProviderCompiler
     protected function startOptimizedEntry(string $event): string
     {
         return <<<END
-    $event::class => [
+    \\$event::class => [
 END;
     }
 
@@ -84,6 +90,76 @@ END;
     ],
 END;
     }
+
+    protected function createOptimizedEntry(CompileableListenerEntryInterface $listenerEntry): string
+    {
+        $listener = $listenerEntry->getProperties();
+        switch ($listener['entryType']) {
+            case ListenerFunctionEntry::class:
+                $ret = "'{$listener['listener']}'";
+                break;
+            case ListenerStaticMethodEntry::class:
+                $ret = var_export([$listener['class'], $listener['method']], true);
+                break;
+            case ListenerServiceEntry::class:
+                $ret = sprintf('fn(object $event) => $this->container->get(\'%s\')->%s($event)', $listener['serviceName'], $listener['method']);
+                break;
+            default:
+                throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
+        }
+
+        return $ret . ',' . PHP_EOL;
+    }
+
+    protected function createEntry(CompileableListenerEntryInterface $listenerEntry): string
+    {
+        $listener = $listenerEntry->getProperties();
+        switch ($listener['entryType']) {
+            case ListenerFunctionEntry::class:
+                $ret = var_export(['type' => $listener['type'], 'callable' => $listener['listener']], true);
+                break;
+            case ListenerStaticMethodEntry::class:
+                $ret = var_export(['type' => $listener['type'], 'callable' => [$listener['class'], $listener['method']]], true);
+                break;
+            case ListenerServiceEntry::class:
+                $callable = sprintf('fn(object $event) => $this->container->get(\'%s\')->%s($event)', $listener['serviceName'], $listener['method']);
+                $ret = <<<END
+                [
+                    'type' => '{$listener['type']}',
+                    'callable' => $callable,
+                ]
+END;
+
+                break;
+            default:
+                throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
+        }
+
+        return $ret . ',' . PHP_EOL;
+    }
+
+    protected function createPreamble(string $class, string $namespace): string
+    {
+        return <<<END
+<?php
+
+declare(strict_types=1);
+
+namespace {$namespace};
+
+use Crell\Tukio\CompiledListenerProviderBase;
+use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventInterface;
+
+class {$class} extends CompiledListenerProviderBase
+{
+    public function __construct(ContainerInterface \$container)
+    {
+        parent::__construct(\$container);
+
+END;
+    }
+
 
     /**
      * Returns a list of all class and interface parents of a class.
@@ -103,7 +179,7 @@ END;
     protected function startOptimizedList(): string
     {
         return <<<END
-  protected const OPTIMIZED = [
+        \$this->optimized = [
 
 END;
     }
@@ -116,33 +192,10 @@ END;
 END;
     }
 
-    protected function createEntry(CompileableListenerEntryInterface $listenerEntry): string
-    {
-        return var_export($listenerEntry->getProperties(), true) . ',' . PHP_EOL;
-    }
-
-    protected function createPreamble(string $class, string $namespace): string
-    {
-        return <<<END
-<?php
-
-declare(strict_types=1);
-
-namespace {$namespace};
-
-use Crell\Tukio\CompiledListenerProviderBase;
-use Psr\EventDispatcher\EventInterface;
-
-class {$class} extends CompiledListenerProviderBase
-{
-
-END;
-    }
-
     protected function startMainListenersList(): string
     {
         return <<<END
-  protected const LISTENERS = [
+        \$this->listeners = [
 
 END;
 
@@ -159,7 +212,8 @@ END;
     protected function createClosing(): string
     {
         return <<<'END'
-}
+    }   // Close constructor
+}       // Close class
 
 END;
     }
