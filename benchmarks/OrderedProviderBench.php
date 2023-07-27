@@ -14,11 +14,6 @@ use Psr\EventDispatcher\ListenerProviderInterface;
  */
 class OrderedProviderBench extends ProviderBenchBase
 {
-    /**
-     * @var ListenerProviderInterface
-     */
-    protected $provider;
-
     public function setUp(): void
     {
         $this->provider = new OrderedListenerProvider();
@@ -27,7 +22,7 @@ class OrderedProviderBench extends ProviderBenchBase
         $priority->next();
 
         foreach(range(1, static::$numListeners) as $counter) {
-            $this->provider->addListener(static function(CollectingEvent $task): void {}, $priority->current());
+            $this->provider->addListener([static::class, 'fakeListener'], $priority->current());
             $priority->next();
         }
     }

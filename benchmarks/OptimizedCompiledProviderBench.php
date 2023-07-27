@@ -22,7 +22,7 @@ use PhpBench\Benchmark\Metadata\Annotations\Warmup;
  * @BeforeClassMethods({"createCompiledProvider"})
  * @AfterClassMethods({"removeCompiledProvider"})
  */
-class CompiledProviderBench extends ProviderBenchBase
+class OptimizedCompiledProviderBench extends ProviderBenchBase
 {
     /** @var string */
     protected static $filename = 'compiled_provider.php';
@@ -45,6 +45,8 @@ class CompiledProviderBench extends ProviderBenchBase
             $builder->addListener([static::class, 'fakeListener'], $priority->current());
             $priority->next();
         }
+
+        $builder->optimizeEvent(CollectingEvent::class);
 
         // Write the generated compiler out to a temp file.
         $out = fopen(static::$filename, 'w');

@@ -7,23 +7,25 @@ namespace Crell\Tukio\Benchmarks;
 use Crell\Tukio\CollectingEvent;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
+use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
+use PhpBench\Benchmark\Metadata\Annotations\RetryThreshold;
 use PhpBench\Benchmark\Metadata\Annotations\Revs;
+use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 /**
  * @Groups({"Providers"})
- * @Revs(1000)
- * @Iterations(5)
+ * @Revs(50)
+ * @Iterations(10)
+ * @Warmup(2)
+ * @OutputTimeUnit("milliseconds", precision=4)
+ * @RetryThreshold(10.0)
  */
 abstract class ProviderBenchBase extends TukioBenchmarks
 {
-    /**
-     * @var ListenerProviderInterface
-     */
-    protected $provider;
+    protected ListenerProviderInterface $provider;
 
-    /** @var int */
-    protected static $numListeners = 5000;
+    protected static int $numListeners = 1000;
 
     /**
      * @var array<int>
@@ -47,6 +49,10 @@ abstract class ProviderBenchBase extends TukioBenchmarks
         $listeners = $this->provider->getListenersForEvent($task);
 
         // Run out the generator.
-        iterator_to_array($listeners);
+        is_array($listeners) || iterator_to_array($listeners);
+    }
+
+    public static function fakeListener(CollectingEvent $task): void
+    {
     }
 }
