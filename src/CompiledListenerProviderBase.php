@@ -18,6 +18,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
     /** @var array<mixed> */
     protected array $listeners = [];
 
+    /** @var array<class-string, mixed>  */
     protected array $optimized = [];
 
     public function __construct(ContainerInterface $container)

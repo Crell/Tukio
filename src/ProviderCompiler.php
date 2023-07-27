@@ -36,6 +36,10 @@ class ProviderCompiler
         fwrite($stream, $this->createClosing());
     }
 
+    /**
+     * @param resource $stream
+     *   A writeable stream to which to write the compiled code.
+     */
     protected function writeMainListenersList(ProviderBuilder $listeners, $stream): void
     {
         fwrite($stream, $this->startMainListenersList());
@@ -49,6 +53,10 @@ class ProviderCompiler
         fwrite($stream, $this->endMainListenersList());
     }
 
+    /**
+     * @param resource $stream
+     *   A writeable stream to which to write the compiled code.
+     */
     protected function writeOptimizedList(ProviderBuilder $listeners, $stream): void
     {
         fwrite($stream, $this->startOptimizedList());

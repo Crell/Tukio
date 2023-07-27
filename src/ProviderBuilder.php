@@ -39,6 +39,9 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $this->optimizedEvents[] = $event;
     }
 
+    /**
+     * @return array<class-string>
+     */
     public function optimizedEvents(): array
     {
         return $this->optimizedEvents;
