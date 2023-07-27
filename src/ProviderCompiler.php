@@ -112,6 +112,7 @@ END;
     {
         return <<<'END'
     ];
+
 END;
     }
 
@@ -134,6 +135,7 @@ use Psr\EventDispatcher\EventInterface;
 
 class {$class} extends CompiledListenerProviderBase
 {
+
 END;
     }
 
@@ -150,6 +152,7 @@ END;
     {
         return <<<'END'
     ];
+
 END;
     }
 
@@ -157,6 +160,7 @@ END;
     {
         return <<<'END'
 }
+
 END;
     }
 }
