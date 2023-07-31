@@ -300,8 +300,40 @@ $provider = new Name\Space\Of\My\App\MyCompiledProvider($container);
 
 And boom!  `$provider` is now a fully functional Provider you can pass to a Dispatcher.  It will work just like any other, but faster.
 
-
 But what if you want to have most of your listeners pre-registered, but have some that you add conditionally at runtime?  Have a look at the FIG's [`AggregateProvider`](https://github.com/php-fig/event-dispatcher-util/blob/master/src/AggregateProvider.php), and combine your compiled Provider with an instance of `OrderedListenerProvider`.
+
+### Compiler optimization
+
+The `ProviderBuilder` has one other trick.  If you specify one or more events via the `optimizeEvent($class)` method, then the compiler will pre-compute what listeners apply to it based on its type, including its parent classes and interfaces.  The result is a constant-time simple array lookup for those events, also known as "virtually instantaneous."
+
+```php
+use Crell\Tukio\ProviderBuilder;
+use Crell\Tukio\ProviderCompiler;
+
+$builder = new ProviderBuilder();
+
+$builder->addListener('listenerA', 100);
+$builder->addListenerAfter('listenerA', 'listenerB');
+$builder->addListener([Listen::class, 'listen']);
+$builder->addListenerService('listeners', 'listen', CollectingEvent::class);
+$builder->addSubscriber('subscriber', Subscriber::class);
+
+// Here's where you specify what events you know you will have.
+// Returning the listeners for these events will be near instant.
+$builder->optimizeEvent(EvenOne::class);
+$builder->optimizeEvent(EvenTwo::class);
+
+$compiler = new ProviderCompiler();
+
+// Write the generated compiler out to a file.
+$filename = 'MyCompiledProvider.php';
+$out = fopen($filename, 'w');
+
+// Here's the magic:
+$compiler->compile($builder, $out, 'MyCompiledProvider', '\\Name\\Space\\Of\\My\\App');
+
+fclose($out);
+```
 
 ### Attribute-based registration
 

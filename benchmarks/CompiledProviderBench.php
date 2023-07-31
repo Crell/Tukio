@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace Crell\Tukio\Benchmarks;
 
 use Crell\Tukio\CollectingEvent;
+use Crell\Tukio\DummyEvent;
 use Crell\Tukio\MockContainer;
 use Crell\Tukio\ProviderBuilder;
 use Crell\Tukio\ProviderCompiler;
 use PhpBench\Benchmark\Metadata\Annotations\AfterClassMethods;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeClassMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
-use Psr\EventDispatcher\ListenerProviderInterface;
+use PhpBench\Benchmark\Metadata\Annotations\Iterations;
+use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
+use PhpBench\Benchmark\Metadata\Annotations\RetryThreshold;
+use PhpBench\Benchmark\Metadata\Annotations\Revs;
+use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 
 /**
  * @Groups({"Providers"})
@@ -20,19 +25,13 @@ use Psr\EventDispatcher\ListenerProviderInterface;
  */
 class CompiledProviderBench extends ProviderBenchBase
 {
-    /**
-     * @var ListenerProviderInterface
-     */
-    protected $provider;
+    protected static string $filename = 'compiled_provider.php';
 
-    /** @var string */
-    protected static $filename = 'compiled_provider.php';
+    protected static string $className = 'CompiledProvider';
 
-    /** @var string */
-    protected static $className = 'CompiledProvider';
+    protected static string $namespace = 'Test\\Space';
 
-    /** @var string */
-    protected static $namespace = 'Test\\Space';
+    protected static array $optimizeClasses = [];
 
     public static function createCompiledProvider(): void
     {
@@ -42,10 +41,13 @@ class CompiledProviderBench extends ProviderBenchBase
         $priority = new \InfiniteIterator(new \ArrayIterator(static::$listenerPriorities));
         $priority->next();
 
-        foreach(range(1, static::$numListeners) as $counter) {
+        foreach(range(1, ceil(static::$numListeners/2)) as $counter) {
             $builder->addListener([static::class, 'fakeListener'], $priority->current());
+            $builder->addListenerService('Foo', 'bar', DummyEvent::class, $priority->current());
             $priority->next();
         }
+
+        $builder->optimizeEvents(...static::$optimizeClasses);
 
         // Write the generated compiler out to a temp file.
         $out = fopen(static::$filename, 'w');
@@ -60,16 +62,11 @@ class CompiledProviderBench extends ProviderBenchBase
 
     public function setUp(): void
     {
-        // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
         include static::$filename;
 
         $container = new MockContainer();
 
         $compiledClassName = static::$namespace . '\\' . static::$className;
         $this->provider = new $compiledClassName($container);
-    }
-
-    public static function fakeListener(CollectingEvent $task): void
-    {
     }
 }
