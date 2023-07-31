@@ -47,9 +47,7 @@ class CompiledProviderBench extends ProviderBenchBase
             $priority->next();
         }
 
-        foreach (static::$optimizeClasses as $class) {
-            $builder->optimizeEvent($class);
-        }
+        $builder->optimizeEvents(...static::$optimizeClasses);
 
         // Write the generated compiler out to a temp file.
         $out = fopen(static::$filename, 'w');

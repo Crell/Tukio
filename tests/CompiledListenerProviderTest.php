@@ -171,7 +171,7 @@ class CompiledEventDispatcherTest extends TestCase
         $builder->addListenerAfter('id-2', "{$ns}event_listener_three", 'id-3');
         $builder->addListenerAfter('id-3', "{$ns}event_listener_four");
 
-        $builder->optimizeEvent(CollectingEvent::class);
+        $builder->optimizeEvents(CollectingEvent::class);
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 

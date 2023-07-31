@@ -32,17 +32,17 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
     /**
      * Pre-specify an event class that should have an optimized listener list built.
      *
-     * @param class-string $event
+     * @param class-string ...$events
      */
-    public function optimizeEvent(string $event): void
+    public function optimizeEvents(string ...$events): void
     {
-        $this->optimizedEvents[] = $event;
+        $this->optimizedEvents = [...$this->optimizedEvents, ...$events];
     }
 
     /**
      * @return array<class-string>
      */
-    public function optimizedEvents(): array
+    public function getOptimizedEvents(): array
     {
         return $this->optimizedEvents;
     }

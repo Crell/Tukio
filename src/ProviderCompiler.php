@@ -63,7 +63,7 @@ class ProviderCompiler
 
         $listenerDefs = iterator_to_array($listeners, false);
 
-        foreach ($listeners->optimizedEvents() as $event) {
+        foreach ($listeners->getOptimizedEvents() as $event) {
             $ancestors = $this->classAncestors($event);
 
             fwrite($stream, $this->startOptimizedEntry($event));
