@@ -31,9 +31,8 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
      */
     public function getListenersForEvent(object $event): iterable
     {
-        // @todo Switch to ::class syntax in PHP 8.
-        if (isset($this->optimized[get_class($event)])) {
-            return $this->optimized[get_class($event)];
+        if (isset($this->optimized[$event::class])) {
+            return $this->optimized[$event::class];
         }
 
         $count = count($this->listeners);

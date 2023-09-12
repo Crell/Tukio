@@ -44,9 +44,6 @@ class AtListenService
     }
 }
 
-/**
- * @requires PHP >= 8.0
- */
 class CompiledEventDispatcherAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;

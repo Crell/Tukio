@@ -169,13 +169,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
      */
     protected function findAttributesOnMethod(\ReflectionMethod $rMethod): array
     {
-        // This extra dance needed to keep the code working on PHP < 8.0. It can be removed once
-        // 8.0 is made a requirement.
-        $attributes = [];
-        if (class_exists('ReflectionAttribute', false)) {
-            $attributes = array_map(static fn (\ReflectionAttribute $attrib): object
-                => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
-        }
+        $attributes = array_map(static fn (\ReflectionAttribute $attrib): object
+        => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
 
         return $attributes;
     }
@@ -192,10 +187,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             foreach ($attributes as $attrib) {
                 $params = $rMethod->getParameters();
                 $paramType = $params[0]->getType();
-                // This can simplify to ?-> once we require PHP 8.0.
                 // getName() is not part of the declared reflection API, but it's there.
                 // @phpstan-ignore-next-line
-                $type = $attrib->type ?? ($paramType ? $paramType->getName() : null);
+                $type = $attrib->type ?? $paramType?->getName();
                 if (is_null($type)) {
                     throw InvalidTypeException::fromClassCallable($class, $methodName);
                 }

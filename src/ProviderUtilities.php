@@ -20,11 +20,6 @@ trait ProviderUtilities
      */
     protected function getAttributes(callable $listener): array
     {
-        // Bail out < PHP 8.0.
-        if (!class_exists('ReflectionAttribute', false)) {
-            return [];
-        }
-
         $ref = null;
 
         if ($this->isFunctionCallable($listener)) {

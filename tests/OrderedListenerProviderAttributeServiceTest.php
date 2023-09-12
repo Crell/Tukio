@@ -7,9 +7,6 @@ namespace Crell\Tukio;
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires PHP >= 8.0
- */
 class OrderedListenerProviderAttributeServiceTest extends TestCase
 {
     public function test_add_subscriber() : void

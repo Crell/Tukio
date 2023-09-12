@@ -73,9 +73,6 @@ function at_multi_one(CollectingEvent $event): void
     $event->add('A');
 }
 
-/**
- * @requires PHP >= 8.0
- */
 class OrderedListenerProviderAttributeTest extends TestCase
 {
     public function test_id_from_attribute_is_found() : void
