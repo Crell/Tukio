@@ -71,7 +71,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         }
 
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        $id ??= $this->getListenerId($listener);
 
         return $this->listeners->addItem($entry, $priority ?? 0, $id);
     }
@@ -82,8 +82,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             // @todo We can probably do better than this in the next major.
             /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $type ??= $attrib->type ?? $this->getType($listener);
+                $id ??= $attrib->id ?? $this->getListenerId($listener);
                 $entry = $this->getListenerEntry($listener, $type);
                 // The before-ness of this method takes priority over the attribute.
                 $generatedId = $this->listeners->addItemBefore($before, $entry, $id);
@@ -92,7 +92,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             return $generatedId;
         }
 
-        $id = $id ?? $this->getListenerId($listener);
+        $id ??= $this->getListenerId($listener);
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
         return $this->listeners->addItemBefore($before, $entry, $id);
     }
@@ -103,8 +103,8 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             // @todo We can probably do better than this in the next major.
             /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $type ??= $attrib->type ?? $this->getType($listener);
+                $id ??= $attrib->id ?? $this->getListenerId($listener);
                 $entry = $this->getListenerEntry($listener, $type);
                 // The before-ness of this method takes priority over the attribute.
                 $generatedId = $this->listeners->addItemBefore($after, $entry, $id);
@@ -114,7 +114,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         }
 
         $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        $id ??= $this->getListenerId($listener);
 
         return $this->listeners->addItemAfter($after, $entry, $id);
     }
@@ -122,7 +122,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
     public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
-        $priority = $priority ?? 0;
+        $priority ??= 0;
 
         return $this->listeners->addItem($entry, $priority, $id);
     }

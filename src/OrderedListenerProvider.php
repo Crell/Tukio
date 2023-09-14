@@ -65,8 +65,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             // @todo We can probably do better than this in the next major.
             /** @var Listener $attrib */
             foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $type ??= $attrib->type ?? $this->getType($listener);
+                $id ??= $attrib->id ?? $this->getListenerId($listener);
                 // The before-ness of this method call always overrides the attribute.
                 $generatedId = $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
             }
@@ -74,8 +74,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             return $generatedId;
         }
 
-        $type = $type ?? $this->getType($listener);
-        $id = $id ?? $this->getListenerId($listener);
+        $type ??= $this->getType($listener);
+        $id ??= $this->getListenerId($listener);
 
         return $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
     }
@@ -86,8 +86,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             // @todo We can probably do better than this in the next major.
             /** @var Listener $attrib */
             foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
+                $type ??= $attrib->type ?? $this->getType($listener);
+                $id ??= $attrib->id ?? $this->getListenerId($listener);
                 // The after-ness of this method call always overrides the attribute.
                 $generatedId = $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
             }
@@ -95,22 +95,22 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
             return $generatedId;
         }
 
-        $type = $type ?? $this->getType($listener);
-        $id = $id ?? $this->getListenerId($listener);
+        $type ??= $this->getType($listener);
+        $id ??= $this->getListenerId($listener);
 
         return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
     }
 
     public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
     {
-        $id = $id ?? $service . '-' . $method;
-        $priority = $priority ?? 0;
+        $id ??= $service . '-' . $method;
+        $priority ??= 0;
         return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
     }
 
     public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
-        $id = $id ?? $service . '-' . $method;
+        $id ??= $service . '-' . $method;
         return $this->addListenerBefore($before, $this->makeListenerForService($service, $method), $id, $type);
     }
 
@@ -170,16 +170,14 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
         if (count($attributes)) {
             // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
+            /** @var Listener $attrib */
             foreach ($attributes as $attrib) {
                 $params = $rMethod->getParameters();
                 $paramType = $params[0]->getType();
                 // getName() is not part of the declared reflection API, but it's there.
                 // @phpstan-ignore-next-line
-                $type = $attrib->type ?? $paramType?->getName();
-                if (is_null($type)) {
-                    throw InvalidTypeException::fromClassCallable($class, $methodName);
-                }
+                $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
+
                 if ($attrib instanceof ListenerBefore) {
                     $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
                 } elseif ($attrib instanceof ListenerAfter) {
