@@ -148,7 +148,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class))) {
+        if (in_array(SubscriberInterface::class, class_implements($class), true)) {
             /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
@@ -159,7 +159,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
                 $methodName = $rMethod->getName();
-                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
+                if (str_starts_with($methodName, 'on') && !in_array($methodName, $proxy->getRegisteredMethods(), true)) {
                     $params = $rMethod->getParameters();
                     // getName() is not part of the declared reflection API, but it's there.
                     // @phpstan-ignore-next-line

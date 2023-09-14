@@ -57,15 +57,12 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $def->id ??= $this->getListenerId($listener);
         $def->type ??= $this->getType($listener);
 
-        if ($def->before) {
-            $generatedId = $this->listeners->addItemBefore($def->before, new ListenerEntry($listener, $def->type), $def->id);
-        } elseif ($def->after) {
-            $generatedId = $this->listeners->addItemAfter($def->after, new ListenerEntry($listener, $def->type), $def->id);
-        } elseif ($def->priority) {
-            $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $def->type), $def->priority, $def->id);
-        } else {
-            $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $def->type), $priority ?? 0, $def->id);
-        }
+        $generatedId = match (true) {
+            $def->before !== null => $this->listeners->addItemBefore($def->before, new ListenerEntry($listener, $def->type), $def->id),
+            $def->after !== null => $this->listeners->addItemAfter($def->after, new ListenerEntry($listener, $def->type), $def->id),
+            $def->priority !== null => $this->listeners->addItem(new ListenerEntry($listener, $def->type), $def->priority, $def->id),
+            default => $this->listeners->addItem(new ListenerEntry($listener, $def->type), $priority ?? 0, $def->id),
+        };
 
         return $generatedId;
     }
@@ -206,7 +203,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
                     $this->addListenerService($service, $methodName, $type, null, $attrib->id);
                 }
             }
-        } elseif (strpos($methodName, 'on') === 0) {
+        } elseif (str_starts_with($methodName, 'on')) {
             $params = $rMethod->getParameters();
             $type = $params[0]->getType();
             if (is_null($type)) {
