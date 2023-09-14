@@ -135,13 +135,8 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         try {
             $methods = (new \ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            // Explicitly registered methods ignore all auto-registration mechanisms.
-            $methods = array_filter($methods, static function(\ReflectionMethod $refm) use ($proxy) {
-                return !in_array($refm->getName(), $proxy->getRegisteredMethods());
-            });
-
-            // Once we require PHP 7.4, replace the above with this line.
-            //$methods = array_filter($methods, fn(\ReflectionMethod $r) => !in_array($r->getName(), $proxy->getRegisteredMethods()));
+            $methods = array_filter($methods, fn(\ReflectionMethod $r)
+                => !in_array($r->getName(), $proxy->getRegisteredMethods(), true));
 
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
@@ -157,7 +152,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class))) {
+        if (in_array(SubscriberInterface::class, class_implements($class), true)) {
             /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
