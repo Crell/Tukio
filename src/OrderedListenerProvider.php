@@ -44,15 +44,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         $attributes = $this->getAttributes($listener);
         $def = $attributes[0] ?? new Listener();
 
-        if ($priority) {
-            $def->priority = $priority;
-        }
-        if ($id) {
-            $def->id = $id;
-        }
-        if ($type) {
-            $def->type = $type;
-        }
+        $def = $def->maskWith(id: $id, priority: $priority, type: $type);
 
         $def->id ??= $this->getListenerId($listener);
         $def->type ??= $this->getType($listener);
@@ -71,7 +63,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     {
         if ($attributes = $this->getAttributes($listener)) {
             // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
+            /** @var Listener $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -92,7 +84,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     {
         if ($attributes = $this->getAttributes($listener)) {
             // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
+            /** @var Listener $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);

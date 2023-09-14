@@ -28,4 +28,18 @@ class Listener implements ListenerAttribute
             throw new Exception('TODO: Make this a custom exception');
         }
     }
+
+    /**
+     * @internal
+     */
+    public function maskWith(?string $id = null, ?int $priority = null, ?string $before = null, ?string $after = null, ?string $type = null): self
+    {
+        return new self(
+            id: $id ?? $this->id,
+            priority: $priority ?? $this->priority,
+            before: $before ?? $this->before,
+            after: $after ?? $this->after,
+            type: $type ?? $this->type,
+        );
+    }
 }
