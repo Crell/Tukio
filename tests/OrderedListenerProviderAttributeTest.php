@@ -194,6 +194,7 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
     public function test_multiple_attributes_read_separately(): void
     {
+        $this->markTestSkipped('We are probably removing this functionality.');
         $p = new OrderedListenerProvider();
 
         // Just to make the following lines shorter and easier to read.

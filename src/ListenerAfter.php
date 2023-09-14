@@ -7,11 +7,9 @@ namespace Crell\Tukio;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class ListenerAfter implements ListenerAttribute
+class ListenerAfter extends Listener
 {
-    public function __construct(
-        public string $after,
-        public ?string $id = null,
-        public ?string $type = null,
-    ) {}
+    public function __construct(string $after, ?string $id = null, ?string $type = null) {
+        parent::__construct(id: $id, after: $after, type: $type);
+    }
 }

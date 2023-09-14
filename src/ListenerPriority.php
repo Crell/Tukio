@@ -7,11 +7,9 @@ namespace Crell\Tukio;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class ListenerPriority implements ListenerAttribute
+class ListenerPriority extends Listener
 {
-    public function __construct(
-        public ?int $priority,
-        public ?string $id = null,
-        public ?string $type = null,
-    ) {}
+    public function __construct(?int $priority, ?string $id = null, ?string $type = null) {
+        parent::__construct(id: $id, priority: $priority, type: $type);
+    }
 }

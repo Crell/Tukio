@@ -41,30 +41,33 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
 
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
-                if ($attrib instanceof ListenerBefore) {
-                    $generatedId = $this->listeners->addItemBefore($attrib->before, new ListenerEntry($listener, $type), $id);
-                } elseif ($attrib instanceof ListenerAfter) {
-                    $generatedId = $this->listeners->addItemAfter($attrib->after, new ListenerEntry($listener, $type), $id);
-                } elseif ($attrib instanceof ListenerPriority) {
-                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $attrib->priority, $id);
-                } else {
-                    $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
-                }
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
+        $attributes = $this->getAttributes($listener);
+        $def = $attributes[0] ?? new Listener();
+
+        if ($priority) {
+            $def->priority = $priority;
+        }
+        if ($id) {
+            $def->id = $id;
+        }
+        if ($type) {
+            $def->type = $type;
         }
 
-        $type = $type ?? $this->getType($listener);
-        $id = $id ?? $this->getListenerId($listener);
+        $def->id ??= $this->getListenerId($listener);
+        $def->type ??= $this->getType($listener);
 
-        return $this->listeners->addItem(new ListenerEntry($listener, $type), $priority ?? 0, $id);
+        if ($def->before) {
+            $generatedId = $this->listeners->addItemBefore($def->before, new ListenerEntry($listener, $def->type), $def->id);
+        } elseif ($def->after) {
+            $generatedId = $this->listeners->addItemAfter($def->after, new ListenerEntry($listener, $def->type), $def->id);
+        } elseif ($def->priority) {
+            $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $def->type), $def->priority, $def->id);
+        } else {
+            $generatedId = $this->listeners->addItem(new ListenerEntry($listener, $def->type), $priority ?? 0, $def->id);
+        }
+
+        return $generatedId;
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
