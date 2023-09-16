@@ -57,7 +57,7 @@ class ListenerProxy
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * @param string $before
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
@@ -69,11 +69,11 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
+    public function addListenerBefore(string $before, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-        return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
+        return $this->provider->addListenerServiceBefore($before, $this->serviceName, $methodName, $type, $id);
     }
 
     /**
@@ -82,7 +82,7 @@ class ListenerProxy
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * @param string $after
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
@@ -94,11 +94,11 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
+    public function addListenerAfter(string $after, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-        return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
+        return $this->provider->addListenerServiceAfter($after, $this->serviceName, $methodName, $type, $id);
     }
 
     /**
