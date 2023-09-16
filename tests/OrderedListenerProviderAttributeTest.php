@@ -191,25 +191,4 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
         $this->assertEquals('CAD', implode($event->result()));
     }
-
-    public function test_multiple_attributes_read_separately(): void
-    {
-        $this->markTestSkipped('We are probably removing this functionality.');
-        /*
-        $p = new OrderedListenerProvider();
-
-        // Just to make the following lines shorter and easier to read.
-        $ns = '\\Crell\\Tukio\\';
-
-        $idOne = $p->addListener("{$ns}at_multi_one");
-
-        $event = new CollectingEvent();
-
-        foreach ($p->getListenersForEvent($event) as $listener) {
-            $listener($event);
-        }
-
-        $this->assertEquals('AAA', implode($event->result()));
-        */
-    }
 }
