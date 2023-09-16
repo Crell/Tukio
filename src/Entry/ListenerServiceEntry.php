@@ -11,18 +11,11 @@ namespace Crell\Tukio\Entry;
  */
 class ListenerServiceEntry implements CompileableListenerEntryInterface
 {
-    public string $serviceName;
-
-    public string $method;
-
-    public string $type;
-
-    public function __construct(string $serviceName, string $method, string $type)
-    {
-        $this->serviceName = $serviceName;
-        $this->method = $method;
-        $this->type = $type;
-    }
+    public function __construct(
+        public string $serviceName,
+        public string $method,
+        public string $type,
+    ) {}
 
     /**
      * @return array{
