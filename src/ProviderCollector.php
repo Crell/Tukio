@@ -24,7 +24,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
     public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
     {
-        $attrib ??= $this->getAttributes($listener)[0] ?? null;
+        $attrib = $this->getAttributes($listener)[0] ?? null;
         $id ??= $order->id ?? $attrib?->id ?? $this->getListenerId($listener);
         $type ??= $order->type ?? $attrib?->type ?? $this->getType($listener);
         $order ??= $attrib?->order;
@@ -99,13 +99,15 @@ abstract class ProviderCollector implements OrderedProviderInterface
         }
 
         $attributes = $this->findAttributesOnMethod($rMethod);
-        /** @var Listener $attrib */
+        /** @var ?Listener $attrib */
         $attrib = $attributes[0] ?? null;
 
         if (str_starts_with($methodName, 'on') || $attrib) {
             $paramType = $params[0]->getType();
 
             $id = $attrib->id ?? $service . '-' . $methodName;
+            // getName() is not a documented part of the Reflection API, but it's always there.
+            // @phpstan-ignore-next-line
             $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
 
             $this->listenerService($service, $methodName, $type, $attrib?->order, $id);
@@ -209,20 +211,14 @@ abstract class ProviderCollector implements OrderedProviderInterface
      */
     protected function getListenerId(callable $listener): ?string
     {
-        // The methods called in this method are from an external trait, and
-        // its docblock is a bit buggy.  Just ignore that on our end until
-        // it's fixed in the util package.
-        // @phpstan-ignore-next-line
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
             // @phpstan-ignore-next-line
             return (string)$listener;
         }
-        // @phpstan-ignore-next-line
         if ($this->isClassCallable($listener)) {
             return $listener[0] . '::' . $listener[1];
         }
-        // @phpstan-ignore-next-line
         if (is_array($listener) && is_object($listener[0])) {
             return get_class($listener[0]) . '::' . $listener[1];
         }

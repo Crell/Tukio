@@ -9,17 +9,17 @@ namespace Crell\Tukio;
  */
 abstract class Order
 {
-    public static function Priority(int $priority): static
+    public static function Priority(int $priority): OrderPriority
     {
         return new OrderPriority(priority: $priority);
     }
 
-    public static function Before(string $before): static
+    public static function Before(string $before): OrderBefore
     {
         return new OrderBefore(before: $before);
     }
 
-    public static function After(string $after): static
+    public static function After(string $after): OrderAfter
     {
         return new OrderAfter(after: $after);
     }
