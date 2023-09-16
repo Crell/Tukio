@@ -79,26 +79,32 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->listener($listener, $after ? Order::After($after) : null, $id, $type);
     }
 
-    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
+    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
-        $priority ??= 0;
+        $id ??= $service . '-' . $method;
 
-        return $this->listeners->addItem($entry, $priority, $id);
+        return match (true) {
+            $order instanceof OrderBefore => $this->listeners->addItemBefore($order->before, $entry, $id),
+            $order instanceof OrderAfter => $this->listeners->addItemAfter($order->after, $entry, $id),
+            $order instanceof OrderPriority => $this->listeners->addItem($entry, $order->priority, $id),
+            default => $this->listeners->addItem($entry, id: $id),
+        };
+    }
+
+    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
+    {
+        return $this->listenerService($service, $method, $type, ($priority !== null) ? Order::Priority($priority) : null, $id);
     }
 
     public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
-        $entry = new ListenerServiceEntry($service, $method, $type);
-
-        return $this->listeners->addItemBefore($before, $entry, $id);
+        return $this->listenerService($service, $method, $type, $before ? Order::Before($before) : null, $id);
     }
 
     public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
     {
-        $entry = new ListenerServiceEntry($service, $method, $type);
-
-        return $this->listeners->addItemAfter($after, $entry, $id);
+        return $this->listenerService($service, $method, $type, $after ? Order::After($after) : null, $id);
     }
 
     public function addSubscriber(string $class, string $service): void

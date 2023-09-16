@@ -84,23 +84,25 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         return $this->listener($listener, $after ? Order::After($after) : null, $id, $type);
     }
 
-    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
+    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string
     {
         $id ??= $service . '-' . $method;
-        $priority ??= 0;
-        return $this->addListener($this->makeListenerForService($service, $method), $priority, $id, $type);
+        return $this->listener($this->makeListenerForService($service, $method), $order, $id, $type);
+    }
+
+    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
+    {
+        return $this->listenerService($service, $method, $type, ($priority !== null) ? Order::Priority($priority) : null, $id);
     }
 
     public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
-        $id ??= $service . '-' . $method;
-        return $this->addListenerBefore($before, $this->makeListenerForService($service, $method), $id, $type);
+        return $this->listenerService($service, $method, $type, $before ? Order::Before($before) : null, $id);
     }
 
     public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
     {
-        $id = $id ?? $service . '-' . $method;
-        return $this->addListenerAfter($after, $this->makeListenerForService($service, $method), $id, $type);
+        return $this->listenerService($service, $method, $type, $after ? Order::After($after) : null, $id);
     }
 
     public function addSubscriber(string $class, string $service): void
@@ -162,7 +164,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         if (str_starts_with($methodName, 'on') || $attrib) {
             $paramType = $params[0]->getType();
 
-            $id ??= $attrib->id ?? $service . '-' . $methodName;
+            $id = $attrib->id ?? $service . '-' . $methodName;
             $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
 
             $this->listener($this->makeListenerForService($service, $methodName), $attrib?->order, $id, $type);
