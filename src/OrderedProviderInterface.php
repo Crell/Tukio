@@ -18,7 +18,7 @@ interface OrderedProviderInterface
      *    The identifier by which this listener should be known. If not specified one will be generated.
      * @param ?string $type
      *    The class or interface type of events for which this listener will be registered. If not provided
-     *    it will be derived based on the type hint of the listener.
+     *    it will be derived based on the type declaration of the listener.
      *
      * @return string
      *    The opaque ID of the listener.  This can be used for future reference.     */
@@ -34,7 +34,7 @@ interface OrderedProviderInterface
      * @param string $method
      *    The method name of the service that is the listener being registered.
      * @param string $type
-     *    The class or interface type of events for which this listener will be registered.     * @param Order|null $order
+     *    The class or interface type of events for which this listener will be registered.
      * @param Order|null $order
      *    One of Order::Priority(), Order::Before(), or Order::After().
      *
@@ -57,7 +57,7 @@ interface OrderedProviderInterface
      *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param ?string $type
      *   The class or interface type of events for which this listener will be registered. If not provided
-     *   it will be derived based on the type hint of the listener.
+     *   it will be derived based on the type declaration of the listener.
      *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
@@ -81,7 +81,7 @@ interface OrderedProviderInterface
      *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param ?string $type
      *   The class or interface type of events for which this listener will be registered. If not provided
-     *   it will be derived based on the type hint of the listener.
+     *   it will be derived based on the type declaration of the listener.
      *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
@@ -105,7 +105,7 @@ interface OrderedProviderInterface
      *   The identifier by which this listener should be known. If not specified one will be generated.
      * @param ?string $type
      *   The class or interface type of events for which this listener will be registered. If not provided
-     *   it will be derived based on the type hint of the listener.
+     *   it will be derived based on the type declaration of the listener.
      *
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
@@ -189,7 +189,7 @@ interface OrderedProviderInterface
      * - It's name is in the form on*.  onUpdate(), onUserLogin(), onHammerTime() will all be registered.
      * - It has a Listener/ListenerBefore/ListenerAfter attribute.
      *
-     * The event type the listener is for will be derived from the type hint in the method signature.
+     * The event type the listener is for will be derived from the type declaration in the method signature.
      *
      * @param string $class
      *   The class name to be registered as a subscriber.
