@@ -10,6 +10,6 @@ use Attribute;
 class ListenerPriority extends Listener
 {
     public function __construct(?int $priority, ?string $id = null, ?string $type = null) {
-        parent::__construct(id: $id, priority: $priority, type: $type);
+        parent::__construct(id: $id, order: Order::Priority($priority), type: $type);
     }
 }

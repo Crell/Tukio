@@ -6,6 +6,8 @@ namespace Crell\Tukio;
 
 use Crell\Tukio\Entry\ListenerEntry;
 use Crell\OrderedCollection\OrderedCollection;
+use Crell\Tukio\Entry\ListenerFunctionEntry;
+use Crell\Tukio\Entry\ListenerStaticMethodEntry;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -36,66 +38,50 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         }
     }
 
+    public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
+    {
+        $attrib ??= $this->getAttributes($listener)[0] ?? null;
+        $id ??= $order->id ?? $attrib?->id ?? $this->getListenerId($listener);
+        $type ??= $order->type ?? $attrib?->type ?? $this->getType($listener);
+        $order ??= $attrib?->order;
+
+        $entry = $this->getListenerEntry($listener, $type);
+
+        return match (true) {
+            $order instanceof OrderBefore => $this->listeners->addItemBefore($order->before, $entry, $id),
+            $order instanceof OrderAfter => $this->listeners->addItemAfter($order->after, $entry, $id),
+            $order instanceof OrderPriority => $this->listeners->addItem($entry, $order->priority, $id),
+            default => $this->listeners->addItem($entry, id: $id),
+        };
+    }
+
+    protected function getListenerEntry(callable $listener, string $type): ListenerEntry
+    {
+        // String means it's a function name, and that's safe.
+        if (is_string($listener)) {
+            return new ListenerFunctionEntry($listener, $type);
+        }
+        // This is how we recognize a static method call.
+        if (is_array($listener) && isset($listener[0]) && is_string($listener[0])) {
+            return new ListenerStaticMethodEntry($listener[0], $listener[1], $type);
+        }
+
+        return new ListenerEntry($listener, $type);
+    }
+
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
-        $attributes = $this->getAttributes($listener);
-        $def = $attributes[0] ?? new Listener();
-
-        $def = $def->maskWith(id: $id, priority: $priority, type: $type);
-
-        $def->id ??= $this->getListenerId($listener);
-        $def->type ??= $this->getType($listener);
-
-        $generatedId = match (true) {
-            $def->before !== null => $this->listeners->addItemBefore($def->before, new ListenerEntry($listener, $def->type), $def->id),
-            $def->after !== null => $this->listeners->addItemAfter($def->after, new ListenerEntry($listener, $def->type), $def->id),
-            $def->priority !== null => $this->listeners->addItem(new ListenerEntry($listener, $def->type), $def->priority, $def->id),
-            default => $this->listeners->addItem(new ListenerEntry($listener, $def->type), $priority ?? 0, $def->id),
-        };
-
-        return $generatedId;
+        return $this->listener($listener, ($priority !== null) ? Order::Priority($priority) : null, $id, $type);
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener $attrib */
-            foreach ($attributes as $attrib) {
-                $type ??= $attrib->type ?? $this->getType($listener);
-                $id ??= $attrib->id ?? $this->getListenerId($listener);
-                // The before-ness of this method call always overrides the attribute.
-                $generatedId = $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $type ??= $this->getType($listener);
-        $id ??= $this->getListenerId($listener);
-
-        return $this->listeners->addItemBefore($before, new ListenerEntry($listener, $type), $id);
+        return $this->listener($listener, $before ? Order::Before($before) : null, $id, $type);
     }
 
     public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener $attrib */
-            foreach ($attributes as $attrib) {
-                $type ??= $attrib->type ?? $this->getType($listener);
-                $id ??= $attrib->id ?? $this->getListenerId($listener);
-                // The after-ness of this method call always overrides the attribute.
-                $generatedId = $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $type ??= $this->getType($listener);
-        $id ??= $this->getListenerId($listener);
-
-        return $this->listeners->addItemAfter($after, new ListenerEntry($listener, $type), $id);
+        return $this->listener($listener, $after ? Order::After($after) : null, $id, $type);
     }
 
     public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
@@ -154,7 +140,7 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     protected function findAttributesOnMethod(\ReflectionMethod $rMethod): array
     {
         $attributes = array_map(static fn (\ReflectionAttribute $attrib): object
-        => $attrib->newInstance(), $rMethod->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF));
+        => $attrib->newInstance(), $rMethod->getAttributes(Listener::class, \ReflectionAttribute::IS_INSTANCEOF));
 
         return $attributes;
     }
@@ -162,38 +148,24 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
     protected function addSubscriberMethod(\ReflectionMethod $rMethod, string $class, string $service): void
     {
         $methodName = $rMethod->getName();
+        $params = $rMethod->getParameters();
+
+        if (count($params) < 1) {
+            // Skip this method, as it doesn't take arguments.
+            return;
+        }
 
         $attributes = $this->findAttributesOnMethod($rMethod);
+        /** @var Listener $attrib */
+        $attrib = $attributes[0] ?? null;
 
-        if (count($attributes)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener $attrib */
-            foreach ($attributes as $attrib) {
-                $params = $rMethod->getParameters();
-                $paramType = $params[0]->getType();
-                // getName() is not part of the declared reflection API, but it's there.
-                // @phpstan-ignore-next-line
-                $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
+        if (str_starts_with($methodName, 'on') || $attrib) {
+            $paramType = $params[0]->getType();
 
-                if ($attrib instanceof ListenerBefore) {
-                    $this->addListenerServiceBefore($attrib->before, $service, $methodName, $type, $attrib->id);
-                } elseif ($attrib instanceof ListenerAfter) {
-                    $this->addListenerServiceAfter($attrib->after, $service, $methodName, $type, $attrib->id);
-                } elseif ($attrib instanceof ListenerPriority) {
-                    $this->addListenerService($service, $methodName, $type, $attrib->priority, $attrib->id);
-                } else {
-                    $this->addListenerService($service, $methodName, $type, null, $attrib->id);
-                }
-            }
-        } elseif (str_starts_with($methodName, 'on')) {
-            $params = $rMethod->getParameters();
-            $type = $params[0]->getType();
-            if (is_null($type)) {
-                throw InvalidTypeException::fromClassCallable($class, $methodName);
-            }
-            // getName() is not part of the declared reflection API, but it's there.
-            // @phpstan-ignore-next-line
-            $this->addListenerService($service, $rMethod->getName(), $type->getName());
+            $id ??= $attrib->id ?? $service . '-' . $methodName;
+            $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
+
+            $this->listener($this->makeListenerForService($service, $methodName), $attrib?->order, $id, $type);
         }
     }
 

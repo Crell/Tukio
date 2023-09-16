@@ -47,11 +47,30 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->optimizedEvents;
     }
 
+    public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
+    {
+        $attrib ??= $this->getAttributes($listener)[0] ?? null;
+        $id ??= $order->id ?? $attrib?->id ?? $this->getListenerId($listener);
+        $type ??= $order->type ?? $attrib?->type ?? $this->getType($listener);
+        $order ??= $attrib?->order;
+
+        $entry = $this->getListenerEntry($listener, $type);
+
+        return match (true) {
+            $order instanceof OrderBefore => $this->listeners->addItemBefore($order->before, $entry, $id),
+            $order instanceof OrderAfter => $this->listeners->addItemAfter($order->after, $entry, $id),
+            $order instanceof OrderPriority => $this->listeners->addItem($entry, $order->priority, $id),
+            default => $this->listeners->addItem($entry, id: $id),
+        };
+    }
+
+
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
+        return $this->listener($listener, $priority ? Order::Priority($priority) : null, $id, $type);
+        /*
         if ($attributes = $this->getAttributes($listener)) {
             // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
             foreach ($attributes as $attrib) {
                 $type = $type ?? $attrib->type ?? $this->getType($listener);
                 $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
@@ -74,6 +93,7 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         $id ??= $this->getListenerId($listener);
 
         return $this->listeners->addItem($entry, $priority ?? 0, $id);
+        */
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string

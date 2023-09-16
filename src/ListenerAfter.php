@@ -10,6 +10,6 @@ use Attribute;
 class ListenerAfter extends Listener
 {
     public function __construct(string $after, ?string $id = null, ?string $type = null) {
-        parent::__construct(id: $id, after: $after, type: $type);
+        parent::__construct(id: $id, order: Order::After($after), type: $type);
     }
 }

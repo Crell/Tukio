@@ -10,6 +10,6 @@ use Attribute;
 class ListenerBefore extends Listener
 {
     public function __construct(string $before, ?string $id = null, ?string $type = null) {
-        parent::__construct(id: $id, before: $before, type: $type);
+        parent::__construct(id: $id, order: Order::Before($before), type: $type);
     }
 }
