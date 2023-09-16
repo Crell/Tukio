@@ -16,7 +16,7 @@ trait ProviderUtilities
     use ParameterDeriverTrait;
 
     /**
-     * @return array<ListenerAttribute>
+     * @return array<Listener>
      */
     protected function getAttributes(callable $listener): array
     {
@@ -42,7 +42,7 @@ trait ProviderUtilities
             return [];
         }
 
-        $attribs = $ref->getAttributes(ListenerAttribute::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $attribs = $ref->getAttributes(Listener::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }
