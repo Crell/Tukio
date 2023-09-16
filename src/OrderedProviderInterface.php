@@ -6,6 +6,11 @@ namespace Crell\Tukio;
 
 interface OrderedProviderInterface
 {
+
+    public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string;
+
+    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string;
+
     /**
      * Adds a listener to the provider.
      *

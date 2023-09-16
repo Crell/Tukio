@@ -22,7 +22,6 @@ class ListenerStaticMethodEntry extends ListenerEntry implements CompileableList
         $this->class = $class;
         $this->method = $method;
         $this->type = $type;
-        $this->listener = [$class, $method];
     }
 
     /**
