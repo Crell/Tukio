@@ -194,8 +194,6 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
         // the wrapping listener must listen to just object.  The explicit $type means it will still get only
         // the right event type, and the real listener can still type itself properly.
         $container = $this->container;
-        return static function (object $event) use ($serviceName, $methodName, $container): void {
-            $container->get($serviceName)->$methodName($event);
-        };
+        return static fn (object $event) => $container->get($serviceName)->$methodName($event);
     }
 }
