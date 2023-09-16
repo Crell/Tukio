@@ -7,8 +7,40 @@ namespace Crell\Tukio;
 interface OrderedProviderInterface
 {
 
+    /**
+     * Adds a listener to the provider.
+     *
+     * @param callable $listener
+     *    The listener to register.
+     * @param Order|null $order
+     *    One of Order::Priority(), Order::Before(), or Order::After().
+     * @param ?string $id
+     *    The identifier by which this listener should be known. If not specified one will be generated.
+     * @param ?string $type
+     *    The class or interface type of events for which this listener will be registered. If not provided
+     *    it will be derived based on the type hint of the listener.
+     *
+     * @return string
+     *    The opaque ID of the listener.  This can be used for future reference.     */
     public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string;
 
+    /**
+     * Adds a method on a service as a listener.
+     *
+     * This method does not support attributes, as the class name is unknown at registration.
+     *
+     * @param string $service
+     *    The name of a service on which this listener lives.
+     * @param string $method
+     *    The method name of the service that is the listener being registered.
+     * @param string $type
+     *    The class or interface type of events for which this listener will be registered.     * @param Order|null $order
+     * @param Order|null $order
+     *    One of Order::Priority(), Order::Before(), or Order::After().
+     *
+     * @return string
+     *    The opaque ID of the listener.  This can be used for future reference.
+     */
     public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string;
 
     /**
