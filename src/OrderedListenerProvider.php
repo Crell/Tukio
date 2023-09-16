@@ -18,12 +18,9 @@ class OrderedListenerProvider implements ListenerProviderInterface, OrderedProvi
      */
     protected OrderedCollection $listeners;
 
-    protected ?ContainerInterface $container;
-
-    public function __construct(?ContainerInterface $container = null)
+    public function __construct(protected ?ContainerInterface $container = null)
     {
         $this->listeners = new OrderedCollection();
-        $this->container = $container;
     }
 
     /**
