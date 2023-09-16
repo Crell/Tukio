@@ -102,19 +102,14 @@ END;
     protected function createOptimizedEntry(CompileableListenerEntryInterface $listenerEntry): string
     {
         $listener = $listenerEntry->getProperties();
-        switch ($listener['entryType']) {
-            case ListenerFunctionEntry::class:
-                $ret = "'{$listener['listener']}'";
-                break;
-            case ListenerStaticMethodEntry::class:
-                $ret = var_export([$listener['class'], $listener['method']], true);
-                break;
-            case ListenerServiceEntry::class:
-                $ret = sprintf('fn(object $event) => $this->container->get(\'%s\')->%s($event)', $listener['serviceName'], $listener['method']);
-                break;
-            default:
-                throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s', $listener['entryType']));
-        }
+        $ret = match ($listener['entryType']) {
+            ListenerFunctionEntry::class => "'{$listener['listener']}'",
+            ListenerStaticMethodEntry::class => var_export([$listener['class'], $listener['method']], true),
+            ListenerServiceEntry::class => sprintf('fn(object $event) => $this->container->get(\'%s\')->%s($event)',
+                $listener['serviceName'], $listener['method']),
+            default => throw new \RuntimeException(sprintf('No such listener type found in compiled container definition: %s',
+                $listener['entryType'])),
+        };
 
         return $ret . ',' . PHP_EOL;
     }
