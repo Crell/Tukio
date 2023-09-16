@@ -64,79 +64,19 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         };
     }
 
-
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
         return $this->listener($listener, $priority ? Order::Priority($priority) : null, $id, $type);
-        /*
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                if ($attrib instanceof ListenerBefore) {
-                    $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
-                } elseif ($attrib instanceof ListenerAfter) {
-                    $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
-                } elseif ($attrib instanceof ListenerPriority) {
-                    $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
-                } else {
-                    $generatedId = $this->listeners->addItem($entry, $priority ?? 0, $id);
-                }
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id ??= $this->getListenerId($listener);
-
-        return $this->listeners->addItem($entry, $priority ?? 0, $id);
-        */
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type ??= $attrib->type ?? $this->getType($listener);
-                $id ??= $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                // The before-ness of this method takes priority over the attribute.
-                $generatedId = $this->listeners->addItemBefore($before, $entry, $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $id ??= $this->getListenerId($listener);
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        return $this->listeners->addItemBefore($before, $entry, $id);
+        return $this->listener($listener, $before ? Order::Before($before) : null, $id, $type);
     }
 
     public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type ??= $attrib->type ?? $this->getType($listener);
-                $id ??= $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                // The before-ness of this method takes priority over the attribute.
-                $generatedId = $this->listeners->addItemBefore($after, $entry, $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id ??= $this->getListenerId($listener);
-
-        return $this->listeners->addItemAfter($after, $entry, $id);
+        return $this->listener($listener, $after ? Order::After($after) : null, $id, $type);
     }
 
     public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
