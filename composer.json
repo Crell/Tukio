@@ -27,8 +27,8 @@
     },
     "require-dev": {
         "phpbench/phpbench": "^1.2",
-        "phpstan/phpstan": "^1.5",
-        "phpunit/phpunit": "^9.5"
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.3"
     },
     "provide": {
         "psr/event-dispatcher-implementation": "1.0"
