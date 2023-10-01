@@ -40,7 +40,7 @@ class ListenService
     }
 }
 
-class CompiledEventDispatcherTest extends TestCase
+class CompiledListenerProviderTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 

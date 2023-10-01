@@ -44,7 +44,7 @@ class AtListenService
     }
 }
 
-class CompiledEventDispatcherAttributeTest extends TestCase
+class CompiledListenerProviderAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
