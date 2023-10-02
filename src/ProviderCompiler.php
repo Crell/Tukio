@@ -8,10 +8,14 @@ use Crell\Tukio\Entry\CompileableListenerEntryInterface;
 use Crell\Tukio\Entry\ListenerFunctionEntry;
 use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
+use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\ListenerProviderInterface;
 
 class ProviderCompiler
 {
     /**
+     * Compiles a provided ProviderBuilder to a named class on disk.
+     *
      * @param ProviderBuilder $listeners
      *   The set of listeners to compile.
      * @param resource $stream
@@ -34,6 +38,36 @@ class ProviderCompiler
         $this->writeOptimizedList($listeners, $stream);
 
         fwrite($stream, $this->createClosing());
+    }
+
+    /**
+     * Compiles a provided ProviderBuilder to an anonymous class on disk.
+     *
+     * The generated class requires a container instance in its constructor, which
+     * because it's anonymous has a pre-defined name of $container.  That variable must
+     * be in scope when the resulting file is require()ed/include()ed.  The easiest way
+     * to do that is to use the loadAnonymous() method of this class, but you may also
+     * do so manually.
+     *
+     * @param ProviderBuilder $listeners
+     *    The set of listeners to compile.
+     * @param resource $stream
+     *    A writeable stream to which to write the compiled class.
+     */
+    public function compileAnonymous(ProviderBuilder $listeners, $stream): void
+    {
+        fwrite($stream, $this->createAnonymousPreamble());
+
+        $this->writeMainListenersList($listeners, $stream);
+
+        $this->writeOptimizedList($listeners, $stream);
+
+        fwrite($stream, $this->createAnonymousClosing());
+    }
+
+    public function loadAnonymous(string $filename, ContainerInterface $container): ListenerProviderInterface
+    {
+        return require($filename);
     }
 
     /**
@@ -163,6 +197,25 @@ class {$class} extends CompiledListenerProviderBase
 END;
     }
 
+    protected function createAnonymousPreamble(): string
+    {
+        return <<<END
+<?php
+
+declare(strict_types=1);
+
+use Crell\Tukio\CompiledListenerProviderBase;
+use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventInterface;
+
+return new class(\$container) extends CompiledListenerProviderBase
+{
+    public function __construct(ContainerInterface \$container)
+    {
+        parent::__construct(\$container);
+
+END;
+    }
 
     /**
      * Returns a list of all class and interface parents of a class.
@@ -217,6 +270,15 @@ END;
         return <<<'END'
     }   // Close constructor
 }       // Close class
+
+END;
+    }
+
+    protected function createAnonymousClosing(): string
+    {
+        return <<<'END'
+    }   // Close constructor
+};       // Close class
 
 END;
     }

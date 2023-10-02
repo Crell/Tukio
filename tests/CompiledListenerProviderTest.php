@@ -182,4 +182,58 @@ class CompiledListenerProviderTest extends TestCase
 
         $this->assertEquals('BACD', implode($event->result()));
     }
+
+    public function test_anonymous_class_compile(): void
+    {
+        $builder = new ProviderBuilder();
+
+        $container = new MockContainer();
+        $container->addService('D', new ListenService());
+
+        $builder->addListener('\\Crell\\Tukio\\listenerA');
+        $builder->addListener('\\Crell\\Tukio\\listenerB');
+        $builder->addListener('\\Crell\\Tukio\\noListen');
+        $builder->addListener([Listen::class, 'listen']);
+        $builder->addListenerService('D', 'listen', CollectingEvent::class);
+
+        $provider = $this->makeAnonymousProvider($builder, $container);
+
+        $event = new CollectingEvent();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $result = $event->result();
+        $this->assertContains('A', $result);
+        $this->assertContains('B', $result);
+        $this->assertContains('C', $result);
+        $this->assertContains('D', $result);
+
+        $this->assertTrue(true);
+    }
+
+    public function test_optimize_event_anonymous_class(): void
+    {
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        // Just to make the following lines shorter and easier to read.
+        $ns = '\\Crell\\Tukio\\';
+
+        $builder->addListener("{$ns}event_listener_one", -4, 'id-1');
+        $builder->addListenerBefore('id-1', "{$ns}event_listener_two", 'id-2');
+        $builder->addListenerAfter('id-2', "{$ns}event_listener_three", 'id-3');
+        $builder->addListenerAfter('id-3', "{$ns}event_listener_four");
+
+        $builder->optimizeEvents(CollectingEvent::class);
+
+        $provider = $this->makeAnonymousProvider($builder, $container);
+
+        $event = new CollectingEvent();
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $this->assertEquals('BACD', implode($event->result()));
+    }
 }

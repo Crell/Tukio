@@ -57,4 +57,29 @@ trait MakeCompiledProviderTrait
         return $provider;
     }
 
+    protected function makeAnonymousProvider(ProviderBuilder $builder, ContainerInterface $container): ListenerProviderInterface
+    {
+        try {
+            $compiler = new ProviderCompiler();
+
+            // Write the generated compiler out to a temp file.
+            $filename = tempnam(sys_get_temp_dir(), 'compiled');
+            $out = fopen($filename, 'w');
+            $compiler->compileAnonymous($builder, $out);
+            fclose($out);
+
+            // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
+            $provider = $compiler->loadAnonymous($filename, $container);
+        }
+        finally {
+            // This check is not actually needed as no exception could be
+            // thrown before $filename gets defined, but PHPStan doesn't
+            // understand that.
+            if (isset($filename)) {
+                unlink($filename);
+            }
+        }
+
+        return $provider;
+    }
 }
