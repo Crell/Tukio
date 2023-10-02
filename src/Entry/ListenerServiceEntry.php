@@ -9,7 +9,7 @@ namespace Crell\Tukio\Entry;
  *
  * @internal
  */
-class ListenerServiceEntry implements CompileableListenerEntryInterface
+class ListenerServiceEntry implements CompileableListenerEntry
 {
     public function __construct(
         public string $serviceName,

@@ -9,7 +9,7 @@ namespace Crell\Tukio\Entry;
  *
  * @internal
  */
-class ListenerStaticMethodEntry extends ListenerEntry implements CompileableListenerEntryInterface
+class ListenerStaticMethodEntry extends ListenerEntry implements CompileableListenerEntry
 {
     public function __construct(
         public string $class,

@@ -9,7 +9,7 @@ namespace Crell\Tukio\Entry;
  *
  * @internal
  */
-class ListenerFunctionEntry extends ListenerEntry implements CompileableListenerEntryInterface
+class ListenerFunctionEntry extends ListenerEntry implements CompileableListenerEntry
 {
     /**
      * @return array{

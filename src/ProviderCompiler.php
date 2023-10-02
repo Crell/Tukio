@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\Tukio\Entry\CompileableListenerEntryInterface;
+use Crell\Tukio\Entry\CompileableListenerEntry;
 use Crell\Tukio\Entry\ListenerFunctionEntry;
 use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
@@ -78,7 +78,7 @@ class ProviderCompiler
     {
         fwrite($stream, $this->startMainListenersList());
 
-        /** @var CompileableListenerEntryInterface $listenerEntry */
+        /** @var CompileableListenerEntry $listenerEntry */
         foreach ($listeners as $listenerEntry) {
             $item = $this->createEntry($listenerEntry);
             fwrite($stream, $item);
@@ -103,11 +103,11 @@ class ProviderCompiler
             fwrite($stream, $this->startOptimizedEntry($event));
 
             $relevantListeners = array_filter($listenerDefs,
-                static fn(CompileableListenerEntryInterface $entry)
+                static fn(CompileableListenerEntry $entry)
                     => in_array($entry->getProperties()['type'], $ancestors, true)
             );
 
-            /** @var CompileableListenerEntryInterface $listenerEntry */
+            /** @var CompileableListenerEntry $listenerEntry */
             foreach ($relevantListeners as $listenerEntry) {
                 $item = $this->createOptimizedEntry($listenerEntry);
                 fwrite($stream, $item);
@@ -133,7 +133,7 @@ END;
 END;
     }
 
-    protected function createOptimizedEntry(CompileableListenerEntryInterface $listenerEntry): string
+    protected function createOptimizedEntry(CompileableListenerEntry $listenerEntry): string
     {
         $listener = $listenerEntry->getProperties();
         $ret = match ($listener['entryType']) {
@@ -148,7 +148,7 @@ END;
         return $ret . ',' . PHP_EOL;
     }
 
-    protected function createEntry(CompileableListenerEntryInterface $listenerEntry): string
+    protected function createEntry(CompileableListenerEntry $listenerEntry): string
     {
         $listener = $listenerEntry->getProperties();
         switch ($listener['entryType']) {
