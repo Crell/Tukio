@@ -10,15 +10,6 @@ class ListenerProxy
 {
     use ParameterDeriverTrait;
 
-    protected OrderedProviderInterface $provider;
-
-    protected string $serviceName;
-
-    /**
-     * @var class-string
-     */
-    protected string $serviceClass;
-
     /**
      * @var array<string>
      *     Methods that have already been registered on this subscriber, so we know not to double-subscribe them.
@@ -30,12 +21,11 @@ class ListenerProxy
      * @param string $serviceName
      * @param class-string $serviceClass
      */
-    public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
-    {
-        $this->provider = $provider;
-        $this->serviceName = $serviceName;
-        $this->serviceClass = $serviceClass;
-    }
+    public function __construct(
+        protected OrderedProviderInterface $provider,
+        protected string $serviceName,
+        protected string $serviceClass
+    ) {}
 
     /**
      * Adds a method on a service as a listener.
