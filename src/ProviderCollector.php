@@ -125,12 +125,15 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $attributes;
     }
 
+    /**
+     * @param class-string $class
+     */
     protected function addSubscribersByProxy(string $class, string $service): ListenerProxy
     {
         $proxy = new ListenerProxy($this, $service, $class);
 
         // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class), true)) {
+        if (in_array(SubscriberInterface::class, class_implements($class) ?: [], true)) {
             /** @var SubscriberInterface $class */
             $class::registerListeners($proxy);
         }
@@ -145,6 +148,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
         $ref = null;
 
         if ($this->isFunctionCallable($listener)) {
+            /** @var string $listener */
             $ref = new \ReflectionFunction($listener);
         } elseif ($this->isClassCallable($listener)) {
             // PHPStan says you cannot use array destructuring on a callable, but you can
@@ -186,6 +190,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
             $type = $this->getParameterType($listener);
         } catch (\InvalidArgumentException $exception) {
             if ($this->isClassCallable($listener) || $this->isObjectCallable($listener)) {
+                /** @var array{0: class-string, 1: string} $listener */
                 throw InvalidTypeException::fromClassCallable($listener[0], $listener[1], $exception);
             }
             if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
@@ -217,6 +222,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
             return (string)$listener;
         }
         if ($this->isClassCallable($listener)) {
+            /** @var array{0: class-string, 1: string} $listener */
             return $listener[0] . '::' . $listener[1];
         }
         if (is_array($listener) && is_object($listener[0])) {

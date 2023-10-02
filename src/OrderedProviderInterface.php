@@ -191,7 +191,7 @@ interface OrderedProviderInterface
      *
      * The event type the listener is for will be derived from the type declaration in the method signature.
      *
-     * @param string $class
+     * @param class-string $class
      *   The class name to be registered as a subscriber.
      * @param string $service
      *   The name of a service in the container.

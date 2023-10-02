@@ -220,12 +220,14 @@ END;
     /**
      * Returns a list of all class and interface parents of a class.
      *
+     * @param class-string $class
      * @return array<class-string>
      */
     protected function classAncestors(string $class, bool $includeClass = true): array
     {
         // These methods both return associative arrays, making + safe.
-        $ancestors = class_parents($class) + class_implements($class);
+        /** @var array<class-string, class-string> $ancestors */
+        $ancestors = (class_parents($class) ?: []) + (class_implements($class) ?: []);
         return $includeClass
             ? [$class => $class] + $ancestors
             : $ancestors

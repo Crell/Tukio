@@ -14,6 +14,9 @@ class ListenerProxy
 
     protected string $serviceName;
 
+    /**
+     * @var class-string
+     */
     protected string $serviceClass;
 
     /**
@@ -22,6 +25,11 @@ class ListenerProxy
      */
     protected array $registeredMethods = [];
 
+    /**
+     * @param OrderedProviderInterface $provider
+     * @param string $serviceName
+     * @param class-string $serviceClass
+     */
     public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
     {
         $this->provider = $provider;
@@ -124,6 +132,9 @@ class ListenerProxy
     protected function getServiceMethodType(string $methodName): string
     {
         try {
+            // We don't have a real object here, so we cannot use first-class-closures.
+            // PHPStan complains that an aray is not a callable, even though it is, because PHP.
+            // @phpstan-ignore-next-line
             $type = $this->getParameterType([$this->serviceClass, $methodName]);
         } catch (\InvalidArgumentException $exception) {
             throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);

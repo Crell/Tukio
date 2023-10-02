@@ -26,7 +26,7 @@ class CompiledListenerProviderBase implements ListenerProviderInterface
      * The keys are an event class name.  The value is an array of callables that may be
      * returned to the dispatcher as-is.
      *
-     * @var array<class-string, callable>
+     * @var array<class-string, array<callable>>
      */
     protected array $optimized = [];
 

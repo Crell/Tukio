@@ -1,15 +1,9 @@
 parameters:
-    level: 6
+    level: 7
     paths:
         - src
         - tests
     checkGenericClassInNonGenericObjectType: false
-    excludePaths:
-        # Attribute classes use PHP 8 syntax that's invalid on 7.4, but we don't care.
-        - src/Listener.php
-        - src/ListenerBefore.php
-        - src/ListenerAfter.php
-        - src/ListenerPriority.php
     ignoreErrors:
         -
             message: '#type has no value type specified in iterable type array#'
