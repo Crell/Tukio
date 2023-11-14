@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 function event_listener_one(CollectingEvent $event): void
@@ -53,7 +54,8 @@ class TestListeners
 class OrderedListenerProviderIdTest extends TestCase
 {
 
-    public function test_natural_id_for_function(): void
+    #[Test]
+    public function natural_id_for_function(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -74,7 +76,8 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_static_method(): void
+    #[Test]
+    public function natural_id_for_static_method(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -90,7 +93,8 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BA', implode($event->result()));
     }
 
-    public function test_natural_id_for_object_method(): void
+    #[Test]
+    public function natural_id_for_object_method(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -108,7 +112,8 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('DC', implode($event->result()));
     }
 
-    public function test_explicit_id_for_function(): void
+    #[Test]
+    public function explicit_id_for_function(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -129,7 +134,8 @@ class OrderedListenerProviderIdTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_service_listener(): void
+    #[Test]
+    public function natural_id_for_service_listener(): void
     {
         $container = new MockContainer();
 

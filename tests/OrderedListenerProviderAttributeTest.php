@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerPriority(0, 'a')]
@@ -75,7 +76,8 @@ function at_multi_one(CollectingEvent $event): void
 
 class OrderedListenerProviderAttributeTest extends TestCase
 {
-    public function test_id_from_attribute_is_found() : void
+    #[Test]
+    public function id_from_attribute_is_found() : void
     {
         $p = new OrderedListenerProvider();
 
@@ -95,7 +97,8 @@ class OrderedListenerProviderAttributeTest extends TestCase
         $this->assertEquals('BA', implode($event->result()));
     }
 
-    public function test_priority_from_attribute_honored() : void
+    #[Test]
+    public function priority_from_attribute_honored() : void
     {
         $p = new OrderedListenerProvider();
 
@@ -114,7 +117,8 @@ class OrderedListenerProviderAttributeTest extends TestCase
         $this->assertEquals('CA', implode($event->result()));
     }
 
-    public function test_type_from_attribute_called_correctly() : void
+    #[Test]
+    public function type_from_attribute_called_correctly() : void
     {
         $p = new OrderedListenerProvider();
 
@@ -134,7 +138,8 @@ class OrderedListenerProviderAttributeTest extends TestCase
         $this->assertEquals('CDA', implode($event->result()));
     }
 
-    public function test_type_from_attribute_skips_correctly() : void
+    #[Test]
+    public function type_from_attribute_skips_correctly() : void
     {
         $p = new OrderedListenerProvider();
 
@@ -154,7 +159,8 @@ class OrderedListenerProviderAttributeTest extends TestCase
         $this->assertEquals(false, $event->called);
     }
 
-    public function test_attributes_found_on_object_methods() : void
+    #[Test]
+    public function attributes_found_on_object_methods() : void
     {
         $p = new OrderedListenerProvider();
 
@@ -172,7 +178,8 @@ class OrderedListenerProviderAttributeTest extends TestCase
         $this->assertEquals('DC', implode($event->result()));
     }
 
-    public function test_before_after_methods_win_over_attributes(): void
+    #[Test]
+    public function before_after_methods_win_over_attributes(): void
     {
         $p = new OrderedListenerProvider();
 

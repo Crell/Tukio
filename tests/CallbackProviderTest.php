@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 
@@ -57,7 +58,8 @@ class FakeEntity
 class CallbackProviderTest extends TestCase
 {
 
-    public function test_callback(): void
+    #[Test]
+    public function callback_provider(): void
     {
         $p = new CallbackProvider();
 
@@ -76,7 +78,8 @@ class CallbackProviderTest extends TestCase
         $this->assertEquals('AD', implode($event->result()));
     }
 
-    public function test_non_callback_event_skips_silently(): void
+    #[Test]
+    public function non_callback_event_skips_silently(): void
     {
         $p = new CallbackProvider();
 

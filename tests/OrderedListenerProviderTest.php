@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class EventOne extends CollectingEvent {}
@@ -13,7 +14,8 @@ class EventTwo extends CollectingEvent {}
 
 class OrderedListenerProviderTest extends TestCase
 {
-    public function test_only_type_correct_listeners_are_returned(): void
+    #[Test]
+    public function only_type_correct_listeners_are_returned(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -42,7 +44,8 @@ class OrderedListenerProviderTest extends TestCase
         $this->assertEquals('YY', implode($event->result()));
     }
 
-    public function test_add_ordered_listeners(): void
+    #[Test]
+    public function add_ordered_listeners(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -71,7 +74,8 @@ class OrderedListenerProviderTest extends TestCase
         $this->assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_before(): void
+    #[Test]
+    public function add_listener_before(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -100,7 +104,8 @@ class OrderedListenerProviderTest extends TestCase
         $this->assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_after(): void
+    #[Test]
+    public function add_listener_after(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -129,7 +134,8 @@ class OrderedListenerProviderTest extends TestCase
         $this->assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_malformed_listener(): void
+    #[Test]
+    public function add_malformed_listener(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -140,7 +146,8 @@ class OrderedListenerProviderTest extends TestCase
         });
     }
 
-    public function test_add_malformed_listener_before(): void
+    #[Test]
+    public function add_malformed_listener_before(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -154,7 +161,8 @@ class OrderedListenerProviderTest extends TestCase
         });
     }
 
-    public function test_add_malformed_listener_after(): void
+    #[Test]
+    public function add_malformed_listener_after(): void
     {
         $this->expectException(InvalidTypeException::class);
 

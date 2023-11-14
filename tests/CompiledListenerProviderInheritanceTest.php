@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 interface EventParentInterface
@@ -62,7 +63,8 @@ class CompiledListenerProviderInheritanceTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    public function test_interface_listener_catches_everything(): void
+    #[Test]
+    public function interface_listener_catches_everything(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';
@@ -91,7 +93,8 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         }
     }
 
-    public function test_class_listener_catches_subclass(): void
+    #[Test]
+    public function class_listener_catches_subclass(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';
@@ -120,7 +123,8 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         }
     }
 
-    public function test_subclass_listener_catches_subclass(): void
+    #[Test]
+    public function subclass_listener_catches_subclass(): void
     {
         $class = __FUNCTION__;
         $namespace = 'Test\\Space';

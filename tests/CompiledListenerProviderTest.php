@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 function listenerA(CollectingEvent $event): void
@@ -44,7 +45,8 @@ class CompiledListenerProviderTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    function test_compiled_provider_triggers_in_order(): void
+    #[Test]
+    public function compiled_provider_triggers_in_order(): void
     {
         $class = 'CompiledProvider';
         $namespace = 'Test\\Space';
@@ -76,7 +78,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_add_subscriber(): void
+    #[Test]
+    public function add_subscriber(): void
     {
         // This test is parallel to and uses the same mock subscriber as
         // OrderedListenerProviderServiceTest::test_add_subscriber().
@@ -103,7 +106,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertEquals('BCAEDF', implode($event->result()));
     }
 
-    public function test_natural_id_on_compiled_provider(): void
+    #[Test]
+    public function natural_id_on_compiled_provider(): void
     {
         $class = 'NaturalIdProvider';
         $namespace = 'Test\\Space';
@@ -129,7 +133,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_explicit_id_on_compiled_provider(): void
+    #[Test]
+    public function explicit_id_on_compiled_provider(): void
     {
         $class = 'ExplicitIdProvider';
         $namespace = 'Test\\Space';
@@ -155,7 +160,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_optimize_event(): void
+    #[Test]
+    public function optimize_event(): void
     {
         $class = 'OptimizedEventProvider';
         $namespace = 'Test\\Space';
@@ -183,7 +189,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_anonymous_class_compile(): void
+    #[Test]
+    public function anonymous_class_compile(): void
     {
         $builder = new ProviderBuilder();
 
@@ -212,7 +219,8 @@ class CompiledListenerProviderTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_optimize_event_anonymous_class(): void
+    #[Test]
+    public function optimize_event_anonymous_class(): void
     {
         $builder = new ProviderBuilder();
         $container = new MockContainer();

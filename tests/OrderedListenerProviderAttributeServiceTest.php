@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OrderedListenerProviderAttributeServiceTest extends TestCase
 {
-    public function test_add_subscriber() : void
+    #[Test]
+    public function add_subscriber() : void
     {
         $container = new MockContainer();
 

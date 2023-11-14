@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerPriority(3, 'A', CollectingEvent::class)]
@@ -48,7 +49,8 @@ class CompiledListenerProviderAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    function test_compiled_provider_triggers_in_order(): void
+    #[Test]
+    public function compiled_provider_triggers_in_order(): void
     {
         $class = 'AtCompiledProvider';
         $namespace = 'Test\\Space';
@@ -75,7 +77,8 @@ class CompiledListenerProviderAttributeTest extends TestCase
         $this->assertEquals('ABC', implode($event->result()));
     }
 
-    public function test_add_subscriber(): void
+    #[Test]
+    public function add_subscriber(): void
     {
         // This test is parallel to and uses the same mock subscriber as
         // RegisterableListenerProviderServiceTest::test_add_subscriber().

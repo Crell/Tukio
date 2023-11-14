@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\AbstractLogger;
@@ -22,7 +23,8 @@ class DebugEventDispatcherTest extends TestCase
         $this->logger = new MockLogger();
     }
 
-    public function test_event_is_logged() : void
+    #[Test]
+    public function event_is_logged() : void
     {
         $inner = new class implements EventDispatcherInterface {
             public function dispatch(object $event)

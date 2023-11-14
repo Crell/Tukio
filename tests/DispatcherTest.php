@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\AbstractLogger;
@@ -21,7 +22,8 @@ class DispatcherTest extends TestCase
         $this->logger = new MockLogger();
     }
 
-    public function test_dispatcher_calls_all_listeners() : void
+    #[Test]
+    public function dispatcher_calls_all_listeners() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
@@ -42,7 +44,8 @@ class DispatcherTest extends TestCase
         $this->assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_stoppable_events_stop() : void {
+    #[Test]
+    public function stoppable_events_stop() : void {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
             {
@@ -62,7 +65,8 @@ class DispatcherTest extends TestCase
         $this->assertEquals('CRE', implode($event->result()));
     }
 
-    public function test_listener_exception_logged() : void
+    #[Test]
+    public function listener_exception_logged() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
@@ -95,7 +99,8 @@ class DispatcherTest extends TestCase
         $this->assertEquals($event, $entry['context']['event']);
     }
 
-    public function test_already_stopped_event_calls_no_listeners() : void
+    #[Test]
+    public function already_stopped_event_calls_no_listeners() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable

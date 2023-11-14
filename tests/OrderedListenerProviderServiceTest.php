@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OrderedListenerProviderServiceTest extends TestCase
@@ -64,7 +65,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         $this->mockContainer = $container;
     }
 
-    public function test_add_listener_service(): void
+    #[Test]
+    public function add_listener_service(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
@@ -83,7 +85,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         $this->assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_service_before_another(): void
+    #[Test]
+    public function add_listener_service_before_another(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
