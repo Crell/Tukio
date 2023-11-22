@@ -38,8 +38,8 @@ class DebugEventDispatcherTest extends TestCase
         $event = new CollectingEvent();
         $p->dispatch($event);
 
-        $this->assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
-        $this->assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
-        $this->assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
+        self::assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
+        self::assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
+        self::assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
     }
 }

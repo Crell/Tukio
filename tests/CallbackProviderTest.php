@@ -75,7 +75,7 @@ class CallbackProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('AD', implode($event->result()));
+        self::assertEquals('AD', implode($event->result()));
     }
 
     #[Test]
@@ -93,6 +93,6 @@ class CallbackProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('', implode($event->result()));
+        self::assertEquals('', implode($event->result()));
     }
 }

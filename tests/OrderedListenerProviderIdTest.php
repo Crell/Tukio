@@ -73,7 +73,7 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
     #[Test]
@@ -90,7 +90,7 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BA', implode($event->result()));
+        self::assertEquals('BA', implode($event->result()));
     }
 
     #[Test]
@@ -109,7 +109,7 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('DC', implode($event->result()));
+        self::assertEquals('DC', implode($event->result()));
     }
 
     #[Test]
@@ -131,7 +131,7 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
     #[Test]
@@ -164,8 +164,8 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('A-listen', $idA);
-        $this->assertEquals('AB', implode($event->result()));
+        self::assertEquals('A-listen', $idA);
+        self::assertEquals('AB', implode($event->result()));
     }
 
 }

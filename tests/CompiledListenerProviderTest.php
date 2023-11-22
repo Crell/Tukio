@@ -70,12 +70,12 @@ class CompiledListenerProviderTest extends TestCase
         }
 
         $result = $event->result();
-        $this->assertContains('A', $result);
-        $this->assertContains('B', $result);
-        $this->assertContains('C', $result);
-        $this->assertContains('D', $result);
+        self::assertContains('A', $result);
+        self::assertContains('B', $result);
+        self::assertContains('C', $result);
+        self::assertContains('D', $result);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
@@ -136,7 +136,7 @@ class CompiledListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
     #[Test]
@@ -163,7 +163,7 @@ class CompiledListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
     #[Test]
@@ -192,7 +192,7 @@ class CompiledListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
     #[Test]
@@ -217,12 +217,12 @@ class CompiledListenerProviderTest extends TestCase
         }
 
         $result = $event->result();
-        $this->assertContains('A', $result);
-        $this->assertContains('B', $result);
-        $this->assertContains('C', $result);
-        $this->assertContains('D', $result);
+        self::assertContains('A', $result);
+        self::assertContains('B', $result);
+        self::assertContains('C', $result);
+        self::assertContains('D', $result);
 
-        $this->assertTrue(true);
+        self::assertTrue(true);
     }
 
     #[Test]
@@ -248,6 +248,6 @@ class CompiledListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 }

@@ -89,7 +89,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);
             }
-            $this->assertEquals($result, implode($event->result()));
+            self::assertEquals($result, implode($event->result()));
         }
     }
 
@@ -119,7 +119,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);
             }
-            $this->assertEquals($result, implode($event->result()));
+            self::assertEquals($result, implode($event->result()));
         }
     }
 
@@ -149,7 +149,7 @@ class CompiledListenerProviderInheritanceTest extends TestCase
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);
             }
-            $this->assertEquals($result, implode($event->result()));
+            self::assertEquals($result, implode($event->result()));
         }
     }
 

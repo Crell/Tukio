@@ -82,7 +82,7 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]
@@ -102,7 +102,7 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     public function test_add_listener_service_after_another(): void
@@ -121,7 +121,7 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     public function test_service_registration_fails_without_container(): void

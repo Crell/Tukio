@@ -41,7 +41,7 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('YY', implode($event->result()));
+        self::assertEquals('YY', implode($event->result()));
     }
 
     #[Test]
@@ -71,7 +71,7 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]
@@ -101,7 +101,7 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]
@@ -131,7 +131,7 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]

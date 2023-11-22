@@ -41,7 +41,7 @@ class DispatcherTest extends TestCase
         $event = new CollectingEvent();
         $p->dispatch($event);
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]
@@ -62,7 +62,7 @@ class DispatcherTest extends TestCase
         $event = new StoppableCollectingEvent();
         $p->dispatch($event);
 
-        $this->assertEquals('CRE', implode($event->result()));
+        self::assertEquals('CRE', implode($event->result()));
     }
 
     #[Test]
@@ -87,16 +87,16 @@ class DispatcherTest extends TestCase
             $this->fail('No exception was bubbled up.');
         }
         catch (\Exception $e) {
-            $this->assertEquals('Fail!', $e->getMessage());
+            self::assertEquals('Fail!', $e->getMessage());
         }
 
-        $this->assertEquals('CR', implode($event->result()));
+        self::assertEquals('CR', implode($event->result()));
 
-        $this->assertArrayHasKey(LogLevel::WARNING, $this->logger->messages);
-        $this->assertCount(1, $this->logger->messages[LogLevel::WARNING]);
+        self::assertArrayHasKey(LogLevel::WARNING, $this->logger->messages);
+        self::assertCount(1, $this->logger->messages[LogLevel::WARNING]);
         $entry = $this->logger->messages[LogLevel::WARNING][0];
-        $this->assertEquals('Unhandled exception thrown from listener while processing event.', $entry['message']);
-        $this->assertEquals($event, $entry['context']['event']);
+        self::assertEquals('Unhandled exception thrown from listener while processing event.', $entry['message']);
+        self::assertEquals($event, $entry['context']['event']);
     }
 
     #[Test]
@@ -116,6 +116,6 @@ class DispatcherTest extends TestCase
 
         $d->dispatch($event);
 
-        $this->assertEquals('', implode($event->result()));
+        self::assertEquals('', implode($event->result()));
     }
 }
