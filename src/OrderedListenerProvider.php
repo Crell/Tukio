@@ -4,18 +4,12 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\OrderedCollection\OrderedCollection;
 use Crell\Tukio\Entry\ListenerEntry;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 class OrderedListenerProvider extends ProviderCollector implements ListenerProviderInterface
 {
-    /**
-     * @var OrderedCollection<callable>
-     */
-    protected OrderedCollection $listeners;
-
     public function __construct(protected ?ContainerInterface $container = null)
     {
         parent::__construct();

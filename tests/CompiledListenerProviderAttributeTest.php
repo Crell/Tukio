@@ -102,6 +102,12 @@ class CompiledListenerProviderAttributeTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BCAEDF', implode($event->result()));
+        // We can't guarantee a stricter order than the instructions provided, so
+        // just check for those rather than a precise order.
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'C') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'D') > strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'F') > strpos($result, 'A'));
     }
 }

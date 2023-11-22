@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-use Crell\OrderedCollection\OrderedCollection;
+use Crell\OrderedCollection\MultiOrderedCollection;
 use Crell\Tukio\Entry\ListenerEntry;
 use Fig\EventDispatcher\ParameterDeriverTrait;
 
@@ -13,13 +13,13 @@ abstract class ProviderCollector implements OrderedProviderInterface
     use ParameterDeriverTrait;
 
     /**
-     * @var OrderedCollection<callable>
+     * @var MultiOrderedCollection<ListenerEntry>
      */
-    protected OrderedCollection $listeners;
+    protected MultiOrderedCollection $listeners;
 
     public function __construct()
     {
-        $this->listeners = new OrderedCollection();
+        $this->listeners = new MultiOrderedCollection();
     }
 
     public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
@@ -77,7 +77,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
             $methods = (new \ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
 
             $methods = array_filter($methods, static fn(\ReflectionMethod $r)
-            => !in_array($r->getName(), $proxy->getRegisteredMethods(), true));
+                => !in_array($r->getName(), $proxy->getRegisteredMethods(), true));
 
             /** @var \ReflectionMethod $rMethod */
             foreach ($methods as $rMethod) {
