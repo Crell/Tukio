@@ -8,7 +8,7 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 - Major internal refactoring.
-- There is now an `add()` method on the Provider and Compiler classes that allows specifying multiple before/after rules at once, in addition to priority. It is *recommended* to use this method in place of the older ones.
+- There is now a `listener()` method on the Provider and Compiler classes that allows specifying multiple before/after rules at once, in addition to priority. It is *recommended* to use this method in place of the older ones.
 - Upgraded to OrderedCollection v2, and switched to a Topological-based sort.  The main advantage is the ability to support multiple before/after rules.  However, this has a side effect that the order of listeners that had no relative order specified may have changed.  This is not an API break as that order was never guaranteed, but may still affect some order-sensitive code that worked by accident.  If that happens, and you care about the order, specify before/after orders as appropriate.
 
 ### Deprecated
