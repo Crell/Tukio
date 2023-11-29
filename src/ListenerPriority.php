@@ -6,10 +6,16 @@ namespace Crell\Tukio;
 
 use Attribute;
 
-#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class ListenerPriority extends Listener
+#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD)]
+class ListenerPriority implements ListenerAttribute
 {
-    public function __construct(int $priority, ?string $id = null, ?string $type = null) {
-        parent::__construct(id: $id, order: Order::Priority($priority), type: $type);
+    public ?Order $order = null;
+
+    public function __construct(
+        int $priority,
+        public ?string $id = null,
+        public ?string $type = null,
+    ) {
+        $this->order = Order::Priority($priority);
     }
 }

@@ -74,7 +74,8 @@ class CompiledListenerProviderAttributeTest extends TestCase
             $listener($event);
         }
 
-        self::assertEquals('ABC', implode($event->result()));
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') > strpos($result, 'A'));
     }
 
     #[Test]

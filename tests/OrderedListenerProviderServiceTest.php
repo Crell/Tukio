@@ -73,7 +73,7 @@ class OrderedListenerProviderServiceTest extends TestCase
         $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
         $p->addListenerService('E', 'listen', CollectingEvent::class, 80);
         $p->addListenerService('C', 'listen', CollectingEvent::class, 100);
-        $p->addListenerService('L', 'hear', CollectingEvent::class); // Defaults to 0
+        $p->addListenerService('L', 'hear', CollectingEvent::class, priority: 0);
         $p->addListenerService('R', 'listen', CollectingEvent::class, 90);
 
         $event = new CollectingEvent();

@@ -24,24 +24,29 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
     public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
     {
-        $attrib = $this->getAttributes($listener)[0] ?? null;
-        $id ??= $order->id ?? $attrib?->id ?? $this->getListenerId($listener);
-        $type ??= $order->type ?? $attrib?->type ?? $this->getType($listener);
-        $order ??= $attrib?->order;
+        /** @var Listener $def */
+        $def = $this->getAttributeDefinition($listener);
+        $id ??= $order->id ?? $def?->id ?? $this->getListenerId($listener);
+        $type ??= $type ?? $def?->type ?? $this->getType($listener);
+
+        if ($order) {
+            $def->absorbOrder($order);
+        }
 
         $entry = $this->getListenerEntry($listener, $type);
 
-        return match (true) {
-            $order instanceof OrderBefore => $this->listeners->addItemBefore($order->before, $entry, $id),
-            $order instanceof OrderAfter => $this->listeners->addItemAfter($order->after, $entry, $id),
-            $order instanceof OrderPriority => $this->listeners->addItem($entry, $order->priority, $id),
-            default => $this->listeners->addItem($entry, id: $id),
-        };
+        return $this->listeners->add(
+            item: $entry,
+            id: $id,
+            priority: $def->priority,
+            before: $def->before,
+            after: $def->after
+        );
     }
 
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
-        return $this->listener($listener, $priority ? Order::Priority($priority) : null, $id, $type);
+        return $this->listener($listener, is_null($priority) ? null : Order::Priority($priority), $id, $type);
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
@@ -110,7 +115,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
             // @phpstan-ignore-next-line
             $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
 
-            $this->listenerService($service, $methodName, $type, $attrib?->order, $id);
+            $this->listenerService($service, $methodName, $type, null, $id);
         }
     }
 
@@ -140,10 +145,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $proxy;
     }
 
-    /**
-     * @return array<Listener>
-     */
-    protected function getAttributes(callable $listener): array
+    protected function getAttributeDefinition(callable $listener): Listener
     {
         $ref = null;
 
@@ -165,11 +167,37 @@ abstract class ProviderCollector implements OrderedProviderInterface
         }
 
         if (!$ref) {
-            return [];
+            return new Listener();
         }
 
-        $attribs = $ref->getAttributes(Listener::class, \ReflectionAttribute::IS_INSTANCEOF);
+        // All this logic is very similar to AttributeUtils Sub-Attributes.
+        // Maybe AU can be improved to make sub-attributes accessible outside
+        // the analyzer?
 
+        $def = $this->getAttributes(Listener::class, $ref)[0] ?? new Listener();
+
+        $beforeAttribs = $this->getAttributes(ListenerBefore::class, $ref);
+        $def->absorbBefore($beforeAttribs);
+
+        $afterAttribs = $this->getAttributes(ListenerAfter::class, $ref);
+        $def->absorbAfter($afterAttribs);
+
+        $priorityAttribs = $this->getAttributes(ListenerPriority::class, $ref)[0] ?? null;
+        if ($priorityAttribs) {
+            $def->absorbPriority($priorityAttribs);
+        }
+
+        return $def;
+    }
+
+    /**
+     * @param class-string $attribute
+     * @param \Reflector $ref
+     * @return array<object>
+     */
+    protected function getAttributes(string $attribute, \Reflector $ref): array
+    {
+        $attribs = $ref->getAttributes($attribute, \ReflectionAttribute::IS_INSTANCEOF);
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }
 

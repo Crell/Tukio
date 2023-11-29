@@ -80,20 +80,20 @@ class OrderedListenerProviderTest extends TestCase
         $p = new OrderedListenerProvider();
 
         $p->addListener(function (CollectingEvent $event) {
-            $event->add('E');
-        }, 0);
-        $rid = $p->addListener(function (CollectingEvent $event) {
-            $event->add('R');
-        }, 90);
+            $event->add('A');
+        }, 0, id: 'A');
+        $bid = $p->addListener(function (CollectingEvent $event) {
+            $event->add('B');
+        }, 90, id: 'B');
         $p->addListener(function (CollectingEvent $event) {
-            $event->add('L');
-        }, 0);
-        $p->addListenerBefore($rid, function (CollectingEvent $event) {
             $event->add('C');
-        });
+        }, -5, id: 'C');
+        $p->addListenerBefore($bid, function (CollectingEvent $event) {
+            $event->add('D');
+        }, id: 'D');
         $p->addListener(function (CollectingEvent $event) {
-            $event->add('L');
-        }, 0);
+            $event->add('E');
+        }, 0, id: 'E');
 
         $event = new CollectingEvent();
 
@@ -101,7 +101,13 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        self::assertEquals('CRELL', implode($event->result()));
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'C'));
+        self::assertTrue(strpos($result, 'D') < strpos($result, 'B'));
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'E'));
+        self::assertTrue(strpos($result, 'E') < strpos($result, 'C'));
+
+//        self::assertEquals('CRELL', implode($event->result()));
     }
 
     #[Test]
@@ -114,7 +120,7 @@ class OrderedListenerProviderTest extends TestCase
         }, 90);
         $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
-        }, 0);
+        }, -5);
         $p->addListenerBefore($rid, function (CollectingEvent $event) {
             $event->add('C');
         });

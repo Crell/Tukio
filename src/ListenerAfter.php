@@ -7,9 +7,15 @@ namespace Crell\Tukio;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class ListenerAfter extends Listener
+class ListenerAfter implements ListenerAttribute
 {
-    public function __construct(string $after, ?string $id = null, ?string $type = null) {
-        parent::__construct(id: $id, order: Order::After($after), type: $type);
+    public ?Order $order = null;
+
+    public function __construct(
+        string $after,
+        public ?string $id = null,
+        public ?string $type = null,
+    ) {
+        $this->order = Order::After($after);
     }
 }
