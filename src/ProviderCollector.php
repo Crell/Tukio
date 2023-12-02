@@ -116,7 +116,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
         $def = $this->getAttributeForRef($rMethod);
 
-        if (str_starts_with($methodName, 'on') || $def) {
+        if ($def->id || $def->before || $def->after || $def->priority || str_starts_with($methodName, 'on')) {
             $paramType = $params[0]->getType();
 
             $id = $def->id ?? $service . '-' . $methodName;
