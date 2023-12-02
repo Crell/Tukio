@@ -9,13 +9,13 @@ use Attribute;
 #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class ListenerAfter implements ListenerAttribute
 {
-    public ?Order $order = null;
+    public array $after = [];
 
     public function __construct(
-        string $after,
+        string|array $after,
         public ?string $id = null,
         public ?string $type = null,
     ) {
-        $this->order = Order::After($after);
+        $this->after = is_array($after) ? $after : [$after];
     }
 }

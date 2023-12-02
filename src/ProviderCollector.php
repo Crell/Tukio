@@ -22,15 +22,26 @@ abstract class ProviderCollector implements OrderedProviderInterface
         $this->listeners = new MultiOrderedCollection();
     }
 
-    public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string
+    public function listener(
+        callable $listener,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null,
+        ?string $type = null
+    ): string
     {
         /** @var Listener $def */
         $def = $this->getAttributeDefinition($listener);
-        $id ??= $order->id ?? $def?->id ?? $this->getListenerId($listener);
+        $id ??= $def?->id ?? $this->getListenerId($listener);
         $type ??= $type ?? $def?->type ?? $this->getType($listener);
 
-        if ($order) {
-            $def->absorbOrder($order);
+        // If any ordering is specified explicitly, that completely overrules any
+        // attributes.
+        if (!is_null($priority) || $before || $after) {
+            $def->priority = $priority;
+            $def->before = $before;
+            $def->after = $after;
         }
 
         $entry = $this->getListenerEntry($listener, $type);
@@ -46,32 +57,32 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
     public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
     {
-        return $this->listener($listener, is_null($priority) ? null : Order::Priority($priority), $id, $type);
+        return $this->listener($listener, priority: $priority, id: $id, type: $type);
     }
 
     public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        return $this->listener($listener, $before ? Order::Before($before) : null, $id, $type);
+        return $this->listener($listener,  before: [$before], id: $id, type: $type);
     }
 
     public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
     {
-        return $this->listener($listener, $after ? Order::After($after) : null, $id, $type);
+        return $this->listener($listener, after: [$after], id: $id, type: $type);
     }
 
     public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
     {
-        return $this->listenerService($service, $method, $type, ($priority !== null) ? Order::Priority($priority) : null, $id);
+        return $this->listenerService($service, $method, $type, priority: $priority, id: $id);
     }
 
     public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
     {
-        return $this->listenerService($service, $method, $type, $before ? Order::Before($before) : null, $id);
+        return $this->listenerService($service, $method, $type, before: [$before], id: $id);
     }
 
     public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
     {
-        return $this->listenerService($service, $method, $type, $after ? Order::After($after) : null, $id);
+        return $this->listenerService($service, $method, $type, after: [$after], id: $id);
     }
 
     public function addSubscriber(string $class, string $service): void
@@ -103,19 +114,17 @@ abstract class ProviderCollector implements OrderedProviderInterface
             return;
         }
 
-        $attributes = $this->findAttributesOnMethod($rMethod);
-        /** @var ?Listener $attrib */
-        $attrib = $attributes[0] ?? null;
+        $def = $this->getAttributeForRef($rMethod);
 
-        if (str_starts_with($methodName, 'on') || $attrib) {
+        if (str_starts_with($methodName, 'on') || $def) {
             $paramType = $params[0]->getType();
 
-            $id = $attrib->id ?? $service . '-' . $methodName;
+            $id = $def->id ?? $service . '-' . $methodName;
             // getName() is not a documented part of the Reflection API, but it's always there.
             // @phpstan-ignore-next-line
-            $type = $attrib->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
+            $type = $def->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
 
-            $this->listenerService($service, $methodName, $type, null, $id);
+            $this->listenerService($service, $methodName, $type, $def->priority, $def->before,$def->after, $id);
         }
     }
 
@@ -170,6 +179,11 @@ abstract class ProviderCollector implements OrderedProviderInterface
             return new Listener();
         }
 
+        return $this->getAttributeForRef($ref);
+    }
+
+    protected function getAttributeForRef(\Reflector $ref): Listener
+    {
         // All this logic is very similar to AttributeUtils Sub-Attributes.
         // Maybe AU can be improved to make sub-attributes accessible outside
         // the analyzer?

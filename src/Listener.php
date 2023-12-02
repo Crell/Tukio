@@ -36,7 +36,7 @@ class Listener implements ListenerAttribute
         foreach ($attribs as $attrib) {
             $this->id ??= $attrib->id;
             $this->type ??= $attrib->type;
-            $this->before = [...$this->before, $attrib->order->before];
+            $this->before = [...$this->before, ...$attrib->before];
         }
     }
 
@@ -48,7 +48,7 @@ class Listener implements ListenerAttribute
         foreach ($attribs as $attrib) {
             $this->id ??= $attrib->id;
             $this->type ??= $attrib->type;
-            $this->after = [...$this->after, $attrib->order->after];
+            $this->after = [...$this->after, ...$attrib->after];
         }
     }
 
@@ -56,16 +56,6 @@ class Listener implements ListenerAttribute
     {
         $this->id ??= $attrib->id;
         $this->type ??= $attrib->type;
-        $this->priority = $attrib->order->priority;
-    }
-
-    public function absorbOrder(Order $order): void
-    {
-        match (true) {
-            $order instanceof OrderBefore => $this->before = [...$this->before, $order->before],
-            $order instanceof OrderAfter => $this->after = [...$this->after, $order->after],
-            $order instanceof OrderPriority => $this->priority = $order->priority,
-            default => null,
-        };
+        $this->priority = $attrib->priority;
     }
 }

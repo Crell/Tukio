@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerAfter('b')]
-#[ListenerAfter('listener_c')]
+#[ListenerAfter('\\Crell\\Tukio\\listener_c')]
 function listener_a(CollectingEvent $event): void
 {
     $event->add('A');
@@ -25,7 +25,7 @@ function listener_c(CollectingEvent $event): void
     $event->add('C');
 }
 
-#[ListenerBefore('listener_a')]
+#[ListenerBefore('\\Crell\\Tukio\\listener_a')]
 #[ListenerBefore('b')]
 function listener_d(CollectingEvent $event): void
 {

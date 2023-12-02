@@ -11,9 +11,13 @@ interface OrderedProviderInterface
      * Adds a listener to the provider.
      *
      * @param callable $listener
-     *    The listener to register.
-     * @param Order|null $order
-     *    One of Order::Priority(), Order::Before(), or Order::After().
+     *   The listener to register.
+     * @param int|null $priority
+     *   The numeric priority of the listener.
+     * @param array<string> $before
+     *   A list of listener IDs this listener should come before.
+     * @param array<string> $after
+     * A list of listener IDs this listener should come after.
      * @param ?string $id
      *    The identifier by which this listener should be known. If not specified one will be generated.
      * @param ?string $type
@@ -22,7 +26,14 @@ interface OrderedProviderInterface
      *
      * @return string
      *    The opaque ID of the listener.  This can be used for future reference.     */
-    public function listener(callable $listener, ?Order $order = null, ?string $id = null, ?string $type = null): string;
+    public function listener(
+        callable $listener,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null,
+        ?string $type = null
+    ): string;
 
     /**
      * Adds a method on a service as a listener.
@@ -35,13 +46,24 @@ interface OrderedProviderInterface
      *    The method name of the service that is the listener being registered.
      * @param string $type
      *    The class or interface type of events for which this listener will be registered.
-     * @param Order|null $order
-     *    One of Order::Priority(), Order::Before(), or Order::After().
-     *
+     * @param int|null $priority
+     *    The numeric priority of the listener.
+     * @param array<string> $before
+     *    A list of listener IDs this listener should come before.
+     * @param array<string> $after
+     *  A list of listener IDs this listener should come after.
      * @return string
      *    The opaque ID of the listener.  This can be used for future reference.
      */
-    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string;
+    public function listenerService(
+        string $service,
+        string $method,
+        string $type,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null
+    ): string;
 
     /**
      * Adds a listener to the provider.

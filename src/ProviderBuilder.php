@@ -34,17 +34,20 @@ class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
         return $this->optimizedEvents;
     }
 
-    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string
+    public function listenerService(
+        string $service,
+        string $method,
+        string $type,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null
+    ): string
     {
         $entry = new ListenerServiceEntry($service, $method, $type);
         $id ??= $service . '-' . $method;
 
-        return match (true) {
-            $order instanceof OrderBefore => $this->listeners->addItemBefore($order->before, $entry, $id),
-            $order instanceof OrderAfter => $this->listeners->addItemAfter($order->after, $entry, $id),
-            $order instanceof OrderPriority => $this->listeners->addItem($entry, $order->priority, $id),
-            default => $this->listeners->addItem($entry, id: $id),
-        };
+        return $this->listeners->add($entry, $id, priority: $priority, before: $before, after: $after);
     }
 
     public function getIterator(): \Traversable

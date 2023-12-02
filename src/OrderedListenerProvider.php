@@ -33,10 +33,18 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
         return new ListenerEntry($listener, $type);
     }
 
-    public function listenerService(string $service, string $method, string $type, ?Order $order = null, ?string $id = null): string
+    public function listenerService(
+        string $service,
+        string $method,
+        string $type,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null
+    ): string
     {
         $id ??= $service . '-' . $method;
-        return $this->listener($this->makeListenerForService($service, $method), $order, $id, $type);
+        return $this->listener($this->makeListenerForService($service, $method), priority: $priority, before: $before, after: $after, id: $id, type: $type);
     }
 
     /**
