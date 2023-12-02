@@ -6,7 +6,8 @@ namespace Crell\Tukio;
 
 use Psr\Log\AbstractLogger;
 
-class MockLogger extends AbstractLogger {
+class MockLogger extends AbstractLogger
+{
 
     /**
      * @var array<mixed>

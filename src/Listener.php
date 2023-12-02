@@ -12,7 +12,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::TARGET_CLASS)]
 class Listener implements ListenerAttribute
 {
+    /** @var string[]  */
     public array $before = [];
+
+    /** @var string[] */
     public array $after = [];
     public ?int $priority = null;
 

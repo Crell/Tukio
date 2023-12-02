@@ -34,7 +34,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
         /** @var Listener $def */
         $def = $this->getAttributeDefinition($listener);
         $id ??= $def?->id ?? $this->getListenerId($listener);
-        $type ??= $type ?? $def?->type ?? $this->getType($listener);
+        $type ??= $def?->type ?? $this->getType($listener);
 
         // If any ordering is specified explicitly, that completely overrules any
         // attributes.
@@ -188,17 +188,21 @@ abstract class ProviderCollector implements OrderedProviderInterface
         // Maybe AU can be improved to make sub-attributes accessible outside
         // the analyzer?
 
+        /** @var Listener $def */
         $def = $this->getAttributes(Listener::class, $ref)[0] ?? new Listener();
 
+        /** @var ListenerBefore[] $beforeAttribs */
         $beforeAttribs = $this->getAttributes(ListenerBefore::class, $ref);
         $def->absorbBefore($beforeAttribs);
 
+        /** @var ListenerAfter[] $afterAttribs */
         $afterAttribs = $this->getAttributes(ListenerAfter::class, $ref);
         $def->absorbAfter($afterAttribs);
 
-        $priorityAttribs = $this->getAttributes(ListenerPriority::class, $ref)[0] ?? null;
-        if ($priorityAttribs) {
-            $def->absorbPriority($priorityAttribs);
+        /** @var ListenerPriority|null $priorityAttrib */
+        $priorityAttrib = $this->getAttributes(ListenerPriority::class, $ref)[0] ?? null;
+        if ($priorityAttrib) {
+            $def->absorbPriority($priorityAttrib);
         }
 
         return $def;
@@ -211,6 +215,9 @@ abstract class ProviderCollector implements OrderedProviderInterface
      */
     protected function getAttributes(string $attribute, \Reflector $ref): array
     {
+        // The Reflector interface doesn't have getAttributes() defined, but
+        // it's always there.  PHP bug.
+        // @phpstan-ignore-next-line
         $attribs = $ref->getAttributes($attribute, \ReflectionAttribute::IS_INSTANCEOF);
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
     }

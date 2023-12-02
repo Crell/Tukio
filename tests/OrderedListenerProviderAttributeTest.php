@@ -66,14 +66,6 @@ class TestAttributedListeners
     }
 }
 
-#[Listener('A')]
-#[Listener('B')]
-#[Listener('C')]
-function at_multi_one(CollectingEvent $event): void
-{
-    $event->add('A');
-}
-
 class OrderedListenerProviderAttributeTest extends TestCase
 {
     #[Test]
