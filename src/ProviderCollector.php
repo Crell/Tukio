@@ -29,8 +29,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
         array $after = [],
         ?string $id = null,
         ?string $type = null
-    ): string
-    {
+    ): string {
         /** @var Listener $def */
         $def = $this->getAttributeDefinition($listener);
         $id ??= $def?->id ?? $this->getListenerId($listener);
@@ -220,6 +219,24 @@ abstract class ProviderCollector implements OrderedProviderInterface
         // @phpstan-ignore-next-line
         $attribs = $ref->getAttributes($attribute, \ReflectionAttribute::IS_INSTANCEOF);
         return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
+    }
+
+    protected function deriveMethod(string $service): string
+    {
+        if (!class_exists($service)) {
+            throw ServiceRegistrationClassNotExists::create($service);
+        }
+        $rClass = new \ReflectionClass($service);
+        $rMethods = $rClass->getMethods();
+
+        // If the class has only one method, assume that's the listener.
+        // Otherwise, use __invoke if not otherwise specified.
+        // Otherwise, we cannot tell what to do so throw.
+        return match (true) {
+            count($rMethods) === 1 => $rMethods[0]->name,
+            $rClass->hasMethod('__invoke') => '__invoke',
+            default => throw ServiceRegistrationTooManyMethods::create($service),
+        };
     }
 
     /**

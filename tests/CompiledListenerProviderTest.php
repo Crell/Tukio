@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -249,5 +250,64 @@ class CompiledListenerProviderTest extends TestCase
         }
 
         self::assertEquals('BACD', implode($event->result()));
+    }
+
+
+
+    #[Test, DataProvider('detection_class_examples')]
+    public function detects_invoke_method_and_type(string $class): void
+    {
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        $container->addService($class, new $class());
+
+        $builder->listenerService($class);
+
+        $provider = $this->makeAnonymousProvider($builder, $container);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals($class, $event->result()[0]);
+    }
+
+    public static function detection_class_examples(): iterable
+    {
+        return [
+            [InvokableListener::class],
+            [ArbitraryListener::class],
+            [CompoundListener::class],
+        ];
+    }
+
+    #[Test]
+    public function rejects_multi_method_class_without_invoke(): void
+    {
+        $this->expectException(ServiceRegistrationTooManyMethods::class);
+        $container = new MockContainer();
+
+        $container->addService(InvalidListener::class, new InvalidListener());
+
+        $builder = new ProviderBuilder();
+
+        $builder->listenerService(InvalidListener::class);
+    }
+
+    #[Test]
+    public function rejects_missing_auto_detected_service(): void
+    {
+        $this->expectException(ServiceRegistrationClassNotExists::class);
+        $container = new MockContainer();
+
+        $provider = new OrderedListenerProvider($container);
+
+        $builder = new ProviderBuilder();
+
+        /** @phpsan-ignore-next-line */
+        $builder->listenerService(DoesNotExist::class);
     }
 }

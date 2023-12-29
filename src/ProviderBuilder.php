@@ -36,14 +36,22 @@ class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
 
     public function listenerService(
         string $service,
-        string $method,
-        string $type,
+        ?string $method = null,
+        ?string $type = null,
         ?int $priority = null,
         array $before = [],
         array $after = [],
         ?string $id = null
-    ): string
-    {
+    ): string {
+        $method ??= $this->deriveMethod($service);
+
+        if (!$type) {
+            if (!class_exists($service)) {
+                throw ServiceRegistrationClassNotExists::create($service);
+            }
+            $type = $this->getParameterType([$service, $method]);
+        }
+
         $entry = new ListenerServiceEntry($service, $method, $type);
         $id ??= $service . '-' . $method;
 

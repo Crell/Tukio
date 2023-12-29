@@ -42,10 +42,15 @@ interface OrderedProviderInterface
      *
      * @param string $service
      *    The name of a service on which this listener lives.
-     * @param string $method
+     * @param string|null $method
      *    The method name of the service that is the listener being registered.
-     * @param string $type
+     *    If not specified, the collector will attempt to derive it on the
+     *    assumption the class and service name are the same.  A single-method
+     *    class will use that single method.  Otherwise, __invoke() will be assumed.
+     * @param string|null $type
      *    The class or interface type of events for which this listener will be registered.
+     *    If not specified, the collector will attempt to derive it on the assumption
+     *    that the class and service name are the same.
      * @param int|null $priority
      *    The numeric priority of the listener.
      * @param array<string> $before
@@ -57,8 +62,8 @@ interface OrderedProviderInterface
      */
     public function listenerService(
         string $service,
-        string $method,
-        string $type,
+        ?string $method = null,
+        ?string $type = null,
         ?int $priority = null,
         array $before = [],
         array $after = [],
