@@ -41,26 +41,8 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
         array $before = [],
         array $after = [],
         ?string $id = null
-    ): string
-    {
-        if (!$method) {
-            if (!class_exists($service)) {
-                throw ServiceRegistrationClassNotExists::create($service);
-            }
-            $rClass = new \ReflectionClass($service);
-            $rMethods = $rClass->getMethods();
-            // If the class has only one method, assume that's the listener.
-            // Otherwise, use __invoke if not otherwise specified.
-            // Otherwise, we cannot tell what to do so throw.
-            if (count($rMethods) === 1) {
-                $method = $rMethods[0]->name;
-            } else if($rClass->hasMethod('__invoke')) {
-                $method = '__invoke';
-            }
-            else {
-                throw ServiceRegistrationTooManyMethods::create($service);
-            }
-        }
+    ): string {
+        $method ??= $this->deriveMethod($service);
 
         if (!$type) {
             if (!class_exists($service)) {
@@ -71,6 +53,24 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
 
         $id ??= $service . '-' . $method;
         return $this->listener($this->makeListenerForService($service, $method), priority: $priority, before: $before, after: $after, id: $id, type: $type);
+    }
+
+    protected function deriveMethod(string $service): string
+    {
+        if (!class_exists($service)) {
+            throw ServiceRegistrationClassNotExists::create($service);
+        }
+        $rClass = new \ReflectionClass($service);
+        $rMethods = $rClass->getMethods();
+
+        // If the class has only one method, assume that's the listener.
+        // Otherwise, use __invoke if not otherwise specified.
+        // Otherwise, we cannot tell what to do so throw.
+        return match (true) {
+            count($rMethods) === 1 => $rMethods[0]->name,
+            $rClass->hasMethod('__invoke') => '__invoke',
+            default => throw ServiceRegistrationTooManyMethods::create($service),
+        };
     }
 
     /**
