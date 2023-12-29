@@ -307,7 +307,7 @@ class CompiledListenerProviderTest extends TestCase
 
         $builder = new ProviderBuilder();
 
-        /** @phpsan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $builder->listenerService(DoesNotExist::class);
     }
 }

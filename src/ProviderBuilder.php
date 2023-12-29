@@ -49,6 +49,7 @@ class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
             if (!class_exists($service)) {
                 throw ServiceRegistrationClassNotExists::create($service);
             }
+            // @phpstan-ignore-next-line
             $type = $this->getParameterType([$service, $method]);
         }
 
