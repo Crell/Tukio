@@ -4,14 +4,53 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+class InvokableListener
+{
+    public function __invoke(CollectingEvent $event): void
+    {
+        $event->add(static::class);
+    }
+}
+class ArbitraryListener
+{
+    public function doStuff(CollectingEvent $event): void
+    {
+        $event->add(static::class);
+    }
+}
+
+class CompoundListener
+{
+    public function __invoke(CollectingEvent $event): void
+    {
+        $event->add(static::class);
+    }
+
+    public function dontUseThis(CollectingEvent $event): void
+    {
+        throw new \Exception('This should not get called.');
+    }
+}
+
+class InvalidListener
+{
+    public function useThis(CollectingEvent $event): void
+    {
+        $event->add(static::class);
+    }
+
+    public function dontUseThis(CollectingEvent $event): void
+    {
+        throw new \Exception('This should not get called.');
+    }
+}
+
 class OrderedListenerProviderServiceTest extends TestCase
 {
-    /** @var MockContainer */
-    protected $mockContainer;
+    protected MockContainer $mockContainer;
 
     public function setUp(): void
     {
@@ -226,4 +265,91 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         MockMalformedSubscriber::registerListenersAfter($proxy);
     }
+
+    #[Test]
+    public function detects_invoke_method_and_type(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(InvokableListener::class, new InvokableListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(InvokableListener::class);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals(InvokableListener::class, $event->result()[0]);
+    }
+
+    #[Test]
+    public function detects_arbitrary_method_and_type(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(ArbitraryListener::class, new ArbitraryListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(ArbitraryListener::class);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals(ArbitraryListener::class, $event->result()[0]);
+    }
+
+    #[Test]
+    public function detects_compound_method_and_type(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(CompoundListener::class, new CompoundListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(CompoundListener::class);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals(CompoundListener::class, $event->result()[0]);
+    }
+
+    #[Test]
+    public function rejects_multi_method_class_without_invoke(): void
+    {
+        $this->expectException(ServiceRegistrationTooManyMethods::class);
+        $container = new MockContainer();
+
+        $container->addService(InvalidListener::class, new InvalidListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(InvalidListener::class);
+    }
+    #[Test]
+    public function rejects_missing_auto_detected_service(): void
+    {
+        $this->expectException(ServiceRegistrationClassNotExists::class);
+        $container = new MockContainer();
+
+        $container->addService(InvalidListener::class, new InvalidListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        /** @phpsan-ignore-next-line */
+        $provider->listenerService(DoesNotExist::class);
+    }
+
 }

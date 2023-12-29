@@ -35,14 +35,40 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
 
     public function listenerService(
         string $service,
-        string $method,
-        string $type,
+        ?string $method = null,
+        ?string $type = null,
         ?int $priority = null,
         array $before = [],
         array $after = [],
         ?string $id = null
     ): string
     {
+        if (!$method) {
+            if (!class_exists($service)) {
+                throw ServiceRegistrationClassNotExists::create($service);
+            }
+            $rClass = new \ReflectionClass($service);
+            $rMethods = $rClass->getMethods();
+            // If the class has only one method, assume that's the listener.
+            // Otherwise, use __invoke if not otherwise specified.
+            // Otherwise, we cannot tell what to do so throw.
+            if (count($rMethods) === 1) {
+                $method = $rMethods[0]->name;
+            } else if($rClass->hasMethod('__invoke')) {
+                $method = '__invoke';
+            }
+            else {
+                throw ServiceRegistrationTooManyMethods::create($service);
+            }
+        }
+
+        if (!$type) {
+            if (!class_exists($service)) {
+                throw ServiceRegistrationClassNotExists::create($service);
+            }
+            $type = $this->getParameterType([$service, $method]);
+        }
+
         $id ??= $service . '-' . $method;
         return $this->listener($this->makeListenerForService($service, $method), priority: $priority, before: $before, after: $after, id: $id, type: $type);
     }
