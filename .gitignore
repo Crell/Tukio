@@ -5,3 +5,4 @@ vendor
 .phpunit.cache
 /vendor-bin/**/vendor
 .env
+.idea
