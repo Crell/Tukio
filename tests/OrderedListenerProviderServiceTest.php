@@ -144,7 +144,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_service_after_another(): void
+    #[Test]
+    public function add_listener_service_after_another(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
@@ -163,7 +164,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_service_registration_fails_without_container(): void
+    #[Test]
+    public function service_registration_fails_without_container(): void
     {
         $this->expectException(ContainerMissingException::class);
 
@@ -173,7 +175,8 @@ class OrderedListenerProviderServiceTest extends TestCase
     }
 
 
-    public function test_add_subscriber() : void
+    #[Test]
+    public function add_subscriber() : void
     {
         $container = new MockContainer();
 
@@ -200,7 +203,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         self::assertTrue(strpos($result, 'F') > strpos($result, 'A'));
     }
 
-    public function test_malformed_subscriber_automatic_fails(): void
+    #[Test]
+    public function malformed_subscriber_automatic_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -215,7 +219,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         $p->addSubscriber(MockMalformedSubscriber::class, 'subscriber');
     }
 
-    public function test_malformed_subscriber_manual_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -232,7 +237,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         MockMalformedSubscriber::registerListenersDirect($proxy);
     }
 
-    public function test_malformed_subscriber_manual_before_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_before_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -249,7 +255,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         MockMalformedSubscriber::registerListenersBefore($proxy);
     }
 
-    public function test_malformed_subscriber_manual_after_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_after_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
