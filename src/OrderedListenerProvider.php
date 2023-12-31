@@ -59,7 +59,6 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
             /** @var Listener $def */
             $def = $this->getAttributeDefinition($listener);
             $id ??= $def?->id ?? $this->getListenerId($listener);
-            $type ??= $def?->type ?? $this->getType($listener);
 
             // If any ordering is specified explicitly, that completely overrules any
             // attributes.

@@ -153,6 +153,9 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $proxy;
     }
 
+    /**
+     * @param callable|array{0: string, 1: string} $listener
+     */
     protected function getAttributeDefinition(callable|array $listener): Listener
     {
         $ref = null;
@@ -160,12 +163,14 @@ abstract class ProviderCollector implements OrderedProviderInterface
         if ($this->isFunctionCallable($listener)) {
             /** @var string $listener */
             $ref = new \ReflectionFunction($listener);
+            // @phpstan-ignore-next-line
         } elseif ($this->isClassCallable($listener)) {
             // PHPStan says you cannot use array destructuring on a callable, but you can
             // if you know that it's an array (which in context we do).
             // @phpstan-ignore-next-line
             [$class, $method] = $listener;
             $ref = (new \ReflectionClass($class))->getMethod($method);
+            // @phpstan-ignore-next-line
         } elseif ($this->isObjectCallable($listener)) {
             // PHPStan says you cannot use array destructuring on a callable, but you can
             // if you know that it's an array (which in context we do).
@@ -274,7 +279,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
      * generate a random ID if necessary.  It will also handle duplicates
      * for us.  This method is just a suggestion.
      *
-     * @param callable|array $listener
+     * @param callable|array{0: string, 1: string} $listener
      *   The listener for which to derive an ID.
      *
      * @return string|null
@@ -287,6 +292,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
             // @phpstan-ignore-next-line
             return (string)$listener;
         }
+        // @phpstan-ignore-next-line
         if ($this->isClassCallable($listener)) {
             /** @var array{0: class-string, 1: string} $listener */
             return $listener[0] . '::' . $listener[1];
@@ -304,6 +310,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
      *
      * Or at least a reasonable approximation, since a function name may not be defined yet.
      *
+     * @param callable|array{0: string, 1: string} $callable
      * @return bool
      *  True if the callable represents a function, false otherwise.
      */
