@@ -153,7 +153,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $proxy;
     }
 
-    protected function getAttributeDefinition(callable $listener): Listener
+    protected function getAttributeDefinition(callable|array $listener): Listener
     {
         $ref = null;
 
@@ -274,13 +274,13 @@ abstract class ProviderCollector implements OrderedProviderInterface
      * generate a random ID if necessary.  It will also handle duplicates
      * for us.  This method is just a suggestion.
      *
-     * @param callable $listener
+     * @param callable|array $listener
      *   The listener for which to derive an ID.
      *
      * @return string|null
      *   The derived ID if possible or null if no reasonable ID could be derived.
      */
-    protected function getListenerId(callable $listener): ?string
+    protected function getListenerId(callable|array $listener): ?string
     {
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
@@ -307,7 +307,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
      * @return bool
      *  True if the callable represents a function, false otherwise.
      */
-    protected function isFunctionCallable(callable $callable): bool
+    protected function isFunctionCallable(callable|array $callable): bool
     {
         // We can't check for function_exists() because it may be included later by the time it matters.
         return is_string($callable);

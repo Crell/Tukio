@@ -310,4 +310,26 @@ class CompiledListenerProviderTest extends TestCase
         // @phpstan-ignore-next-line
         $builder->listenerService(DoesNotExist::class);
     }
+
+    #[Test]
+    public function add_attribute_based_service_methods(): void
+    {
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        $container->addService(TestAttributedListeners::class, new TestAttributedListeners());
+
+        $builder->listenerService(TestAttributedListeners::class, 'listenerC');
+        $builder->listenerService(TestAttributedListeners::class, 'listenerD');
+
+        $provider = $this->makeAnonymousProvider($builder, $container);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals('DC', implode($event->result()));
+    }
 }

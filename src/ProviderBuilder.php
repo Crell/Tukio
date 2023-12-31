@@ -53,6 +53,27 @@ class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
             $type = $this->getParameterType([$service, $method]);
         }
 
+        // In the special case that the service is the class name, we can
+        // leverage attributes.
+        if (class_exists($service)) {
+            $listener = [$service, $method];
+            /** @var Listener $def */
+            $def = $this->getAttributeDefinition($listener);
+            $id ??= $def?->id ?? $this->getListenerId($listener);
+            $type ??= $def?->type ?? $this->getType($listener);
+
+            // If any ordering is specified explicitly, that completely overrules any
+            // attributes.
+            if (!is_null($priority) || $before || $after) {
+                $def->priority = $priority;
+                $def->before = $before;
+                $def->after = $after;
+            }
+
+            $entry = new ListenerServiceEntry($service, $method, $type);
+            return $this->listeners->add($entry, $id, priority: $def->priority, before: $def->before, after: $def->after);
+        }
+
         $entry = new ListenerServiceEntry($service, $method, $type);
         $id ??= $service . '-' . $method;
 
