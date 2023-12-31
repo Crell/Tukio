@@ -4,50 +4,13 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\MockMalformedSubscriber;
+use Crell\Tukio\Listeners\MockSubscriber;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-
-class InvokableListener
-{
-    public function __invoke(CollectingEvent $event): void
-    {
-        $event->add(static::class);
-    }
-}
-class ArbitraryListener
-{
-    public function doStuff(CollectingEvent $event): void
-    {
-        $event->add(static::class);
-    }
-}
-
-class CompoundListener
-{
-    public function __invoke(CollectingEvent $event): void
-    {
-        $event->add(static::class);
-    }
-
-    public function dontUseThis(CollectingEvent $event): void
-    {
-        throw new \Exception('This should not get called.');
-    }
-}
-
-class InvalidListener
-{
-    public function useThis(CollectingEvent $event): void
-    {
-        $event->add(static::class);
-    }
-
-    public function dontUseThis(CollectingEvent $event): void
-    {
-        throw new \Exception('This should not get called.');
-    }
-}
 
 class OrderedListenerProviderServiceTest extends TestCase
 {
@@ -297,9 +260,9 @@ class OrderedListenerProviderServiceTest extends TestCase
     public static function detection_class_examples(): iterable
     {
         return [
-            [InvokableListener::class],
-            [ArbitraryListener::class],
-            [CompoundListener::class],
+            [Listeners\InvokableListener::class],
+            [Listeners\ArbitraryListener::class],
+            [Listeners\CompoundListener::class],
         ];
     }
 
@@ -309,11 +272,11 @@ class OrderedListenerProviderServiceTest extends TestCase
         $this->expectException(ServiceRegistrationTooManyMethods::class);
         $container = new MockContainer();
 
-        $container->addService(InvalidListener::class, new InvalidListener());
+        $container->addService(Listeners\InvalidListener::class, new Listeners\InvalidListener());
 
         $provider = new OrderedListenerProvider($container);
 
-        $provider->listenerService(InvalidListener::class);
+        $provider->listenerService(Listeners\InvalidListener::class);
     }
 
     #[Test]

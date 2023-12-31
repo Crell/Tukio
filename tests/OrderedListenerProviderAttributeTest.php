@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -32,38 +34,6 @@ function at_listener_three(CollectingEvent $event): void
 function at_listener_four($event): void
 {
     $event->add('D');
-}
-
-class DoNothingEvent
-{
-    public bool $called = false;
-}
-
-class TestAttributedListeners
-{
-    #[ListenerPriority(id: 'a', priority: -4)]
-    public static function listenerA(CollectingEvent $event) : void
-    {
-        $event->add('A');
-    }
-
-    #[ListenerBefore(before: 'a')]
-    public static function listenerB(CollectingEvent $event) : void
-    {
-        $event->add('B');
-    }
-
-    #[ListenerPriority(id: 'c', priority: -4)]
-    public function listenerC(CollectingEvent $event) : void
-    {
-        $event->add('C');
-    }
-
-    #[ListenerBefore(before: 'c')]
-    public function listenerD(CollectingEvent $event) : void
-    {
-        $event->add('D');
-    }
 }
 
 class OrderedListenerProviderAttributeTest extends TestCase
@@ -140,7 +110,7 @@ class OrderedListenerProviderAttributeTest extends TestCase
 
         $p->addListener("{$ns}at_listener_four");
 
-        $event = new DoNothingEvent();
+        $event = new Events\DoNothingEvent();
 
         // This should explode with an "method not found" error
         // if the event is passed to the listener.
@@ -156,7 +126,7 @@ class OrderedListenerProviderAttributeTest extends TestCase
     {
         $p = new OrderedListenerProvider();
 
-        $object = new TestAttributedListeners();
+        $object = new Listeners\TestAttributedListeners();
 
         $p->addListener([$object, 'listenerC']);
         $p->addListener([$object, 'listenerD']);
@@ -196,12 +166,12 @@ class OrderedListenerProviderAttributeTest extends TestCase
     {
         $container = new MockContainer();
 
-        $container->addService(TestAttributedListeners::class, new TestAttributedListeners());
+        $container->addService(Listeners\TestAttributedListeners::class, new Listeners\TestAttributedListeners());
 
         $provider = new OrderedListenerProvider($container);
 
-        $provider->listenerService(TestAttributedListeners::class, 'listenerC');
-        $provider->listenerService(TestAttributedListeners::class, 'listenerD');
+        $provider->listenerService(Listeners\TestAttributedListeners::class, 'listenerC');
+        $provider->listenerService(Listeners\TestAttributedListeners::class, 'listenerD');
 
         $event = new CollectingEvent();
 

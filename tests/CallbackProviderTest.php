@@ -5,38 +5,18 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Events\CollectingEvent;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-
-class LifecycleEvent extends CollectingEvent implements CallbackEventInterface
-{
-    protected FakeEntity $entity;
-
-    public function __construct(FakeEntity $entity)
-    {
-        $this->entity = $entity;
-    }
-
-    public function getSubject(): object
-    {
-        return $this->entity;
-    }
-}
-
-class LoadEvent extends LifecycleEvent {}
-
-class SaveEvent extends LifecycleEvent {}
-
 class FakeEntity
 {
-
-    public function load(LoadEvent $event): void
+    public function load(Events\LoadEvent $event): void
     {
         $event->add('A');
     }
 
-    public function save(SaveEvent $event): void
+    public function save(Events\SaveEvent $event): void
     {
         $event->add('B');
     }
@@ -48,12 +28,11 @@ class FakeEntity
         $event->add('C');
     }
 
-    public function all(LifecycleEvent $event): void
+    public function all(Events\LifecycleEvent $event): void
     {
         $event->add('D');
     }
 }
-
 
 class CallbackProviderTest extends TestCase
 {
@@ -65,11 +44,11 @@ class CallbackProviderTest extends TestCase
 
         $entity = new FakeEntity();
 
-        $p->addCallbackMethod(LoadEvent::class, 'load');
-        $p->addCallbackMethod(SaveEvent::class, 'save');
-        $p->addCallbackMethod(LifecycleEvent::class, 'all');
+        $p->addCallbackMethod(Events\LoadEvent::class, 'load');
+        $p->addCallbackMethod(Events\SaveEvent::class, 'save');
+        $p->addCallbackMethod(Events\LifecycleEvent::class, 'all');
 
-        $event = new LoadEvent($entity);
+        $event = new Events\LoadEvent($entity);
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
@@ -83,9 +62,9 @@ class CallbackProviderTest extends TestCase
     {
         $p = new CallbackProvider();
 
-        $p->addCallbackMethod(LoadEvent::class, 'load');
-        $p->addCallbackMethod(SaveEvent::class, 'save');
-        $p->addCallbackMethod(LifecycleEvent::class, 'all');
+        $p->addCallbackMethod(Events\LoadEvent::class, 'load');
+        $p->addCallbackMethod(Events\SaveEvent::class, 'save');
+        $p->addCallbackMethod(Events\LifecycleEvent::class, 'all');
 
         $event = new CollectingEvent();
 

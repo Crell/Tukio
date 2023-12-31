@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\Fakes;
 
 use Psr\Log\AbstractLogger;
 

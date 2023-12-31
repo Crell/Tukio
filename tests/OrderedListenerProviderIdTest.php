@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -28,28 +30,6 @@ function event_listener_four(CollectingEvent $event): void
     $event->add('D');
 }
 
-
-class TestListeners
-{
-    public static function listenerA(CollectingEvent $event): void
-    {
-        $event->add('A');
-    }
-    public static function listenerB(CollectingEvent $event): void
-    {
-        $event->add('B');
-    }
-
-    public function listenerC(CollectingEvent $event): void
-    {
-        $event->add('C');
-    }
-
-    public function listenerD(CollectingEvent $event): void
-    {
-        $event->add('D');
-    }
-}
 
 class OrderedListenerProviderIdTest extends TestCase
 {
@@ -81,8 +61,8 @@ class OrderedListenerProviderIdTest extends TestCase
     {
         $p = new OrderedListenerProvider();
 
-        $p->addListener([TestListeners::class, 'listenerA'], -4);
-        $p->addListenerBefore(TestListeners::class . '::listenerA', [TestListeners::class, 'listenerB']);
+        $p->addListener([Listeners\TestListeners::class, 'listenerA'], -4);
+        $p->addListenerBefore(Listeners\TestListeners::class . '::listenerA', [Listeners\TestListeners::class, 'listenerB']);
 
         $event = new CollectingEvent();
 
@@ -98,10 +78,10 @@ class OrderedListenerProviderIdTest extends TestCase
     {
         $p = new OrderedListenerProvider();
 
-        $l = new TestListeners();
+        $l = new Listeners\TestListeners();
 
         $p->addListener([$l, 'listenerC'], -4);
-        $p->addListenerBefore(TestListeners::class . '::listenerC', [$l, 'listenerD']);
+        $p->addListenerBefore(Listeners\TestListeners::class . '::listenerC', [$l, 'listenerD']);
 
         $event = new CollectingEvent();
 

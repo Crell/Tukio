@@ -2,29 +2,37 @@
 
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\Listeners;
 
 
-class MockAttributeSubscriber
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Listener;
+use Crell\Tukio\ListenerAfter;
+use Crell\Tukio\ListenerBefore;
+use Crell\Tukio\ListenerPriority;
+use Crell\Tukio\NoEvent;
+
+class MockAttributedSubscriber
 {
+    #[Listener(id: 'a')]
     public function onA(CollectingEvent $event) : void
     {
         $event->add('A');
     }
 
-    #[ListenerPriority(5)]
+    #[ListenerPriority(priority: 5)]
     public function onB(CollectingEvent $event) : void
     {
         $event->add('B');
     }
 
-    #[ListenerBefore(__CLASS__ . '-' . 'onA')]
+    #[ListenerBefore(before: 'a')]
     public function onC(CollectingEvent $event) : void
     {
         $event->add('C');
     }
 
-    #[ListenerAfter(__CLASS__ . '-' . 'onA')]
+    #[ListenerAfter(after: 'a')]
     public function onD(CollectingEvent $event) : void
     {
         $event->add('D');
@@ -35,12 +43,13 @@ class MockAttributeSubscriber
         $event->add('E');
     }
 
-    #[ListenerPriority(-5)]
+    #[ListenerPriority(priority: -5)]
     public function notNormalName(CollectingEvent $event) : void
     {
         $event->add('F');
     }
 
+    #[Listener]
     // @phpstan-ignore-next-line
     public function onG(NoEvent $event) : void
     {

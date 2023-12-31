@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Events\EventOne;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\ArbitraryListener;
+use Crell\Tukio\Listeners\CompoundListener;
+use Crell\Tukio\Listeners\InvalidListener;
+use Crell\Tukio\Listeners\InvokableListener;
+use Crell\Tukio\Listeners\MockSubscriber;
+use Crell\Tukio\Listeners\TestAttributedListeners;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -26,22 +35,6 @@ function noListen(EventOne $event): void
     throw new \Exception('This should not be called');
 }
 
-class Listen
-{
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('C');
-    }
-}
-
-class ListenService
-{
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('D');
-    }
-}
-
 class CompiledListenerProviderTest extends TestCase
 {
     use MakeCompiledProviderTrait;
@@ -55,12 +48,12 @@ class CompiledListenerProviderTest extends TestCase
         $builder = new ProviderBuilder();
 
         $container = new MockContainer();
-        $container->addService('D', new ListenService());
+        $container->addService('D', new Listeners\ListenService());
 
         $builder->addListener('\\Crell\\Tukio\\listenerA');
         $builder->addListener('\\Crell\\Tukio\\listenerB');
         $builder->addListener('\\Crell\\Tukio\\noListen');
-        $builder->addListener([Listen::class, 'listen']);
+        $builder->addListener([Listeners\Listen::class, 'listen']);
         $builder->addListenerService('D', 'listen', CollectingEvent::class);
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
@@ -202,12 +195,12 @@ class CompiledListenerProviderTest extends TestCase
         $builder = new ProviderBuilder();
 
         $container = new MockContainer();
-        $container->addService('D', new ListenService());
+        $container->addService('D', new Listeners\ListenService());
 
         $builder->addListener('\\Crell\\Tukio\\listenerA');
         $builder->addListener('\\Crell\\Tukio\\listenerB');
         $builder->addListener('\\Crell\\Tukio\\noListen');
-        $builder->addListener([Listen::class, 'listen']);
+        $builder->addListener([Listeners\Listen::class, 'listen']);
         $builder->addListenerService('D', 'listen', CollectingEvent::class);
 
         $provider = $this->makeAnonymousProvider($builder, $container);

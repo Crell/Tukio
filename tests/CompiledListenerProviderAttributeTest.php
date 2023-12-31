@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Events\EventOne;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\MockAttributedSubscriber;
+use Crell\Tukio\Listeners\MockSubscriber;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

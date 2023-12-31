@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
 
-use Crell\Tukio\CollectingEvent;
-use Crell\Tukio\DummyEvent;
-use Crell\Tukio\MockContainer;
+use Crell\Tukio\Events\DummyEvent;
+use Crell\Tukio\Fakes\MockContainer;
 use Crell\Tukio\ProviderBuilder;
 use Crell\Tukio\ProviderCompiler;
 use PhpBench\Benchmark\Metadata\Annotations\AfterClassMethods;
 use PhpBench\Benchmark\Metadata\Annotations\BeforeClassMethods;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
-use PhpBench\Benchmark\Metadata\Annotations\Iterations;
-use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;
-use PhpBench\Benchmark\Metadata\Annotations\RetryThreshold;
-use PhpBench\Benchmark\Metadata\Annotations\Revs;
-use PhpBench\Benchmark\Metadata\Annotations\Warmup;
 
 /**
  * @Groups({"Providers"})

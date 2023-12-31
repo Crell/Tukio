@@ -4,60 +4,25 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Fakes\EventParentInterface;
+use Crell\Tukio\Fakes\MockContainer;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-interface EventParentInterface
-{
-    public function add(string $val): void;
-    public function result(): array;
-}
-
-class ListenedDirectly implements EventParentInterface {
-    protected array $out = [];
-
-    public function add(string $val): void
-    {
-        $this->out[] = $val;
-    }
-
-    public function result() : array
-    {
-        return $this->out;
-    }
-}
-
-class Subclass extends ListenedDirectly {}
-
-class NotListenedDirectly implements EventParentInterface {
-    protected array $out = [];
-
-    public function add(string $val): void
-    {
-        $this->out[] = $val;
-    }
-
-    public function result(): array
-    {
-        return $this->out;
-    }
-}
-
-function inheritanceListenerA(EventParentInterface $event): void
+function inheritanceListenerA(Fakes\EventParentInterface $event): void
 {
     $event->add('A');
 }
 
-function inheritanceListenerB(ListenedDirectly $event): void
+function inheritanceListenerB(Fakes\ListenedDirectly $event): void
 {
     $event->add('B');
 }
 
-function inheritanceListenerC(Subclass $event): void
+function inheritanceListenerC(Fakes\Subclass $event): void
 {
     $event->add('C');
 }
-
 
 class CompiledListenerProviderInheritanceTest extends TestCase
 {
@@ -78,13 +43,13 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
         $tests = [
-            ListenedDirectly::class => 'A',
-            Subclass::class => 'A',
-            NotListenedDirectly::class => 'A',
+            Fakes\ListenedDirectly::class => 'A',
+            Fakes\Subclass::class => 'A',
+            Fakes\NotListenedDirectly::class => 'A',
         ];
 
         foreach ($tests as $class => $result) {
-            /** @var EventParentInterface $event */
+            /** @var \Crell\Tukio\Fakes\EventParentInterface $event */
             $event = new $class();
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);
@@ -108,13 +73,13 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
         $tests = [
-            ListenedDirectly::class => 'B',
-            Subclass::class => 'B',
-            NotListenedDirectly::class => '',
+            Fakes\ListenedDirectly::class => 'B',
+            Fakes\Subclass::class => 'B',
+            Fakes\NotListenedDirectly::class => '',
         ];
 
         foreach ($tests as $class => $result) {
-            /** @var EventParentInterface $event */
+            /** @var \Crell\Tukio\Fakes\EventParentInterface $event */
             $event = new $class();
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);
@@ -138,13 +103,13 @@ class CompiledListenerProviderInheritanceTest extends TestCase
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
         $tests = [
-            ListenedDirectly::class => '',
-            Subclass::class => 'C',
-            NotListenedDirectly::class => '',
+            Fakes\ListenedDirectly::class => '',
+            Fakes\Subclass::class => 'C',
+            Fakes\NotListenedDirectly::class => '',
         ];
 
         foreach ($tests as $class => $result) {
-            /** @var EventParentInterface $event */
+            /** @var \Crell\Tukio\Fakes\EventParentInterface $event */
             $event = new $class();
             foreach ($provider->getListenersForEvent($event) as $listener) {
                 $listener($event);

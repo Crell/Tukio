@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
+use Crell\Tukio\Events\CollectingEvent;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-
-class EventOne extends CollectingEvent {}
-
-class EventTwo extends CollectingEvent {}
 
 class OrderedListenerProviderTest extends TestCase
 {
@@ -19,13 +15,13 @@ class OrderedListenerProviderTest extends TestCase
     {
         $p = new OrderedListenerProvider();
 
-        $p->addListener(function (EventOne $event) {
+        $p->addListener(function (Events\EventOne $event) {
             $event->add('Y');
         });
         $p->addListener(function (CollectingEvent $event) {
             $event->add('Y');
         });
-        $p->addListener(function (EventTwo $event) {
+        $p->addListener(function (Events\EventTwo $event) {
             $event->add('N');
         });
         // This class doesn't exist but should not result in an error.
@@ -35,7 +31,7 @@ class OrderedListenerProviderTest extends TestCase
             $event->add('F');
         });
 
-        $event = new EventOne();
+        $event = new Events\EventOne();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
