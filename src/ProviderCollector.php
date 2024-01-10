@@ -176,20 +176,6 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return new Listener();
     }
 
-    /**
-     * @param class-string $attribute
-     * @param \Reflector $ref
-     * @return array<object>
-     */
-    protected function getAttributes(string $attribute, \Reflector $ref): array
-    {
-        // The Reflector interface doesn't have getAttributes() defined, but
-        // it's always there.  PHP bug.
-        // @phpstan-ignore-next-line
-        $attribs = $ref->getAttributes($attribute, \ReflectionAttribute::IS_INSTANCEOF);
-        return array_map(fn(\ReflectionAttribute $attrib) => $attrib->newInstance(), $attribs);
-    }
-
     protected function deriveMethod(string $service): string
     {
         if (!class_exists($service)) {
