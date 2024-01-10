@@ -287,7 +287,7 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $provider = new OrderedListenerProvider($container);
 
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $provider->listenerService(DoesNotExist::class);
     }
 

@@ -147,24 +147,26 @@ abstract class ProviderCollector implements OrderedProviderInterface
     }
 
     /**
-     * @param callable|array{0: string, 1: string} $listener
+     * @param callable|array{0: class-string, 1: string}|array{0: object, 1: string} $listener
      */
     protected function getAttributeDefinition(callable|array $listener): Listener
     {
         if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
+            /** @var \Closure|string $listener */
             return $this->funcAnalyzer->analyze($listener, Listener::class);
         }
 
         if ($this->isObjectCallable($listener)) {
-            /** @var array $listener */
+            /** @var array{0: object, 1: string} $listener */
             [$object, $method] = $listener;
 
             $def = $this->classAnalyzer->analyze($object::class, Listener::class);
             return $def->methods[$method];
         }
 
+        /** @var array{0: class-string, 1: string} $listener */
         if ($this->isClassCallable($listener)) {
-            /** @var array $listener */
+            /** @var array{0: class-string, 1: string} $listener */
             [$class, $method] = $listener;
 
             $def = $this->classAnalyzer->analyze($class, Listener::class);
@@ -241,7 +243,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
      * generate a random ID if necessary.  It will also handle duplicates
      * for us.  This method is just a suggestion.
      *
-     * @param callable|array{0: string, 1: string} $listener
+     * @param callable|array{0: class-string, 1: string}|array{0: object, 1: string} $listener
      *   The listener for which to derive an ID.
      *
      * @return string|null
@@ -251,16 +253,18 @@ abstract class ProviderCollector implements OrderedProviderInterface
     {
         if ($this->isFunctionCallable($listener)) {
             // Function callables are strings, so use that directly.
-            // @phpstan-ignore-next-line
-            return (string)$listener;
+            /** @var string $listener */
+            return $listener;
         }
-        // @phpstan-ignore-next-line
+
+        if ($this->isObjectCallable($listener)) {
+            /** @var array{0: object, 1: string} $listener */
+            return get_class($listener[0]) . '::' . $listener[1];
+        }
+
         if ($this->isClassCallable($listener)) {
             /** @var array{0: class-string, 1: string} $listener */
             return $listener[0] . '::' . $listener[1];
-        }
-        if (is_array($listener) && is_object($listener[0])) {
-            return get_class($listener[0]) . '::' . $listener[1];
         }
 
         // Anything else we can't derive an ID for logically.
@@ -272,7 +276,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
      *
      * Or at least a reasonable approximation, since a function name may not be defined yet.
      *
-     * @param callable|array{0: string, 1: string} $callable
+     * @param callable|array<mixed, mixed> $callable
      * @return bool
      *  True if the callable represents a function, false otherwise.
      */
@@ -285,7 +289,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
     /**
      * Determines if a callable represents a method on an object.
      *
-     * @param callable|array{0: string, 1: string} $callable
+     * @param callable|array<mixed, mixed> $callable
      * @return bool
      *  True if the callable represents a method object, false otherwise.
      */
@@ -297,13 +301,34 @@ abstract class ProviderCollector implements OrderedProviderInterface
     /**
      * Determines if a callable represents a closure/anonymous function.
      *
-     * @param callable|array{0: string, 1: string} $callable
+     * @param callable|array<mixed, mixed> $callable
      * @return bool
      *  True if the callable represents a closure object, false otherwise.
      */
     protected function isClosureCallable(callable|array $callable): bool
     {
         return $callable instanceof \Closure;
+    }
+
+    /**
+     * Determines if a callable represents a static class method.
+     *
+     * The parameter here is untyped so that this method may be called with an
+     * array that represents a class name and a non-static method.  The routine
+     * to determine the parameter type is identical to a static method, but such
+     * an array is still not technically callable.  Omitting the parameter type here
+     * allows us to use this method to handle both cases.
+     *
+     * This method must therefore be called first above, as the array is not actually
+     * an `is_callable()` and will fail `Closure::fromCallable()`.  Because PHP.
+     *
+     * @param callable|array<mixed, mixed> $callable
+     * @return bool
+     *   True if the callable represents a static method, false otherwise.
+     */
+    protected function isClassCallable($callable): bool
+    {
+        return is_array($callable) && is_string($callable[0]) && class_exists($callable[0]);
     }
 
     abstract protected function getListenerEntry(callable $listener, string $type): ListenerEntry;

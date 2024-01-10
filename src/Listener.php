@@ -59,7 +59,7 @@ class Listener implements ListenerAttribute, HasSubAttributes, ParseMethods, Rea
         public ?string $type = null,
     ) {
         if ($id || $this->type) {
-            $this->hasDefinition ??= true;
+            $this->hasDefinition = true;
         }
     }
 
@@ -68,7 +68,9 @@ class Listener implements ListenerAttribute, HasSubAttributes, ParseMethods, Rea
         $this->paramCount = $subject->getNumberOfRequiredParameters();
         if ($this->paramCount === 1) {
             $params = $subject->getParameters();
-            $this->type ??= $params[0]?->getType()?->getName();
+            // getName() isn't part of the interface, but is present. PHP bug.
+            // @phpstan-ignore-next-line
+            $this->type ??= $params[0]->getType()?->getName();
         }
     }
 
@@ -92,6 +94,9 @@ class Listener implements ListenerAttribute, HasSubAttributes, ParseMethods, Rea
         return __CLASS__;
     }
 
+    /**
+     * @param array<string, Listener> $methods
+     */
     public function setStaticMethods(array $methods): void
     {
         $this->staticMethods = $methods;
