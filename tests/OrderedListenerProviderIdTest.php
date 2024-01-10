@@ -137,14 +137,14 @@ class OrderedListenerProviderIdTest extends TestCase
         $p = new OrderedListenerProvider($container);
 
         $idA = $p->addListenerService('A', 'listen', CollectingEvent::class, -4);
-        $p->addListenerServiceAfter('A-listen', 'B', 'listen', CollectingEvent::class);
+        $p->addListenerServiceAfter('A::listen', 'B', 'listen', CollectingEvent::class);
 
         $event = new CollectingEvent();
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
 
-        self::assertEquals('A-listen', $idA);
+        self::assertEquals('A::listen', $idA);
         self::assertEquals('AB', implode($event->result()));
     }
 

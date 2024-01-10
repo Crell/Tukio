@@ -77,7 +77,7 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
             );
         }
 
-        $id ??= $service . '-' . $method;
+        $id ??= $service . '::' . $method;
         return $this->listeners->add(
             item: $this->getListenerEntry($this->makeListenerForService($service, $method), $type),
             id: $id,
