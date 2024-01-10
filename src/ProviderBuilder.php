@@ -58,7 +58,8 @@ class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
         if (class_exists($service)) {
             $listener = [$service, $method];
             /** @var Listener $def */
-            $def = $this->getAttributeDefinition($listener);
+            $def = $this->classAnalyzer->analyze($service, Listener::class);
+            $def = $def->methods[$method];
             $id ??= $def?->id ?? $this->getListenerId($listener);
 
             // If any ordering is specified explicitly, that completely overrules any

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 use Attribute;
+use Crell\AttributeUtils\Multivalue;
 
-#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
-class ListenerAfter implements ListenerAttribute
+#[Attribute(Attribute::TARGET_FUNCTION | Attribute::TARGET_METHOD | Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+class ListenerAfter implements ListenerAttribute, Multivalue
 {
     /** @var string[]  */
     public array $after = [];

@@ -16,6 +16,7 @@ class MockMalformedSubscriber
     {
         $event->add('A');
     }
+
     /**
      * This function should have automatic registration attempted, and fail due to missing a type.
      */
@@ -24,6 +25,7 @@ class MockMalformedSubscriber
     {
         $event->add('A');
     }
+
     /**
      * This function should have manual registration attempted, and fail due to missing a type.
      */
@@ -39,12 +41,14 @@ class MockMalformedSubscriber
         // Should fail and throw an exception:
         $proxy->addListener('abnormalNameWithoutType');
     }
+
     public static function registerListenersBefore(ListenerProxy $proxy): void
     {
         $a = $proxy->addListener('onA');
         // Should fail and throw an exception:
         $proxy->addListenerBefore($a, 'abnormalNameWithoutType');
     }
+
     public static function registerListenersAfter(ListenerProxy $proxy): void
     {
         $a = $proxy->addListener('onA');

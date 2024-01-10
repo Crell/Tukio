@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\AttributeUtils\Analyzer;
+use Crell\AttributeUtils\ClassAnalyzer;
+use Crell\AttributeUtils\FuncAnalyzer;
+use Crell\AttributeUtils\FunctionAnalyzer;
+use Crell\AttributeUtils\MemoryCacheAnalyzer;
 use Crell\OrderedCollection\MultiOrderedCollection;
 use Crell\Tukio\Entry\ListenerEntry;
 use Fig\EventDispatcher\ParameterDeriverTrait;
@@ -17,8 +22,10 @@ abstract class ProviderCollector implements OrderedProviderInterface
      */
     protected MultiOrderedCollection $listeners;
 
-    public function __construct()
-    {
+    public function __construct(
+        protected readonly FunctionAnalyzer $funcAnalyzer = new FuncAnalyzer(),
+        protected readonly ClassAnalyzer $classAnalyzer = new MemoryCacheAnalyzer(new Analyzer()),
+    ) {
         $this->listeners = new MultiOrderedCollection();
     }
 
@@ -86,26 +93,44 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
     public function addSubscriber(string $class, string $service): void
     {
+        // First allow manual registration through the proxy object.
+        // This is deprecated.  Please don't use it.
         $proxy = $this->addSubscribersByProxy($class, $service);
 
+        $proxyRegisteredMethods = $proxy->getRegisteredMethods();
+
         try {
-            $methods = (new \ReflectionClass($class))->getMethods(\ReflectionMethod::IS_PUBLIC);
+            // Get all methods on the class, via AttributeUtils to handle reflection and caching.
+            $methods = $this->classAnalyzer->analyze($class, Listener::class)->methods;
 
-            $methods = array_filter($methods, static fn(\ReflectionMethod $r)
-                => !in_array($r->getName(), $proxy->getRegisteredMethods(), true));
-
-            /** @var \ReflectionMethod $rMethod */
-            foreach ($methods as $rMethod) {
-                $this->addSubscriberMethod($rMethod, $class, $service);
+            /**
+             * @var string $methodName
+             * @var Listener $def
+             */
+            foreach ($methods as $methodName => $def) {
+                if (in_array($methodName, $proxyRegisteredMethods, true)) {
+                    // Exclude anything already registered by proxy.
+                    continue;
+                }
+                // If there was an attribute-based definition, that takes priority.
+                if ($def->hasDefinition) {
+                    $this->listenerService($service, $methodName, $def->type, $def->priority, $def->before,$def->after, $def->id);
+                } elseif (str_starts_with($methodName, 'on') && $def->paramCount === 1) {
+                    // Try to register it iff the method starts with "on" and has only one required parameter.
+                    // (More than one required parameter is guaranteed to fail when invoked.)
+                    if (!$def->type) {
+                        throw InvalidTypeException::fromClassCallable($class, $methodName);
+                    }
+                    $this->listenerService($service, $methodName, type: $def->type, id: $service . '-' . $methodName);
+                }
             }
         } catch (\ReflectionException $e) {
             throw new \RuntimeException('Type error registering subscriber.', 0, $e);
         }
     }
 
-    protected function addSubscriberMethod(\ReflectionMethod $rMethod, string $class, string $service): void
+    protected function addSubscriberMethod(string $methodName, Listener $rMethod, string $class, string $service): void
     {
-        $methodName = $rMethod->getName();
         $params = $rMethod->getParameters();
 
         if (count($params) < 1) {
@@ -113,7 +138,11 @@ abstract class ProviderCollector implements OrderedProviderInterface
             return;
         }
 
-        $def = $this->getAttributeForRef($rMethod);
+        // Definitely wasteful to do this here.
+        // @todo Refactor.
+
+
+        $def = $this->getAttributeDefinition([$rMethod->class, $rMethod->name]);
 
         if ($def->id || $def->before || $def->after || $def->priority || str_starts_with($methodName, 'on')) {
             $paramType = $params[0]->getType();
@@ -158,32 +187,27 @@ abstract class ProviderCollector implements OrderedProviderInterface
      */
     protected function getAttributeDefinition(callable|array $listener): Listener
     {
-        $ref = null;
-
-        if ($this->isFunctionCallable($listener)) {
-            /** @var string $listener */
-            $ref = new \ReflectionFunction($listener);
-            // @phpstan-ignore-next-line
-        } elseif ($this->isClassCallable($listener)) {
-            // PHPStan says you cannot use array destructuring on a callable, but you can
-            // if you know that it's an array (which in context we do).
-            // @phpstan-ignore-next-line
-            [$class, $method] = $listener;
-            $ref = (new \ReflectionClass($class))->getMethod($method);
-            // @phpstan-ignore-next-line
-        } elseif ($this->isObjectCallable($listener)) {
-            // PHPStan says you cannot use array destructuring on a callable, but you can
-            // if you know that it's an array (which in context we do).
-            // @phpstan-ignore-next-line
-            [$class, $method] = $listener;
-            $ref = (new \ReflectionObject($class))->getMethod($method);
+        if ($this->isFunctionCallable($listener) || $this->isClosureCallable($listener)) {
+            return $this->funcAnalyzer->analyze($listener, Listener::class);
         }
 
-        if (!$ref) {
-            return new Listener();
+        if ($this->isObjectCallable($listener)) {
+            /** @var array $listener */
+            [$object, $method] = $listener;
+
+            $def = $this->classAnalyzer->analyze($object::class, Listener::class);
+            return $def->methods[$method];
         }
 
-        return $this->getAttributeForRef($ref);
+        if ($this->isClassCallable($listener)) {
+            /** @var array $listener */
+            [$class, $method] = $listener;
+
+            $def = $this->classAnalyzer->analyze($class, Listener::class);
+            return $def->staticMethods[$method];
+        }
+
+        return new Listener();
     }
 
     protected function getAttributeForRef(\Reflector $ref): Listener
@@ -323,10 +347,11 @@ abstract class ProviderCollector implements OrderedProviderInterface
     /**
      * Determines if a callable represents a method on an object.
      *
+     * @param callable|array{0: string, 1: string} $callable
      * @return bool
      *  True if the callable represents a method object, false otherwise.
      */
-    protected function isObjectCallable(callable $callable): bool
+    protected function isObjectCallable(callable|array $callable): bool
     {
         return is_array($callable) && is_object($callable[0]);
     }
@@ -334,10 +359,11 @@ abstract class ProviderCollector implements OrderedProviderInterface
     /**
      * Determines if a callable represents a closure/anonymous function.
      *
+     * @param callable|array{0: string, 1: string} $callable
      * @return bool
      *  True if the callable represents a closure object, false otherwise.
      */
-    protected function isClosureCallable(callable $callable): bool
+    protected function isClosureCallable(callable|array $callable): bool
     {
         return $callable instanceof \Closure;
     }
