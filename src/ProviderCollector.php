@@ -129,44 +129,6 @@ abstract class ProviderCollector implements OrderedProviderInterface
         }
     }
 
-    protected function addSubscriberMethod(string $methodName, Listener $rMethod, string $class, string $service): void
-    {
-        $params = $rMethod->getParameters();
-
-        if (count($params) < 1) {
-            // Skip this method, as it doesn't take arguments.
-            return;
-        }
-
-        // Definitely wasteful to do this here.
-        // @todo Refactor.
-
-
-        $def = $this->getAttributeDefinition([$rMethod->class, $rMethod->name]);
-
-        if ($def->id || $def->before || $def->after || $def->priority || str_starts_with($methodName, 'on')) {
-            $paramType = $params[0]->getType();
-
-            $id = $def->id ?? $service . '-' . $methodName;
-            // getName() is not a documented part of the Reflection API, but it's always there.
-            // @phpstan-ignore-next-line
-            $type = $def->type ?? $paramType?->getName() ?? throw InvalidTypeException::fromClassCallable($class, $methodName);
-
-            $this->listenerService($service, $methodName, $type, $def->priority, $def->before,$def->after, $id);
-        }
-    }
-
-    /**
-     * @return array<ListenerAttribute>
-     */
-    protected function findAttributesOnMethod(\ReflectionMethod $rMethod): array
-    {
-        $attributes = array_map(static fn (\ReflectionAttribute $attrib): object
-        => $attrib->newInstance(), $rMethod->getAttributes(Listener::class, \ReflectionAttribute::IS_INSTANCEOF));
-
-        return $attributes;
-    }
-
     /**
      * @param class-string $class
      */
@@ -208,32 +170,6 @@ abstract class ProviderCollector implements OrderedProviderInterface
         }
 
         return new Listener();
-    }
-
-    protected function getAttributeForRef(\Reflector $ref): Listener
-    {
-        // All this logic is very similar to AttributeUtils Sub-Attributes.
-        // Maybe AU can be improved to make sub-attributes accessible outside
-        // the analyzer?
-
-        /** @var Listener $def */
-        $def = $this->getAttributes(Listener::class, $ref)[0] ?? new Listener();
-
-        /** @var ListenerBefore[] $beforeAttribs */
-        $beforeAttribs = $this->getAttributes(ListenerBefore::class, $ref);
-        $def->absorbBefore($beforeAttribs);
-
-        /** @var ListenerAfter[] $afterAttribs */
-        $afterAttribs = $this->getAttributes(ListenerAfter::class, $ref);
-        $def->absorbAfter($afterAttribs);
-
-        /** @var ListenerPriority|null $priorityAttrib */
-        $priorityAttrib = $this->getAttributes(ListenerPriority::class, $ref)[0] ?? null;
-        if ($priorityAttrib) {
-            $def->absorbPriority($priorityAttrib);
-        }
-
-        return $def;
     }
 
     /**
