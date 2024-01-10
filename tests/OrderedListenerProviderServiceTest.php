@@ -180,7 +180,7 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $p = new OrderedListenerProvider($container);
 
-        $p->addSubscriber(MockMalformedSubscriber::class, MockMalformedSubscriber::class);
+        $p->addSubscriber(MockMalformedSubscriber::class);
     }
 
     #[Test]

@@ -91,8 +91,10 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $this->listenerService($service, $method, $type, after: [$after], id: $id);
     }
 
-    public function addSubscriber(string $class, string $service): void
+    public function addSubscriber(string $class, ?string $service = null): void
     {
+        $service ??= $class;
+
         // First allow manual registration through the proxy object.
         // This is deprecated.  Please don't use it.
         $proxy = $this->addSubscribersByProxy($class, $service);

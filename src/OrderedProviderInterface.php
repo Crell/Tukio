@@ -220,8 +220,8 @@ interface OrderedProviderInterface
      *
      * @param class-string $class
      *   The class name to be registered as a subscriber.
-     * @param string $service
-     *   The name of a service in the container.
+     * @param null|string $service
+     *   The name of a service in the container. If not specified, it's assumed to be the same as the class.
      */
-    public function addSubscriber(string $class, string $service): void;
+    public function addSubscriber(string $class, ?string $service = null): void;
 }
