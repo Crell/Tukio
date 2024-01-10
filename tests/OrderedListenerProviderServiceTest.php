@@ -6,6 +6,7 @@ namespace Crell\Tukio;
 
 use Crell\Tukio\Events\CollectingEvent;
 use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\InvokableListenerClassAttribute;
 use Crell\Tukio\Listeners\MockMalformedSubscriber;
 use Crell\Tukio\Listeners\MockSubscriber;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -264,6 +265,29 @@ class OrderedListenerProviderServiceTest extends TestCase
             [Listeners\ArbitraryListener::class],
             [Listeners\CompoundListener::class],
         ];
+    }
+
+    #[Test]
+    public function detects_invoke_method_and_type_with_class_attribute(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(InvokableListenerClassAttribute::class, new InvokableListenerClassAttribute());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(InvokableListenerClassAttribute::class);
+        $provider->listener(fn(CollectingEvent $event) => $event->add('A'), priority: 10);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $results = $event->result();
+        self::assertEquals('A', $results[0]);
+        self::assertEquals(InvokableListenerClassAttribute::class, $results[1]);
     }
 
     #[Test]

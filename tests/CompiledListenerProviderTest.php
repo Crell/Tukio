@@ -245,8 +245,6 @@ class CompiledListenerProviderTest extends TestCase
         self::assertEquals('BACD', implode($event->result()));
     }
 
-
-
     #[Test, DataProvider('detection_class_examples')]
     public function detects_invoke_method_and_type(string $class): void
     {
