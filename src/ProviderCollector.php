@@ -37,17 +37,21 @@ abstract class ProviderCollector implements OrderedProviderInterface
         ?string $id = null,
         ?string $type = null
     ): string {
-        /** @var Listener $def */
-        $def = $this->getAttributeDefinition($listener);
-        $id ??= $def?->id ?? $this->getListenerId($listener);
-        $type ??= $def?->type ?? $this->getType($listener);
+        $orderSpecified = !is_null($priority) || !empty($before) || !empty($after);
 
-        // If any ordering is specified explicitly, that completely overrules any
-        // attributes.
-        if (!is_null($priority) || $before || $after) {
-            $def->priority = $priority;
-            $def->before = $before;
-            $def->after = $after;
+        if (!$orderSpecified || !$type || !$id) {
+            /** @var Listener $def */
+            $def = $this->getAttributeDefinition($listener);
+            $id ??= $def?->id ?? $this->getListenerId($listener);
+            $type ??= $def?->type ?? $this->getType($listener);
+
+            // If any ordering is specified explicitly, that completely overrules any
+            // attributes.
+            if (!$orderSpecified) {
+                $priority = $def->priority;
+                $before = $def->before;
+                $after = $def->after;
+            }
         }
 
         $entry = $this->getListenerEntry($listener, $type);
@@ -55,9 +59,9 @@ abstract class ProviderCollector implements OrderedProviderInterface
         return $this->listeners->add(
             item: $entry,
             id: $id,
-            priority: $def->priority,
-            before: $def->before,
-            after: $def->after
+            priority: $priority,
+            before: $before,
+            after: $after
         );
     }
 
