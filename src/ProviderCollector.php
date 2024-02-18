@@ -9,6 +9,7 @@ use Crell\AttributeUtils\ClassAnalyzer;
 use Crell\AttributeUtils\FuncAnalyzer;
 use Crell\AttributeUtils\FunctionAnalyzer;
 use Crell\AttributeUtils\MemoryCacheAnalyzer;
+use Crell\AttributeUtils\MemoryCacheFunctionAnalyzer;
 use Crell\OrderedCollection\MultiOrderedCollection;
 use Crell\Tukio\Entry\ListenerEntry;
 use Fig\EventDispatcher\ParameterDeriverTrait;
@@ -23,7 +24,7 @@ abstract class ProviderCollector implements OrderedProviderInterface
     protected MultiOrderedCollection $listeners;
 
     public function __construct(
-        protected readonly FunctionAnalyzer $funcAnalyzer = new FuncAnalyzer(),
+        protected readonly FunctionAnalyzer $funcAnalyzer = new MemoryCacheFunctionAnalyzer(new FuncAnalyzer()),
         protected readonly ClassAnalyzer $classAnalyzer = new MemoryCacheAnalyzer(new Analyzer()),
     ) {
         $this->listeners = new MultiOrderedCollection();
