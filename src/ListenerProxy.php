@@ -123,7 +123,7 @@ class ListenerProxy
     {
         try {
             // We don't have a real object here, so we cannot use first-class-closures.
-            // PHPStan complains that an aray is not a callable, even though it is, because PHP.
+            // PHPStan complains that an array is not a callable, even though it is, because PHP.
             // @phpstan-ignore-next-line
             $type = $this->getParameterType([$this->serviceClass, $methodName]);
         } catch (\InvalidArgumentException $exception) {

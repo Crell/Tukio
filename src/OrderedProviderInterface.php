@@ -211,17 +211,17 @@ interface OrderedProviderInterface
     /**
      * Registers all listener methods on a service as listeners.
      *
-     * A method on the specified class is a listener if:
-     * - It is public.
+     * A public method on the specified class is a listener if either of these is true:
      * - It's name is in the form on*.  onUpdate(), onUserLogin(), onHammerTime() will all be registered.
-     * - It has a Listener/ListenerBefore/ListenerAfter attribute.
+     * - It has a Listener/ListenerBefore/ListenerAfter/ListenerPriority attribute.
      *
-     * The event type the listener is for will be derived from the type declaration in the method signature.
+     * The event type the listener is for will be derived from the type declaration in the method signature,
+     * unless overriden by an attribute..
      *
      * @param class-string $class
      *   The class name to be registered as a subscriber.
-     * @param string $service
-     *   The name of a service in the container.
+     * @param null|string $service
+     *   The name of a service in the container. If not specified, it's assumed to be the same as the class.
      */
-    public function addSubscriber(string $class, string $service): void;
+    public function addSubscriber(string $class, ?string $service = null): void;
 }

@@ -33,23 +33,6 @@ function atNoListen(EventOne $event): void
     throw new \Exception('This should not be called');
 }
 
-class AtListen
-{
-    #[Listener]
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('C');
-    }
-}
-
-class AtListenService
-{
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('D');
-    }
-}
-
 class CompiledListenerProviderAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;
@@ -63,13 +46,13 @@ class CompiledListenerProviderAttributeTest extends TestCase
         $builder = new ProviderBuilder();
 
         $container = new MockContainer();
-        $container->addService('D', new AtListenService());
+        $container->addService('D', new Listeners\AtListenService());
 
         $ns = "\\Crell\\Tukio";
 
         $builder->addListener("{$ns}\\atListenerB");
         $builder->addListener("{$ns}\\atListenerA");
-        $builder->addListener([AtListen::class, 'listen']);
+        $builder->addListener([Listeners\AtListen::class, 'listen']);
         $builder->addListener("{$ns}\\atNoListen");
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
@@ -99,7 +82,7 @@ class CompiledListenerProviderAttributeTest extends TestCase
         $subscriber = new MockAttributedSubscriber();
 
         $container->addService('subscriber', $subscriber);
-        $builder->addSubscriber(MockSubscriber::class, 'subscriber');
+        $builder->addSubscriber(MockAttributedSubscriber::class, 'subscriber');
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 

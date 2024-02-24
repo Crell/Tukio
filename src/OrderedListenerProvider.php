@@ -52,27 +52,34 @@ class OrderedListenerProvider extends ProviderCollector implements ListenerProvi
             $type = $this->getParameterType([$service, $method]);
         }
 
+        $orderSpecified = !is_null($priority) || !empty($before) || !empty($after);
+
         // In the special case that the service is the class name, we can
         // leverage attributes.
-        if (class_exists($service)) {
+        if (!$orderSpecified && class_exists($service)) {
             $listener = [$service, $method];
             /** @var Listener $def */
-            $def = $this->getAttributeDefinition($listener);
+            $def = $this->classAnalyzer->analyze($service, Listener::class);
+            $def = $def->methods[$method];
             $id ??= $def?->id ?? $this->getListenerId($listener);
 
-            // If any ordering is specified explicitly, that completely overrules any
-            // attributes.
-            if (!is_null($priority) || $before || $after) {
-                $def->priority = $priority;
-                $def->before = $before;
-                $def->after = $after;
-            }
-            return $this->listener($this->makeListenerForService($service, $method), priority: $def->priority, before: $def->before, after: $def->after, id: $id, type: $type);
+            return $this->listeners->add(
+                item: $this->getListenerEntry($this->makeListenerForService($service, $method), $type),
+                id: $id,
+                priority: $def->priority,
+                before: $def->before,
+                after: $def->after
+            );
         }
 
-
-        $id ??= $service . '-' . $method;
-        return $this->listener($this->makeListenerForService($service, $method), priority: $priority, before: $before, after: $after, id: $id, type: $type);
+        $id ??= $service . '::' . $method;
+        return $this->listeners->add(
+            item: $this->getListenerEntry($this->makeListenerForService($service, $method), $type),
+            id: $id,
+            priority: $priority,
+            before: $before,
+            after: $after,
+        );
     }
 
     /**

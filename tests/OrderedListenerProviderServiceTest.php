@@ -6,6 +6,7 @@ namespace Crell\Tukio;
 
 use Crell\Tukio\Events\CollectingEvent;
 use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\InvokableListenerClassAttribute;
 use Crell\Tukio\Listeners\MockMalformedSubscriber;
 use Crell\Tukio\Listeners\MockSubscriber;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -176,11 +177,11 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $subscriber = new MockMalformedSubscriber();
 
-        $container->addService('subscriber', $subscriber);
+        $container->addService(MockMalformedSubscriber::class, $subscriber);
 
         $p = new OrderedListenerProvider($container);
 
-        $p->addSubscriber(MockMalformedSubscriber::class, 'subscriber');
+        $p->addSubscriber(MockMalformedSubscriber::class);
     }
 
     #[Test]
@@ -267,6 +268,29 @@ class OrderedListenerProviderServiceTest extends TestCase
     }
 
     #[Test]
+    public function detects_invoke_method_and_type_with_class_attribute(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(InvokableListenerClassAttribute::class, new InvokableListenerClassAttribute());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(InvokableListenerClassAttribute::class);
+        $provider->listener(fn(CollectingEvent $event) => $event->add('A'), priority: 10);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $results = $event->result();
+        self::assertEquals('A', $results[0]);
+        self::assertEquals(InvokableListenerClassAttribute::class, $results[1]);
+    }
+
+    #[Test]
     public function rejects_multi_method_class_without_invoke(): void
     {
         $this->expectException(ServiceRegistrationTooManyMethods::class);
@@ -287,7 +311,7 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $provider = new OrderedListenerProvider($container);
 
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $provider->listenerService(DoesNotExist::class);
     }
 
