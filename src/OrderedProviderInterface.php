@@ -76,6 +76,7 @@ interface OrderedProviderInterface
      * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
      * the priority, id, or type.  Values specified in the method call take priority over the attribute.
      *
+     * @deprecated
      * @param callable $listener
      *   The listener to register.
      * @param ?int $priority
@@ -100,6 +101,7 @@ interface OrderedProviderInterface
      * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
      * the id or type.  The $before parameter specified here will always be used and the type of attribute ignored.
      *
+     * @deprecated
      * @param string $before
      *   The ID of an existing listener.
      * @param callable $listener
@@ -124,6 +126,7 @@ interface OrderedProviderInterface
      * A Listener, ListenerBefore, or ListenerAfter attribute on the listener may also provide
      * the id or type.  The $after parameter specified here will always be used and the type of attribute ignored.
      *
+     * @deprecated
      * @param string $after
      *   The ID of an existing listener.
      * @param callable $listener
@@ -144,6 +147,7 @@ interface OrderedProviderInterface
      *
      * This method does not support attributes, as the class name is unknown at registration.
      *
+     * @deprecated
      * @param string $service
      *   The name of a service on which this listener lives.
      * @param string $method
@@ -168,6 +172,7 @@ interface OrderedProviderInterface
      *
      * This method does not support attributes, as the class name is unknown at registration.
      *
+     * @deprecated
      * @param string $before
      *   The ID of an existing listener.
      * @param string $service
@@ -192,6 +197,7 @@ interface OrderedProviderInterface
      *
      * This method does not support attributes, as the class name is unknown at registration.
      *
+     * @deprecated
      * @param string $after
      *   The ID of an existing listener.
      * @param string $service
