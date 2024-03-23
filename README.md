@@ -114,7 +114,7 @@ $provider->listener(function(SpecificStuffHappened) {
     // ...  
 }, priority: 10);
 
-$provider->addListener('handleStuff', priority: 20);
+$provider->listener('handleStuff', priority: 20);
 ```
 
 Now, the named function Listener will get called before the anonymous function does.  (Higher priority number comes first, and negative numbers are totally legal.) If two listeners have the same priority then their order relative to each other is undefined.
