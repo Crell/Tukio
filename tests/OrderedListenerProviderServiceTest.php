@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\InvokableListenerClassAttribute;
+use Crell\Tukio\Listeners\InvokableListenerClassNoId;
+use Crell\Tukio\Listeners\MockMalformedSubscriber;
+use Crell\Tukio\Listeners\MockSubscriber;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OrderedListenerProviderServiceTest extends TestCase
 {
-    /** @var MockContainer */
-    protected $mockContainer;
+    protected MockContainer $mockContainer;
 
     public function setUp(): void
     {
@@ -64,14 +70,15 @@ class OrderedListenerProviderServiceTest extends TestCase
         $this->mockContainer = $container;
     }
 
-    public function test_add_listener_service(): void
+    #[Test]
+    public function add_listener_service(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
         $p->addListenerService('L', 'hear', CollectingEvent::class, 70);
         $p->addListenerService('E', 'listen', CollectingEvent::class, 80);
         $p->addListenerService('C', 'listen', CollectingEvent::class, 100);
-        $p->addListenerService('L', 'hear', CollectingEvent::class); // Defaults to 0
+        $p->addListenerService('L', 'hear', CollectingEvent::class, priority: 0);
         $p->addListenerService('R', 'listen', CollectingEvent::class, 90);
 
         $event = new CollectingEvent();
@@ -80,10 +87,11 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_service_before_another(): void
+    #[Test]
+    public function add_listener_service_before_another(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
@@ -99,10 +107,11 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_service_after_another(): void
+    #[Test]
+    public function add_listener_service_after_another(): void
     {
         $p = new OrderedListenerProvider($this->mockContainer);
 
@@ -118,10 +127,11 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_service_registration_fails_without_container(): void
+    #[Test]
+    public function service_registration_fails_without_container(): void
     {
         $this->expectException(ContainerMissingException::class);
 
@@ -131,7 +141,8 @@ class OrderedListenerProviderServiceTest extends TestCase
     }
 
 
-    public function test_add_subscriber() : void
+    #[Test]
+    public function add_subscriber() : void
     {
         $container = new MockContainer();
 
@@ -149,10 +160,17 @@ class OrderedListenerProviderServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BCAEDF', implode($event->result()));
+        // We can't guarantee a stricter order than the instructions provided, so
+        // just check for those rather than a precise order.
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'C') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'D') > strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'F') > strpos($result, 'A'));
     }
 
-    public function test_malformed_subscriber_automatic_fails(): void
+    #[Test]
+    public function malformed_subscriber_automatic_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -160,14 +178,15 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         $subscriber = new MockMalformedSubscriber();
 
-        $container->addService('subscriber', $subscriber);
+        $container->addService(MockMalformedSubscriber::class, $subscriber);
 
         $p = new OrderedListenerProvider($container);
 
-        $p->addSubscriber(MockMalformedSubscriber::class, 'subscriber');
+        $p->addSubscriber(MockMalformedSubscriber::class);
     }
 
-    public function test_malformed_subscriber_manual_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -184,7 +203,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         MockMalformedSubscriber::registerListenersDirect($proxy);
     }
 
-    public function test_malformed_subscriber_manual_before_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_before_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -201,7 +221,8 @@ class OrderedListenerProviderServiceTest extends TestCase
         MockMalformedSubscriber::registerListenersBefore($proxy);
     }
 
-    public function test_malformed_subscriber_manual_after_fails(): void
+    #[Test]
+    public function malformed_subscriber_manual_after_fails(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -217,4 +238,95 @@ class OrderedListenerProviderServiceTest extends TestCase
 
         MockMalformedSubscriber::registerListenersAfter($proxy);
     }
+
+    #[Test, DataProvider('detection_class_examples')]
+    public function detects_invoke_method_and_type(string $class): void
+    {
+        $container = new MockContainer();
+
+        $container->addService($class, new $class());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService($class);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        self::assertEquals($class, $event->result()[0]);
+    }
+
+    public static function detection_class_examples(): iterable
+    {
+        return [
+            [Listeners\InvokableListener::class],
+            [Listeners\ArbitraryListener::class],
+            [Listeners\CompoundListener::class],
+        ];
+    }
+
+    #[Test]
+    public function detects_invoke_method_and_type_with_class_attribute(): void
+    {
+        $container = new MockContainer();
+
+        $container->addService(InvokableListenerClassAttribute::class, new InvokableListenerClassAttribute());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(InvokableListenerClassAttribute::class);
+        $provider->listener(fn(CollectingEvent $event) => $event->add('A'), priority: 10);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $results = $event->result();
+        self::assertEquals('A', $results[0]);
+        self::assertEquals(InvokableListenerClassAttribute::class, $results[1]);
+    }
+
+    #[Test]
+    public function detects_invoke_method_and_gives_class_id_by_default(): void
+    {
+        $container = new MockContainer();
+        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId('beep'));
+
+        $provider = new OrderedListenerProvider($container);
+
+        $id = $provider->listenerService(InvokableListenerClassNoId::class);
+
+        self::assertEquals(InvokableListenerClassNoId::class, $id);
+    }
+
+    #[Test]
+    public function rejects_multi_method_class_without_invoke(): void
+    {
+        $this->expectException(ServiceRegistrationTooManyMethods::class);
+        $container = new MockContainer();
+
+        $container->addService(Listeners\InvalidListener::class, new Listeners\InvalidListener());
+
+        $provider = new OrderedListenerProvider($container);
+
+        $provider->listenerService(Listeners\InvalidListener::class);
+    }
+
+    #[Test]
+    public function rejects_missing_auto_detected_service(): void
+    {
+        $this->expectException(ServiceRegistrationClassNotExists::class);
+        $container = new MockContainer();
+
+        $provider = new OrderedListenerProvider($container);
+
+        // @phpstan-ignore-next-line
+        $provider->listenerService(DoesNotExist::class);
+    }
+
 }

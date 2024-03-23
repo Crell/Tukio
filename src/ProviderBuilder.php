@@ -8,26 +8,13 @@ use Crell\Tukio\Entry\ListenerEntry;
 use Crell\Tukio\Entry\ListenerFunctionEntry;
 use Crell\Tukio\Entry\ListenerServiceEntry;
 use Crell\Tukio\Entry\ListenerStaticMethodEntry;
-use Crell\OrderedCollection\OrderedCollection;
 
-class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
+class ProviderBuilder extends ProviderCollector implements \IteratorAggregate
 {
-    use ProviderUtilities;
-
-    /**
-     * @var OrderedCollection<callable>
-     */
-    protected OrderedCollection $listeners;
-
     /**
      * @var array<class-string>
      */
     protected array $optimizedEvents = [];
-
-    public function __construct()
-    {
-        $this->listeners = new OrderedCollection();
-    }
 
     /**
      * Pre-specify an event class that should have an optimized listener list built.
@@ -47,129 +34,44 @@ class ProviderBuilder implements OrderedProviderInterface, \IteratorAggregate
         return $this->optimizedEvents;
     }
 
-    public function addListener(callable $listener, ?int $priority = null, ?string $id = null, ?string $type = null): string
-    {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                if ($attrib instanceof ListenerBefore) {
-                    $generatedId = $this->listeners->addItemBefore($attrib->before, $entry, $id);
-                } elseif ($attrib instanceof ListenerAfter) {
-                    $generatedId = $this->listeners->addItemAfter($attrib->after, $entry, $id);
-                } elseif ($attrib instanceof ListenerPriority) {
-                    $generatedId = $this->listeners->addItem($entry, $attrib->priority, $id);
-                } else {
-                    $generatedId = $this->listeners->addItem($entry, $priority ?? 0, $id);
-                }
+    public function listenerService(
+        string $service,
+        ?string $method = null,
+        ?string $type = null,
+        ?int $priority = null,
+        array $before = [],
+        array $after = [],
+        ?string $id = null
+    ): string {
+        $method ??= $this->deriveMethod($service);
+
+        if (!$type) {
+            if (!class_exists($service)) {
+                throw ServiceRegistrationClassNotExists::create($service);
             }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
+            // @phpstan-ignore-next-line
+            $type = $this->getParameterType([$service, $method]);
         }
 
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
+        $orderSpecified = !is_null($priority) || !empty($before) || !empty($after);
 
-        return $this->listeners->addItem($entry, $priority ?? 0, $id);
-    }
+        // In the special case that the service is the class name, we can
+        // leverage attributes.
+        if (!$orderSpecified && class_exists($service)) {
+            $listener = [$service, $method];
+            /** @var Listener $def */
+            $def = $this->classAnalyzer->analyze($service, Listener::class);
+            $def = $def->methods[$method];
+            $id ??= $def?->id ?? $this->getListenerId($listener);
 
-    public function addListenerBefore(string $before, callable $listener, ?string $id = null, ?string $type = null): string
-    {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                // The before-ness of this method takes priority over the attribute.
-                $generatedId = $this->listeners->addItemBefore($before, $entry, $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
+            $entry = new ListenerServiceEntry($service, $method, $type);
+            return $this->listeners->add($entry, $id, priority: $def->priority, before: $def->before, after: $def->after);
         }
 
-        $id = $id ?? $this->getListenerId($listener);
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        return $this->listeners->addItemBefore($before, $entry, $id);
-    }
-
-    public function addListenerAfter(string $after, callable $listener, ?string $id = null, ?string $type = null): string
-    {
-        if ($attributes = $this->getAttributes($listener)) {
-            // @todo We can probably do better than this in the next major.
-            /** @var Listener|ListenerBefore|ListenerAfter|ListenerPriority $attrib */
-            foreach ($attributes as $attrib) {
-                $type = $type ?? $attrib->type ?? $this->getType($listener);
-                $id = $id ?? $attrib->id ?? $this->getListenerId($listener);
-                $entry = $this->getListenerEntry($listener, $type);
-                // The before-ness of this method takes priority over the attribute.
-                $generatedId = $this->listeners->addItemBefore($after, $entry, $id);
-            }
-            // Return the last id only, because that's all we can do.
-            return $generatedId;
-        }
-
-        $entry = $this->getListenerEntry($listener, $type ?? $this->getParameterType($listener));
-        $id = $id ?? $this->getListenerId($listener);
-
-        return $this->listeners->addItemAfter($after, $entry, $id);
-    }
-
-    public function addListenerService(string $service, string $method, string $type, ?int $priority = null, ?string $id = null): string
-    {
         $entry = new ListenerServiceEntry($service, $method, $type);
-        $priority = $priority ?? 0;
+        $id ??= $service . '-' . $method;
 
-        return $this->listeners->addItem($entry, $priority, $id);
-    }
-
-    public function addListenerServiceBefore(string $before, string $service, string $method, string $type, ?string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($service, $method, $type);
-
-        return $this->listeners->addItemBefore($before, $entry, $id);
-    }
-
-    public function addListenerServiceAfter(string $after, string $service, string $method, string $type, ?string $id = null): string
-    {
-        $entry = new ListenerServiceEntry($service, $method, $type);
-
-        return $this->listeners->addItemAfter($after, $entry, $id);
-    }
-
-    public function addSubscriber(string $class, string $service): void
-    {
-        // @todo This method is identical to the one in OrderedListenerProvider. Is it worth merging them?
-
-        $proxy = new ListenerProxy($this, $service, $class);
-
-        // Explicit registration is opt-in.
-        if (in_array(SubscriberInterface::class, class_implements($class))) {
-            /** @var SubscriberInterface $class */
-            $class::registerListeners($proxy);
-        }
-
-        try {
-            $rClass = new \ReflectionClass($class);
-            $methods = $rClass->getMethods(\ReflectionMethod::IS_PUBLIC);
-            /** @var \ReflectionMethod $rMethod */
-            foreach ($methods as $rMethod) {
-                $methodName = $rMethod->getName();
-                if (!in_array($methodName, $proxy->getRegisteredMethods()) && strpos($methodName, 'on') === 0) {
-                    $params = $rMethod->getParameters();
-                    // getName() is not part of the declared reflection API, but it's there.
-                    // @phpstan-ignore-next-line
-                    $type = $params[0]->getType()->getName();
-                    $this->addListenerService($service, $rMethod->getName(), $type);
-                }
-            }
-        } catch (\ReflectionException $e) {
-            throw new \RuntimeException('Type error registering subscriber.', 0, $e);
-        }
+        return $this->listeners->add($entry, $id, priority: $priority, before: $before, after: $after);
     }
 
     public function getIterator(): \Traversable

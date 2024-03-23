@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Events\EventOne;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\MockAttributedSubscriber;
+use Crell\Tukio\Listeners\MockSubscriber;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[ListenerPriority(3, 'A', CollectingEvent::class)]
@@ -27,31 +33,12 @@ function atNoListen(EventOne $event): void
     throw new \Exception('This should not be called');
 }
 
-class AtListen
-{
-    #[Listener]
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('C');
-    }
-}
-
-class AtListenService
-{
-    public static function listen(CollectingEvent $event): void
-    {
-        $event->add('D');
-    }
-}
-
-/**
- * @requires PHP >= 8.0
- */
-class CompiledEventDispatcherAttributeTest extends TestCase
+class CompiledListenerProviderAttributeTest extends TestCase
 {
     use MakeCompiledProviderTrait;
 
-    function test_compiled_provider_triggers_in_order(): void
+    #[Test]
+    public function compiled_provider_triggers_in_order(): void
     {
         $class = 'AtCompiledProvider';
         $namespace = 'Test\\Space';
@@ -59,13 +46,13 @@ class CompiledEventDispatcherAttributeTest extends TestCase
         $builder = new ProviderBuilder();
 
         $container = new MockContainer();
-        $container->addService('D', new AtListenService());
+        $container->addService('D', new Listeners\AtListenService());
 
         $ns = "\\Crell\\Tukio";
 
         $builder->addListener("{$ns}\\atListenerB");
         $builder->addListener("{$ns}\\atListenerA");
-        $builder->addListener([AtListen::class, 'listen']);
+        $builder->addListener([Listeners\AtListen::class, 'listen']);
         $builder->addListener("{$ns}\\atNoListen");
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
@@ -75,10 +62,12 @@ class CompiledEventDispatcherAttributeTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('ABC', implode($event->result()));
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') > strpos($result, 'A'));
     }
 
-    public function test_add_subscriber(): void
+    #[Test]
+    public function add_subscriber(): void
     {
         // This test is parallel to and uses the same mock subscriber as
         // RegisterableListenerProviderServiceTest::test_add_subscriber().
@@ -93,7 +82,7 @@ class CompiledEventDispatcherAttributeTest extends TestCase
         $subscriber = new MockAttributedSubscriber();
 
         $container->addService('subscriber', $subscriber);
-        $builder->addSubscriber(MockSubscriber::class, 'subscriber');
+        $builder->addSubscriber(MockAttributedSubscriber::class, 'subscriber');
 
         $provider = $this->makeProvider($builder, $container, $class, $namespace);
 
@@ -102,6 +91,12 @@ class CompiledEventDispatcherAttributeTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BCAEDF', implode($event->result()));
+        // We can't guarantee a stricter order than the instructions provided, so
+        // just check for those rather than a precise order.
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'C') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'D') > strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'F') > strpos($result, 'A'));
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Entry;
 
-interface CompileableListenerEntryInterface
+interface CompileableListenerEntry
 {
     /**
      * Extracts relevant information for the listener.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Crell\Tukio\Benchmarks;
 
-use Crell\Tukio\CollectingEvent;
+use Crell\Tukio\Events\CollectingEvent;
 use PhpBench\Benchmark\Metadata\Annotations\Groups;
 use PhpBench\Benchmark\Metadata\Annotations\Iterations;
 use PhpBench\Benchmark\Metadata\Annotations\OutputTimeUnit;

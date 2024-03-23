@@ -29,12 +29,19 @@ trait MakeCompiledProviderTrait
      */
     protected function makeProvider(ProviderBuilder $builder, ContainerInterface $container, string $class, string $namespace) : ListenerProviderInterface
     {
+        // Write the generated compiler out to a temp file.
+        $filename = tempnam(sys_get_temp_dir(), 'compiled');
+        if (!$filename) {
+            throw new \RuntimeException('Unable to create temp file for compiled provider.');
+        }
+        $out = fopen($filename, 'w');
+        if (!$out) {
+            throw new \RuntimeException('Unable to open file to write compiled provider.');
+        }
+
         try {
             $compiler = new ProviderCompiler();
 
-            // Write the generated compiler out to a temp file.
-            $filename = tempnam(sys_get_temp_dir(), 'compiled');
-            $out = fopen($filename, 'w');
             $compiler->compile($builder, $out, $class, $namespace);
             fclose($out);
 
@@ -46,15 +53,37 @@ trait MakeCompiledProviderTrait
             $provider = new $compiledClassName($container);
         }
         finally {
-            // This check is not actually needed as no exception could be
-            // thrown before $filename gets defined, but PHPStan doesn't
-            // understand that.
-            if (isset($filename)) {
-                unlink($filename);
-            }
+            unlink($filename);
         }
 
         return $provider;
     }
 
+    protected function makeAnonymousProvider(ProviderBuilder $builder, ContainerInterface $container): ListenerProviderInterface
+    {
+        // Write the generated compiler out to a temp file.
+        $filename = tempnam(sys_get_temp_dir(), 'compiled');
+        if (!$filename) {
+            throw new \RuntimeException('Unable to create temp file for compiled provider.');
+        }
+        $out = fopen($filename, 'w');
+        if (!$out) {
+            throw new \RuntimeException('Unable to open file to write compiled provider.');
+        }
+
+        try {
+            $compiler = new ProviderCompiler();
+
+            $compiler->compileAnonymous($builder, $out);
+            fclose($out);
+
+            // Now include it.  If there's a parse error PHP will throw a ParseError and PHPUnit will catch it for us.
+            $provider = $compiler->loadAnonymous($filename, $container);
+        }
+        finally {
+            unlink($filename);
+        }
+
+        return $provider;
+    }
 }

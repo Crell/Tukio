@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 function event_listener_one(CollectingEvent $event): void
@@ -28,32 +31,11 @@ function event_listener_four(CollectingEvent $event): void
 }
 
 
-class TestListeners
-{
-    public static function listenerA(CollectingEvent $event): void
-    {
-        $event->add('A');
-    }
-    public static function listenerB(CollectingEvent $event): void
-    {
-        $event->add('B');
-    }
-
-    public function listenerC(CollectingEvent $event): void
-    {
-        $event->add('C');
-    }
-
-    public function listenerD(CollectingEvent $event): void
-    {
-        $event->add('D');
-    }
-}
-
 class OrderedListenerProviderIdTest extends TestCase
 {
 
-    public function test_natural_id_for_function(): void
+    #[Test]
+    public function natural_id_for_function(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -71,15 +53,16 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_static_method(): void
+    #[Test]
+    public function natural_id_for_static_method(): void
     {
         $p = new OrderedListenerProvider();
 
-        $p->addListener([TestListeners::class, 'listenerA'], -4);
-        $p->addListenerBefore(TestListeners::class . '::listenerA', [TestListeners::class, 'listenerB']);
+        $p->addListener([Listeners\TestListeners::class, 'listenerA'], -4);
+        $p->addListenerBefore(Listeners\TestListeners::class . '::listenerA', [Listeners\TestListeners::class, 'listenerB']);
 
         $event = new CollectingEvent();
 
@@ -87,17 +70,18 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BA', implode($event->result()));
+        self::assertEquals('BA', implode($event->result()));
     }
 
-    public function test_natural_id_for_object_method(): void
+    #[Test]
+    public function natural_id_for_object_method(): void
     {
         $p = new OrderedListenerProvider();
 
-        $l = new TestListeners();
+        $l = new Listeners\TestListeners();
 
         $p->addListener([$l, 'listenerC'], -4);
-        $p->addListenerBefore(TestListeners::class . '::listenerC', [$l, 'listenerD']);
+        $p->addListenerBefore(Listeners\TestListeners::class . '::listenerC', [$l, 'listenerD']);
 
         $event = new CollectingEvent();
 
@@ -105,10 +89,11 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('DC', implode($event->result()));
+        self::assertEquals('DC', implode($event->result()));
     }
 
-    public function test_explicit_id_for_function(): void
+    #[Test]
+    public function explicit_id_for_function(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -126,10 +111,11 @@ class OrderedListenerProviderIdTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BACD', implode($event->result()));
+        self::assertEquals('BACD', implode($event->result()));
     }
 
-    public function test_natural_id_for_service_listener(): void
+    #[Test]
+    public function natural_id_for_service_listener(): void
     {
         $container = new MockContainer();
 
@@ -151,15 +137,15 @@ class OrderedListenerProviderIdTest extends TestCase
         $p = new OrderedListenerProvider($container);
 
         $idA = $p->addListenerService('A', 'listen', CollectingEvent::class, -4);
-        $p->addListenerServiceAfter('A-listen', 'B', 'listen', CollectingEvent::class);
+        $p->addListenerServiceAfter('A::listen', 'B', 'listen', CollectingEvent::class);
 
         $event = new CollectingEvent();
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
 
-        $this->assertEquals('A-listen', $idA);
-        $this->assertEquals('AB', implode($event->result()));
+        self::assertEquals('A::listen', $idA);
+        self::assertEquals('AB', implode($event->result()));
     }
 
 }

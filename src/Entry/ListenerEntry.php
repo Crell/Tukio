@@ -14,11 +14,8 @@ class ListenerEntry
     /** @var callable */
     public $listener;
 
-    public string $type;
-
-    public function __construct(callable $listener, string $type)
+    public function __construct(callable $listener, public string $type)
     {
         $this->listener = $listener;
-        $this->type = $type;
     }
 }

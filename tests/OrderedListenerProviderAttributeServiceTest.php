@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockContainer;
+use Crell\Tukio\Listeners\MockAttributedSubscriber;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires PHP >= 8.0
- */
 class OrderedListenerProviderAttributeServiceTest extends TestCase
 {
-    public function test_add_subscriber() : void
+    #[Test]
+    public function add_subscriber() : void
     {
         $container = new MockContainer();
 
@@ -30,6 +32,12 @@ class OrderedListenerProviderAttributeServiceTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('BCAEDF', implode($event->result()));
+        // We can't guarantee a stricter order than the instructions provided, so
+        // just check for those rather than a precise order.
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'C') < strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'D') > strpos($result, 'A'));
+        self::assertTrue(strpos($result, 'F') > strpos($result, 'A'));
     }
 }

@@ -2,8 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\Listeners;
 
+
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Listener;
+use Crell\Tukio\ListenerAfter;
+use Crell\Tukio\ListenerBefore;
+use Crell\Tukio\ListenerPriority;
+use Crell\Tukio\NoEvent;
 
 class MockAttributedSubscriber
 {

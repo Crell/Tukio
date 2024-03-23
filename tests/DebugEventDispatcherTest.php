@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Crell\Tukio;
 
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Fakes\MockLogger;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 class DebugEventDispatcherTest extends TestCase
@@ -22,7 +23,8 @@ class DebugEventDispatcherTest extends TestCase
         $this->logger = new MockLogger();
     }
 
-    public function test_event_is_logged() : void
+    #[Test]
+    public function event_is_logged() : void
     {
         $inner = new class implements EventDispatcherInterface {
             public function dispatch(object $event)
@@ -36,8 +38,8 @@ class DebugEventDispatcherTest extends TestCase
         $event = new CollectingEvent();
         $p->dispatch($event);
 
-        $this->assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
-        $this->assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
-        $this->assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
+        self::assertCount(1, $this->logger->messages[LogLevel::DEBUG]);
+        self::assertEquals('Processing event of type {type}.', $this->logger->messages[LogLevel::DEBUG][0]['message']);
+        self::assertEquals($event, $this->logger->messages[LogLevel::DEBUG][0]['context']['event']);
     }
 }
