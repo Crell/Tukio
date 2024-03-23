@@ -11,6 +11,9 @@ use Crell\Tukio\Listeners\ArbitraryListener;
 use Crell\Tukio\Listeners\CompoundListener;
 use Crell\Tukio\Listeners\InvalidListener;
 use Crell\Tukio\Listeners\InvokableListener;
+use Crell\Tukio\Listeners\InvokableListenerClassAttribute;
+use Crell\Tukio\Listeners\InvokableListenerClassNoId;
+use Crell\Tukio\Listeners\InvokableListenerClassNoIdBefore;
 use Crell\Tukio\Listeners\MockSubscriber;
 use Crell\Tukio\Listeners\TestAttributedListeners;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -322,5 +325,30 @@ class CompiledListenerProviderTest extends TestCase
         }
 
         self::assertEquals('DC', implode($event->result()));
+    }
+
+    #[Test]
+    public function detects_invoke_method_and_gives_class_id_by_default(): void
+    {
+        $builder = new ProviderBuilder();
+        $container = new MockContainer();
+
+        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId());
+        $container->addService(InvokableListenerClassNoIdBefore::class, new InvokableListenerClassNoIdBefore());
+
+        $builder->listenerService(InvokableListenerClassNoId::class);
+        $builder->listenerService(InvokableListenerClassNoIdBefore::class);
+
+        $provider = $this->makeAnonymousProvider($builder, $container);
+
+        $event = new CollectingEvent();
+
+        foreach ($provider->getListenersForEvent($event) as $listener) {
+            $listener($event);
+        }
+
+        $results = $event->result();
+        self::assertEquals(InvokableListenerClassNoIdBefore::class, $results[0]);
+        self::assertEquals(InvokableListenerClassNoId::class, $results[1]);
     }
 }

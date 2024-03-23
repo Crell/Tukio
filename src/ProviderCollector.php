@@ -255,6 +255,9 @@ abstract class ProviderCollector implements OrderedProviderInterface
 
         if ($this->isClassCallable($listener)) {
             /** @var array{0: class-string, 1: string} $listener */
+            if ($listener[1] === '__invoke') {
+                return $listener[0];
+            }
             return $listener[0] . '::' . $listener[1];
         }
 
