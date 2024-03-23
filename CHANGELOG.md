@@ -9,10 +9,14 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
 - Major internal refactoring.
 - There is now a `listener()` method on the Provider and Compiler classes that allows specifying multiple before/after rules at once, in addition to priority. It is *recommended* to use this method in place of the older ones.
+- Similarly, there is a `listenerService()` method for registering any service-based listener.
 - Upgraded to OrderedCollection v2, and switched to a Topological-based sort.  The main advantage is the ability to support multiple before/after rules.  However, this has a side effect that the order of listeners that had no relative order specified may have changed.  This is not an API break as that order was never guaranteed, but may still affect some order-sensitive code that worked by accident.  If that happens, and you care about the order, specify before/after orders as appropriate.
+- Attributes are now the recommended way to register listeners.
+- Attributes may be placed on the class level, and will be inherited by method-level listeners.
 
 ### Deprecated
-- Nothing
+- `SubscriberInterface` is now deprecated.  It will be removed in v3.
+- the `addListener`, `addListenerBefore`, `addListenerAfter`, `addListenerService`, `addListenerServiceBefore`, and `addListenerServiceAfter` methods have been deprecated.  They will be removed in v3.  Use `listener()` and `listenerService()` instead.
 
 ### Fixed
 - Nothing
