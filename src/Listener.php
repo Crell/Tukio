@@ -123,8 +123,8 @@ class Listener implements ListenerAttribute, HasSubAttributes, ParseMethods, Rea
         $this->id ??= $class->id;
         $this->type ??= $class->type;
         $this->priority ??= $class->priority;
-        $this->before ??= $class->before;
-        $this->after ??= $class->after;
+        $this->before = [...$this->before, ...$class->before];
+        $this->after = [...$this->after, ...$class->after];
     }
 
     public function subAttributes(): array
