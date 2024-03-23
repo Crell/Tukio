@@ -333,7 +333,7 @@ class CompiledListenerProviderTest extends TestCase
         $builder = new ProviderBuilder();
         $container = new MockContainer();
 
-        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId());
+        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId('beep'));
         $container->addService(InvokableListenerClassNoIdBefore::class, new InvokableListenerClassNoIdBefore());
 
         $builder->listenerService(InvokableListenerClassNoId::class);

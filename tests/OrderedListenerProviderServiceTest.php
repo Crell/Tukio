@@ -295,7 +295,7 @@ class OrderedListenerProviderServiceTest extends TestCase
     public function detects_invoke_method_and_gives_class_id_by_default(): void
     {
         $container = new MockContainer();
-        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId());
+        $container->addService(InvokableListenerClassNoId::class, new InvokableListenerClassNoId('beep'));
 
         $provider = new OrderedListenerProvider($container);
 
