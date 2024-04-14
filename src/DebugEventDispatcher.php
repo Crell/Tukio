@@ -9,10 +9,6 @@ use Psr\Log\LoggerInterface;
 
 class DebugEventDispatcher implements EventDispatcherInterface
 {
-    protected EventDispatcherInterface $dispatcher;
-
-    protected LoggerInterface $logger;
-
     /**
      * DebugEventDispatcher constructor.
      *
@@ -21,11 +17,10 @@ class DebugEventDispatcher implements EventDispatcherInterface
      * @param LoggerInterface $logger
      *   The logger service through which to log.
      */
-    public function __construct(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
-    {
-        $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
-    }
+    public function __construct(
+        protected EventDispatcherInterface $dispatcher,
+        protected LoggerInterface $logger,
+    ) {}
 
     /**
      * {@inheritdoc}

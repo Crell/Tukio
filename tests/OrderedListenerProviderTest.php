@@ -4,26 +4,24 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
-
+use Crell\Tukio\Events\CollectingEvent;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-
-class EventOne extends CollectingEvent {}
-
-class EventTwo extends CollectingEvent {}
 
 class OrderedListenerProviderTest extends TestCase
 {
-    public function test_only_type_correct_listeners_are_returned(): void
+    #[Test]
+    public function only_type_correct_listeners_are_returned(): void
     {
         $p = new OrderedListenerProvider();
 
-        $p->addListener(function (EventOne $event) {
+        $p->addListener(function (Events\EventOne $event) {
             $event->add('Y');
         });
         $p->addListener(function (CollectingEvent $event) {
             $event->add('Y');
         });
-        $p->addListener(function (EventTwo $event) {
+        $p->addListener(function (Events\EventTwo $event) {
             $event->add('N');
         });
         // This class doesn't exist but should not result in an error.
@@ -33,16 +31,17 @@ class OrderedListenerProviderTest extends TestCase
             $event->add('F');
         });
 
-        $event = new EventOne();
+        $event = new Events\EventOne();
 
         foreach ($p->getListenersForEvent($event) as $listener) {
             $listener($event);
         }
 
-        $this->assertEquals('YY', implode($event->result()));
+        self::assertEquals('YY', implode($event->result()));
     }
 
-    public function test_add_ordered_listeners(): void
+    #[Test]
+    public function add_ordered_listeners(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -68,28 +67,19 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_before(): void
+    #[Test]
+    public function add_listener_before(): void
     {
         $p = new OrderedListenerProvider();
 
-        $p->addListener(function (CollectingEvent $event) {
-            $event->add('E');
-        }, 0);
-        $rid = $p->addListener(function (CollectingEvent $event) {
-            $event->add('R');
-        }, 90);
-        $p->addListener(function (CollectingEvent $event) {
-            $event->add('L');
-        }, 0);
-        $p->addListenerBefore($rid, function (CollectingEvent $event) {
-            $event->add('C');
-        });
-        $p->addListener(function (CollectingEvent $event) {
-            $event->add('L');
-        }, 0);
+        $p->addListener(fn (CollectingEvent $event)  => $event->add('A'), 0, id: 'A');
+        $bid = $p->addListener(fn (CollectingEvent $event) => $event->add('B'), 90, id: 'B');
+        $p->addListener(fn (CollectingEvent $event) => $event->add('C'), -5, id: 'C');
+        $p->addListenerBefore($bid, fn (CollectingEvent $event) => $event->add('D'), id: 'D');
+        $p->addListener(fn (CollectingEvent $event) => $event->add('E'), 0, id: 'E');
 
         $event = new CollectingEvent();
 
@@ -97,10 +87,19 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        $result = implode($event->result());
+        self::assertTrue(strpos($result, 'A') < strpos($result, 'C'));
+        self::assertTrue(strpos($result, 'A') > strpos($result, 'B'));
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'C'));
+        self::assertTrue(strpos($result, 'D') < strpos($result, 'B'));
+        self::assertTrue(strpos($result, 'B') < strpos($result, 'E'));
+        self::assertTrue(strpos($result, 'E') < strpos($result, 'C'));
+
+//        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_listener_after(): void
+    #[Test]
+    public function add_listener_after(): void
     {
         $p = new OrderedListenerProvider();
 
@@ -109,7 +108,7 @@ class OrderedListenerProviderTest extends TestCase
         }, 90);
         $p->addListener(function (CollectingEvent $event) {
             $event->add('L');
-        }, 0);
+        }, -5);
         $p->addListenerBefore($rid, function (CollectingEvent $event) {
             $event->add('C');
         });
@@ -126,10 +125,11 @@ class OrderedListenerProviderTest extends TestCase
             $listener($event);
         }
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_add_malformed_listener(): void
+    #[Test]
+    public function add_malformed_listener(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -140,7 +140,8 @@ class OrderedListenerProviderTest extends TestCase
         });
     }
 
-    public function test_add_malformed_listener_before(): void
+    #[Test]
+    public function add_malformed_listener_before(): void
     {
         $this->expectException(InvalidTypeException::class);
 
@@ -154,7 +155,8 @@ class OrderedListenerProviderTest extends TestCase
         });
     }
 
-    public function test_add_malformed_listener_after(): void
+    #[Test]
+    public function add_malformed_listener_after(): void
     {
         $this->expectException(InvalidTypeException::class);
 

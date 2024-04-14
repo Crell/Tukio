@@ -1,11 +1,8 @@
 <?php
 
-declare(strict_types=1);
+namespace Crell\Tukio\Fakes;
 
-namespace Crell\Tukio;
-
-
-class CollectingEvent
+class ListenedDirectly implements EventParentInterface
 {
     protected array $out = [];
 
@@ -18,5 +15,4 @@ class CollectingEvent
     {
         return $this->out;
     }
-
 }

@@ -10,24 +10,22 @@ class ListenerProxy
 {
     use ParameterDeriverTrait;
 
-    protected OrderedProviderInterface $provider;
-
-    protected string $serviceName;
-
-    protected string $serviceClass;
-
     /**
      * @var array<string>
      *     Methods that have already been registered on this subscriber, so we know not to double-subscribe them.
      */
     protected array $registeredMethods = [];
 
-    public function __construct(OrderedProviderInterface $provider, string $serviceName, string $serviceClass)
-    {
-        $this->provider = $provider;
-        $this->serviceName = $serviceName;
-        $this->serviceClass = $serviceClass;
-    }
+    /**
+     * @param OrderedProviderInterface $provider
+     * @param string $serviceName
+     * @param class-string $serviceClass
+     */
+    public function __construct(
+        protected OrderedProviderInterface $provider,
+        protected string $serviceName,
+        protected string $serviceClass
+    ) {}
 
     /**
      * Adds a method on a service as a listener.
@@ -57,7 +55,7 @@ class ListenerProxy
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * @param string $before
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
@@ -69,11 +67,11 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerBefore(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
+    public function addListenerBefore(string $before, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-        return $this->provider->addListenerServiceBefore($pivotId, $this->serviceName, $methodName, $type, $id);
+        return $this->provider->addListenerServiceBefore($before, $this->serviceName, $methodName, $type, $id);
     }
 
     /**
@@ -82,7 +80,7 @@ class ListenerProxy
      * Note: The new listener is only guaranteed to come before the specified existing listener. No guarantee is made
      * regarding when it comes relative to any other listener.
      *
-     * @param string $pivotId
+     * @param string $after
      *   The ID of an existing listener.
      * @param string $methodName
      *   The method name of the service that is the listener being registered.
@@ -94,11 +92,11 @@ class ListenerProxy
      * @return string
      *   The opaque ID of the listener.  This can be used for future reference.
      */
-    public function addListenerAfter(string $pivotId, string $methodName, ?string $id = null, ?string $type = null): string
+    public function addListenerAfter(string $after, string $methodName, ?string $id = null, ?string $type = null): string
     {
         $type = $type ?? $this->getServiceMethodType($methodName);
         $this->registeredMethods[] = $methodName;
-        return $this->provider->addListenerServiceAfter($pivotId, $this->serviceName, $methodName, $type, $id);
+        return $this->provider->addListenerServiceAfter($after, $this->serviceName, $methodName, $type, $id);
     }
 
     /**
@@ -124,6 +122,9 @@ class ListenerProxy
     protected function getServiceMethodType(string $methodName): string
     {
         try {
+            // We don't have a real object here, so we cannot use first-class-closures.
+            // PHPStan complains that an array is not a callable, even though it is, because PHP.
+            // @phpstan-ignore-next-line
             $type = $this->getParameterType([$this->serviceClass, $methodName]);
         } catch (\InvalidArgumentException $exception) {
             throw InvalidTypeException::fromClassCallable($this->serviceClass, $methodName, $exception);

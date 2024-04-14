@@ -2,8 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Crell\Tukio;
+namespace Crell\Tukio\Listeners;
 
+
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\ListenerProxy;
+use Crell\Tukio\NoEvent;
+use Crell\Tukio\SubscriberInterface;
 
 class MockSubscriber implements SubscriberInterface
 {

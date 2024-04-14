@@ -26,7 +26,7 @@ class CallbackProvider implements ListenerProviderInterface
             if ($event instanceof $type) {
                 foreach ($callbacks as $callback) {
                     if (method_exists($subject, $callback)) {
-                        yield [$subject, $callback];
+                        yield $subject->$callback(...);
                     }
                 }
             }

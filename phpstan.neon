@@ -1,15 +1,9 @@
 parameters:
-    level: 6
+    level: 8
     paths:
         - src
         - tests
     checkGenericClassInNonGenericObjectType: false
-    excludePaths:
-        # Attribute classes use PHP 8 syntax that's invalid on 7.4, but we don't care.
-        - src/Listener.php
-        - src/ListenerBefore.php
-        - src/ListenerAfter.php
-        - src/ListenerPriority.php
     ignoreErrors:
         -
             message: '#type has no value type specified in iterable type array#'
@@ -17,3 +11,6 @@ parameters:
         -
             message: '#type has no value type specified in iterable type iterable#'
             path: tests/
+        # PHPStan is overly aggressive on readonly properties.
+        - '#Class (.*) has an uninitialized readonly property (.*). Assign it in the constructor.#'
+        - '#Readonly property (.*) is assigned outside of the constructor.#'

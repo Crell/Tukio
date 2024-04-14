@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Crell\Tukio;
 
+use Crell\Tukio\Events\CollectingEvent;
+use Crell\Tukio\Events\StoppableCollectingEvent;
+use Crell\Tukio\Fakes\MockLogger;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Psr\Log\AbstractLogger;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 class DispatcherTest extends TestCase
@@ -21,7 +23,8 @@ class DispatcherTest extends TestCase
         $this->logger = new MockLogger();
     }
 
-    public function test_dispatcher_calls_all_listeners() : void
+    #[Test]
+    public function dispatcher_calls_all_listeners() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
@@ -39,10 +42,11 @@ class DispatcherTest extends TestCase
         $event = new CollectingEvent();
         $p->dispatch($event);
 
-        $this->assertEquals('CRELL', implode($event->result()));
+        self::assertEquals('CRELL', implode($event->result()));
     }
 
-    public function test_stoppable_events_stop() : void {
+    #[Test]
+    public function stoppable_events_stop() : void {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
             {
@@ -59,10 +63,11 @@ class DispatcherTest extends TestCase
         $event = new StoppableCollectingEvent();
         $p->dispatch($event);
 
-        $this->assertEquals('CRE', implode($event->result()));
+        self::assertEquals('CRE', implode($event->result()));
     }
 
-    public function test_listener_exception_logged() : void
+    #[Test]
+    public function listener_exception_logged() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
@@ -83,19 +88,20 @@ class DispatcherTest extends TestCase
             $this->fail('No exception was bubbled up.');
         }
         catch (\Exception $e) {
-            $this->assertEquals('Fail!', $e->getMessage());
+            self::assertEquals('Fail!', $e->getMessage());
         }
 
-        $this->assertEquals('CR', implode($event->result()));
+        self::assertEquals('CR', implode($event->result()));
 
-        $this->assertArrayHasKey(LogLevel::WARNING, $this->logger->messages);
-        $this->assertCount(1, $this->logger->messages[LogLevel::WARNING]);
+        self::assertArrayHasKey(LogLevel::WARNING, $this->logger->messages);
+        self::assertCount(1, $this->logger->messages[LogLevel::WARNING]);
         $entry = $this->logger->messages[LogLevel::WARNING][0];
-        $this->assertEquals('Unhandled exception thrown from listener while processing event.', $entry['message']);
-        $this->assertEquals($event, $entry['context']['event']);
+        self::assertEquals('Unhandled exception thrown from listener while processing event.', $entry['message']);
+        self::assertEquals($event, $entry['context']['event']);
     }
 
-    public function test_already_stopped_event_calls_no_listeners() : void
+    #[Test]
+    public function already_stopped_event_calls_no_listeners() : void
     {
         $provider = new class implements ListenerProviderInterface {
             public function getListenersForEvent(object $event): iterable
@@ -111,6 +117,6 @@ class DispatcherTest extends TestCase
 
         $d->dispatch($event);
 
-        $this->assertEquals('', implode($event->result()));
+        self::assertEquals('', implode($event->result()));
     }
 }
