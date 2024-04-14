@@ -231,9 +231,9 @@ Of note, the `methodB` Listener is referencing the `methodA` listener by an expl
 The preferred way to configure Tukio, however, is via attributes.  There are four relevant attributes: `Listener`, `ListenerPriority`, `ListenerBefore`, and `ListenerAfter`.  All can be used with sequential parameters or named parameters.  In most cases, named parameters will be more self-documenting.  All attributes are valid only on functions and methods.
 
 * `Listener` declares a callable a listener and optionally sets the `id` and `type`: `#[Listener(id: 'a_listener', type: 'SomeClass')].
-* `ListenerPriority` has a required `priority` parameter, and optional `id` and `type: `#[ListenerPriority(5)]` or `#[ListenerPriority(priority: 3, id: "a_listener")]`.
-* `ListenerBefore` has a required `before` parameter, and optional `id` and `type: `#[ListenerBefore('other_listener')]` or `#[ListenerBefore(before: 'other_listener', id: "a_listener")]`.
-* `ListenerAfter` has a required `after` parameter, and optional `id` and `type: `#[ListenerAfter('other_listener')]` or `#[ListenerAfter(after: ['other_listener'], id: "a_listener")]`.
+* `ListenerPriority` has a required `priority` parameter, and optional `id` and `type`: `#[ListenerPriority(5)]` or `#[ListenerPriority(priority: 3, id: "a_listener")]`.
+* `ListenerBefore` has a required `before` parameter, and optional `id` and `type`: `#[ListenerBefore('other_listener')]` or `#[ListenerBefore(before: 'other_listener', id: "a_listener")]`.
+* `ListenerAfter` has a required `after` parameter, and optional `id` and `type`: `#[ListenerAfter('other_listener')]` or `#[ListenerAfter(after: ['other_listener'], id: "a_listener")]`.
 
 The `$before` and `$after` parameters will accept either a single string, or an array of strings.
 
