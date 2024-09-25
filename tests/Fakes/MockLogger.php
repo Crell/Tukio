@@ -17,7 +17,7 @@ class MockLogger extends AbstractLogger
     /**
      * @param array<string, string> $context
      */
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $this->messages[$level][] = [
             'message' => $message,

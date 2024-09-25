@@ -3,8 +3,9 @@ parameters:
     paths:
         - src
         - tests
-    checkGenericClassInNonGenericObjectType: false
     ignoreErrors:
+        -
+            identifier: missingType.generics
         -
             message: '#type has no value type specified in iterable type array#'
             path: tests/
